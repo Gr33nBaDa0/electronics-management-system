@@ -16,6 +16,7 @@ import entity.NhanVien;
 import entity.PhanCongCa;
 
 public class HoaDon_DAO {
+
     private final ChiTietHoaDon_DAO ct = new ChiTietHoaDon_DAO();
 
     public HoaDon tim(String ma) throws SQLException {
