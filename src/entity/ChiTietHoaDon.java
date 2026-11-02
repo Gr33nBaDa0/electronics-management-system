@@ -1,14 +1,13 @@
 package entity;
 
-import java.math.BigDecimal;
 
 public class ChiTietHoaDon {
     private HoaDon hoaDon;
     private SanPham sanPham;
     private int soLuong;
     private ChuongTrinhKhuyenMai chuongTrinhKhuyenMai;
-    private BigDecimal donGia;
-    private BigDecimal giamGia;
+    private double donGia;
+    private double giamGia;
 
     public ChiTietHoaDon() {}
 
@@ -19,7 +18,7 @@ public class ChiTietHoaDon {
 
 
     public ChiTietHoaDon(HoaDon hoaDon, SanPham sanPham, int soLuong, ChuongTrinhKhuyenMai chuongTrinhKhuyenMai,
-			BigDecimal donGia, BigDecimal giamGia) {
+			double donGia, double giamGia) {
 		this.hoaDon = hoaDon;
 		this.sanPham = sanPham;
 		this.soLuong = soLuong;
@@ -60,24 +59,24 @@ public class ChiTietHoaDon {
         this.chuongTrinhKhuyenMai = chuongTrinhKhuyenMai;
     }
 
-    public BigDecimal getDonGia() {
+    public double getDonGia() {
         return donGia;
     }
 
-    public void setDonGia(BigDecimal donGia) {
+    public void setDonGia(double donGia) {
         this.donGia = donGia;
     }
 
-    public BigDecimal getGiamGia() {
+    public double getGiamGia() {
         return giamGia;
     }
 
-    public void setGiamGia(BigDecimal giamGia) {
+    public void setGiamGia(double giamGia) {
         this.giamGia = giamGia;
     }
 
-    public BigDecimal getThanhTienChiTiet() {
-        return donGia.multiply(BigDecimal.valueOf(soLuong)).subtract(giamGia);
+    public double getThanhTienChiTiet() {
+        return donGia * soLuong - giamGia;
     }
 
     @Override

@@ -1,12 +1,11 @@
 package entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class ChuongTrinhKhuyenMai {
     private String maKhuyenMai;
     private String tenChuongTrinh;
-    private BigDecimal giaTriGiam;
+    private double giaTriGiam;
     private LocalDate ngayBatDau;
     private LocalDate ngayKetThuc;
     private String trangThai;
@@ -19,7 +18,7 @@ public class ChuongTrinhKhuyenMai {
 
     
 
-    public ChuongTrinhKhuyenMai(String maKhuyenMai, String tenChuongTrinh, BigDecimal giaTriGiam, LocalDate ngayBatDau,
+    public ChuongTrinhKhuyenMai(String maKhuyenMai, String tenChuongTrinh, double giaTriGiam, LocalDate ngayBatDau,
 			LocalDate ngayKetThuc, String trangThai) {
 		this.maKhuyenMai = maKhuyenMai;
 		this.tenChuongTrinh = tenChuongTrinh;
@@ -45,11 +44,11 @@ public class ChuongTrinhKhuyenMai {
         this.tenChuongTrinh = tenChuongTrinh;
     }
 
-    public BigDecimal getGiaTriGiam() {
+    public double getGiaTriGiam() {
         return giaTriGiam;
     }
 
-    public void setGiaTriGiam(BigDecimal giaTriGiam) {
+    public void setGiaTriGiam(double giaTriGiam) {
         this.giaTriGiam = giaTriGiam;
     }
 

@@ -1,6 +1,5 @@
 package entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class HoaDon {
@@ -10,7 +9,7 @@ public class HoaDon {
     private LocalDateTime ngayLap;
     private String hinhThucThanhToan;
     private String trangThaiThanhToan;
-    private BigDecimal thueSuatVAT;
+    private double thueSuatVAT;
     private PhanCongCa phanCongCa;
     private int diemSuDung;
 
@@ -21,7 +20,7 @@ public class HoaDon {
     }
 
     public HoaDon(String maHoaDon, KhachHang khachHang, NhanVien nhanVien, LocalDateTime ngayLap,
-			String hinhThucThanhToan, String trangThaiThanhToan, BigDecimal thueSuatVAT, PhanCongCa phanCongCa,
+			String hinhThucThanhToan, String trangThaiThanhToan, double thueSuatVAT, PhanCongCa phanCongCa,
 			int diemSuDung) {
 		this.maHoaDon = maHoaDon;
 		this.khachHang = khachHang;
@@ -82,11 +81,11 @@ public class HoaDon {
         this.trangThaiThanhToan = trangThaiThanhToan;
     }
 
-    public BigDecimal getThueSuatVAT() {
+    public double getThueSuatVAT() {
         return thueSuatVAT;
     }
 
-    public void setThueSuatVAT(BigDecimal thueSuatVAT) {
+    public void setThueSuatVAT(double thueSuatVAT) {
         this.thueSuatVAT = thueSuatVAT;
     }
 
