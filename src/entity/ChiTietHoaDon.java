@@ -7,7 +7,6 @@ public class ChiTietHoaDon {
     private int soLuong;
     private ChuongTrinhKhuyenMai chuongTrinhKhuyenMai;
     private double donGia;
-    private double giamGia;
 
     public ChiTietHoaDon() {}
 
@@ -18,13 +17,12 @@ public class ChiTietHoaDon {
 
 
     public ChiTietHoaDon(HoaDon hoaDon, SanPham sanPham, int soLuong, ChuongTrinhKhuyenMai chuongTrinhKhuyenMai,
-			double donGia, double giamGia) {
+			double donGia) {
 		this.hoaDon = hoaDon;
 		this.sanPham = sanPham;
 		this.soLuong = soLuong;
 		this.chuongTrinhKhuyenMai = chuongTrinhKhuyenMai;
 		this.donGia = donGia;
-		this.giamGia = giamGia;
 	}
 
 	public HoaDon getHoaDon() {
@@ -68,15 +66,39 @@ public class ChiTietHoaDon {
     }
 
     public double getGiamGia() {
-        return giamGia;
-    }
-
-    public void setGiamGia(double giamGia) {
-        this.giamGia = giamGia;
+        if (chuongTrinhKhuyenMai == null) return 0.0;
+        return HoaDon.lamTronTien(
+                donGia * soLuong * chuongTrinhKhuyenMai.getGiaTriGiam() / 100.0);
     }
 
     public double getThanhTienChiTiet() {
-        return donGia * soLuong - giamGia;
+        return getTienHang() - getGiamGia();
+    }
+
+    public double getTienHang() { return donGia * soLuong; }
+    public double getTienThucTraPhanBo(java.util.List<ChiTietHoaDon> ds, HoaDon h) {
+        for (Object[] dong : h.phanBoTienThucTra(ds)) {
+            if (sanPham.getMaSanPham().equals(dong[0])) {
+                return ((Number) dong[1]).doubleValue();
+            }
+        }
+        throw new IllegalArgumentException("Dòng hàng không thuộc hóa đơn.");
+    }
+    public int getSoLuongConDuocTra(java.util.List<ChiTietDoiTra> cacLanTra) {
+        int daTra = 0;
+        for (ChiTietDoiTra d : cacLanTra) {
+            ChiTietHoaDon goc = d.getChiTietHoaDon();
+            PhieuDoiTra p = d.getPhieuDoiTra();
+            if (p != null && !"Từ chối".equals(p.getTrangThai())
+                    && hoaDon.getMaHoaDon().equals(goc.getHoaDon().getMaHoaDon())
+                    && sanPham.getMaSanPham().equals(goc.getSanPham().getMaSanPham())) daTra += d.getSoLuong();
+        }
+        return soLuong - daTra;
+    }
+    public java.time.LocalDate getHanBaoHanhThamKhao() {
+        if (hoaDon == null || hoaDon.getNgayLap() == null || sanPham == null
+                || sanPham.getBaoHanhThang() <= 0) return null;
+        return hoaDon.getNgayLap().toLocalDate().plusMonths(sanPham.getBaoHanhThang());
     }
 
     @Override

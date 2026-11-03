@@ -34,8 +34,9 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 public class HoaDon_GUI extends JPanel implements ActionListener {
-    // Màu dùng chung được khai báo ở đầu lớp.
-    private static final Color PRIMARY = GiaoDien.PRIMARY,
+    private static final long serialVersionUID = 1L;
+
+	private static final Color PRIMARY = GiaoDien.PRIMARY,
             DARK = GiaoDien.DARK,
             BACKGROUND = GiaoDien.BACKGROUND,
             SURFACE = GiaoDien.SURFACE,
@@ -231,7 +232,7 @@ public class HoaDon_GUI extends JPanel implements ActionListener {
                                             + "\nThời hạn sản phẩm hiện tại: "
                                             + thang
                                             + " tháng\nHạn tham khảo: "
-                                            + h.getNgayLap().toLocalDate().plusMonths(thang)
+                                            + d.getHanBaoHanhThamKhao()
                                             + "\n"
                                             + "Vui lòng đối chiếu chứng từ và điều kiện bảo hành"
                                             + " thực tế.");

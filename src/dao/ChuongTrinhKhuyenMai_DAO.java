@@ -15,6 +15,32 @@ import java.util.List;
 
 public class ChuongTrinhKhuyenMai_DAO {
 
+    public String layMaTiepTheo() throws SQLException {
+        return taoMaTiepTheo(ConnectDB.getConnection(), false);
+    }
+
+    private String taoMaTiepTheo(Connection con, boolean khoa) throws SQLException {
+        if (con == null || con.isClosed()) throw new SQLException("Chưa kết nối SQL.");
+        String tienTo = "KM" + LocalDate.now().getYear();
+        String sql = "SELECT MaKhuyenMai FROM dbo.ChuongTrinhKhuyenMai"
+                + (khoa ? " WITH (UPDLOCK,HOLDLOCK)" : "")
+                + " WHERE MaKhuyenMai LIKE ? ORDER BY MaKhuyenMai DESC";
+        int lonNhat = 0;
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, tienTo + "%");
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String ma = rs.getString("MaKhuyenMai");
+                    if (ma != null && ma.matches("(?i)" + tienTo + "[0-9]{3}")) {
+                        lonNhat = Math.max(lonNhat, Integer.parseInt(ma.substring(tienTo.length())));
+                    }
+                }
+            }
+        }
+        if (lonNhat >= 999) throw new SQLException("Đã hết dải mã khuyến mãi năm " + LocalDate.now().getYear() + ".");
+        return tienTo + String.format(java.util.Locale.ROOT, "%03d", lonNhat + 1);
+    }
+
     public List<ChuongTrinhKhuyenMai> getAllChuongTrinhKhuyenMai() throws SQLException {
         List<ChuongTrinhKhuyenMai> ds = new ArrayList<>();
         String sql = "SELECT * FROM dbo.ChuongTrinhKhuyenMai ORDER BY MaKhuyenMai";
@@ -82,12 +108,13 @@ public class ChuongTrinhKhuyenMai_DAO {
                     || x.getGiaTriGiam() > 50.0) {
                 throw new SQLException("Ngày hoặc % giảm không hợp lệ (0 đến 50%).");
             }
+            String maMoi = taoMaTiepTheo(con, true);
             String sql =
                     "INSERT INTO dbo.ChuongTrinhKhuyenMai"
                         + " (MaKhuyenMai,TenChuongTrinh,GiaTriGiam,NgayBatDau,NgayKetThuc,TrangThai)"
                         + " VALUES (?,?,?,?,?,?)";
             try (PreparedStatement stmt = con.prepareStatement(sql)) {
-                stmt.setString(1, x.getMaKhuyenMai());
+                stmt.setString(1, maMoi);
                 stmt.setString(2, x.getTenChuongTrinh());
                 stmt.setDouble(3, x.getGiaTriGiam());
                 stmt.setDate(4, java.sql.Date.valueOf(x.getNgayBatDau()));
@@ -96,6 +123,7 @@ public class ChuongTrinhKhuyenMai_DAO {
                 stmt.executeUpdate();
             }
             con.commit();
+            x.setMaKhuyenMai(maMoi);
         } catch (SQLException | RuntimeException e) {
             con.rollback();
             throw e;
@@ -136,12 +164,7 @@ public class ChuongTrinhKhuyenMai_DAO {
     }
 
     static boolean hieuLuc(ChuongTrinhKhuyenMai x, LocalDate ngay) {
-        return x != null
-                && "Đang áp dụng".equals(x.getTrangThai())
-                && !(ngay.isBefore(x.getNgayBatDau()))
-                && !(ngay.isAfter(x.getNgayKetThuc()))
-                && Double.isFinite(x.getGiaTriGiam()) && x.getGiaTriGiam() >= 0
-                && x.getGiaTriGiam() <= 50.0;
+        return x != null && x.isDangHieuLuc(ngay);
     }
 
     public boolean updateChuongTrinhKhuyenMai(ChuongTrinhKhuyenMai x, TaiKhoan tk)
@@ -157,6 +180,20 @@ public class ChuongTrinhKhuyenMai_DAO {
                     || !Double.isFinite(x.getGiaTriGiam()) || x.getGiaTriGiam() < 0
                     || x.getGiaTriGiam() > 50.0) {
                 throw new SQLException("Ngày hoặc % giảm không hợp lệ (0 đến 50%).");
+            }
+            ChuongTrinhKhuyenMai cu = tim(con, x.getMaKhuyenMai());
+            if (cu != null && Double.compare(cu.getGiaTriGiam(), x.getGiaTriGiam()) != 0) {
+                String sqlDaDung = "SELECT MaHoaDon FROM dbo.ChiTietHoaDon"
+                        + " WITH (UPDLOCK,HOLDLOCK) WHERE MaKhuyenMai=?";
+                try (PreparedStatement stmt = con.prepareStatement(sqlDaDung)) {
+                    stmt.setString(1, x.getMaKhuyenMai());
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        if (rs.next()) {
+                            throw new SQLException("Khuyến mãi đã dùng trong hóa đơn."
+                                    + " Tạo chương trình mới nếu muốn đổi % giảm.");
+                        }
+                    }
+                }
             }
             String sql2 =
                     "UPDATE dbo.ChuongTrinhKhuyenMai SET"

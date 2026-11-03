@@ -29,8 +29,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class ThanhToan_GUI extends JDialog implements ActionListener {
-    // Màu dùng chung được khai báo ở đầu lớp.
-    private static final Color PRIMARY = GiaoDien.PRIMARY,
+    private static final long serialVersionUID = 1L;
+
+	private static final Color PRIMARY = GiaoDien.PRIMARY,
             DARK = GiaoDien.DARK,
             BACKGROUND = GiaoDien.BACKGROUND,
             SURFACE = GiaoDien.SURFACE,
@@ -61,10 +62,7 @@ public class ThanhToan_GUI extends JDialog implements ActionListener {
             throw new IllegalArgumentException(
                     "Hóa đơn không tồn tại hoặc không còn chờ thanh toán.");
         total =
-                InHoaDon.phaiTra(
-                        new ChiTietHoaDon_DAO().getTheoHoaDon(ma),
-                        h.getDiemSuDung(),
-                        h.getThueSuatVAT());
+                h.getTongThanhToan(new ChiTietHoaDon_DAO().getTheoHoaDon(ma));
         JPanel p = new JPanel();
         GiaoDien.boCuc(p);
         JLabel soTien = new JLabel(formatGia(total) + " VND");
@@ -165,7 +163,6 @@ public class ThanhToan_GUI extends JDialog implements ActionListener {
         }
     }
 
-    /** Cách bố trí QR và nút xác nhận nhận tiền theo file mẫu. */
     private boolean hienThiDialogQR() throws Exception {
         java.awt.image.BufferedImage img = InHoaDon.taoQR(ma, total);
         final boolean[] daNhanTien = {false};
@@ -226,7 +223,7 @@ public class ThanhToan_GUI extends JDialog implements ActionListener {
     private void hienTienThua() {
         if (hinhThuc.getSelectedIndex() != 0) return;
         try {
-            double thua = InHoaDon.tron(InHoaDon.soTien(tienNhan.getText()) - total);
+            double thua = HoaDon.tinhTienThua(InHoaDon.soTien(tienNhan.getText()), total);
             lblTienThua.setForeground(thua < 0 ? ERROR : PRIMARY);
             lblTienThua.setText(
                     (thua < 0 ? "Còn thiếu: " : "Tiền trả lại: ")

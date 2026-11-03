@@ -42,16 +42,14 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.format.DateTimeFormatter;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-/** Các hàm in hóa đơn, tính tiền, điểm tích lũy và tạo QR ngân hàng. */
+
 public final class InHoaDon {
-    // Thông tin cửa hàng dùng chung trên hóa đơn.
     private static final String TEN_CUA_HANG = "GREENSMART", DIA_CHI_CUA_HANG = "12 Nguyễn Văn Bảo", SDT_CUA_HANG = "0343519459";
 
     public static String noiDung(HoaDon h, List<ChiTietHoaDon> ds) {
@@ -65,7 +63,7 @@ public final class InHoaDon {
                     .append(d.getSoLuong()).append(" x ").append(tien(d.getDonGia())).append("; giảm ").append(tien(d.getGiamGia()))
                     .append("; còn ").append(tien(d.getThanhTienChiTiet())).append("\n");
         s.append("\nTổng hàng: ").append(tien(tongHang(ds))).append("\nGiảm khuyến mãi: ")
-                .append(tien(tron(tongHang(ds) - sauKhuyenMai(ds)))).append("\nĐiểm dùng: ").append(h.getDiemSuDung()).append("\nVAT: ")
+                .append(tien(h.getTongGiamKhuyenMai(ds))).append("\nĐiểm dùng: ").append(h.getDiemSuDung()).append("\nVAT: ")
                 .append(tien(vat(ds, h.getDiemSuDung(), h.getThueSuatVAT()))).append("\nPHẢI TRẢ: ")
                 .append(tien(phaiTra(ds, h.getDiemSuDung(), h.getThueSuatVAT()))).append(" VND\n\nCảm ơn quý khách!");
         return s.toString();
@@ -73,82 +71,53 @@ public final class InHoaDon {
 
     public static final double MOT_DIEM = 1000.0;
 
-    // Làm tròn tiền đến 2 chữ số, đối xứng cho cả tiền âm.
     public static double tron(double n) {
-        if (!Double.isFinite(n) || !Double.isFinite(n * 100.0))
-            throw new IllegalArgumentException("Số tiền không hợp lệ.");
-        double giaTri = Math.abs(n) * 100.0;
-        // Bù sai số nhị phân ngay sát mốc nửa xu; số lớn đã không còn phần lẻ xu.
-        double ketQua = giaTri < 4503599627370496.0
-                ? Math.floor(Math.nextUp(giaTri) + 0.5) : giaTri;
-        double tien = Math.copySign(ketQua / 100.0, n);
-        return tien == 0.0 ? 0.0 : tien;
+        return HoaDon.lamTronTien(n);
     }
 
     public static int soSanhTien(double a, double b) {
-        return Double.compare(tron(a), tron(b));
+        return HoaDon.soSanhTien(a, b);
     }
 
     public static double tongHang(List<ChiTietHoaDon> ds) {
-        double tong = 0.0;
-        for (ChiTietHoaDon d : ds) tong += d.getDonGia() * d.getSoLuong();
-        return tron(tong);
+        return new HoaDon().getTongTienHang(ds);
     }
 
     public static double sauKhuyenMai(List<ChiTietHoaDon> ds) {
-        double tong = 0.0;
-        for (ChiTietHoaDon d : ds) tong += d.getThanhTienChiTiet();
-        return tron(tong);
+        return new HoaDon().getTongTienSauKhuyenMai(ds);
     }
 
     public static int diemToiDa(double sauGiam, int soDu) {
-        double diem = Math.floor(tron(sauGiam) / 2000.0);
-        return (int) Math.min(soDu, diem);
+        return HoaDon.tinhDiemSuDungToiDa(sauGiam, soDu);
     }
 
     public static double vat(List<ChiTietHoaDon> ds, int diem, double thue) {
-        return tron((sauKhuyenMai(ds) - MOT_DIEM * diem) * thue);
+        HoaDon h = new HoaDon(); h.setDiemSuDung(diem); h.setThueSuatVAT(thue);
+        return h.getTienVAT(ds);
     }
 
     public static double phaiTra(List<ChiTietHoaDon> ds, int diem, double thue) {
-        return tron(sauKhuyenMai(ds) - MOT_DIEM * diem + vat(ds, diem, thue));
+        HoaDon h = new HoaDon(); h.setDiemSuDung(diem); h.setThueSuatVAT(thue);
+        return h.getTongThanhToan(ds);
     }
 
     public static int diemCong(double thanhToan) {
-        double diem = tron(thanhToan) / 100000.0;
-        diem = diem < 0 ? Math.ceil(diem) : Math.floor(diem);
-        if (diem > Integer.MAX_VALUE || diem < Integer.MIN_VALUE)
-            throw new ArithmeticException("Số điểm vượt giới hạn cho phép.");
-        return (int) diem;
+        return HoaDon.tinhDiemDuocCong(thanhToan);
     }
 
-    // Làm tròn lũy kế để lần trả cuối nhận đúng phần tiền còn lại.
     public static double luyKe(double giaTri, int daTra, int tongSoLuong) {
-        if (tongSoLuong <= 0) throw new IllegalArgumentException("Số lượng gốc phải lớn hơn 0.");
-        return tron(giaTri * daTra / tongSoLuong);
+        return entity.ChiTietDoiTra.tienLuyKe(giaTri, daTra, tongSoLuong);
     }
 
-    public static Map<String, Double> phanBo(List<ChiTietHoaDon> ds, int diem, double thue) {
-        Map<String, Double> kq = new LinkedHashMap<>();
-        double hang = sauKhuyenMai(ds), tong = phaiTra(ds, diem, thue);
-        double daPhanBo = 0.0, luyKeHang = 0.0;
-        for (int i = 0; i < ds.size(); i++) {
-            ChiTietHoaDon d = ds.get(i);
-            luyKeHang = tron(luyKeHang + d.getThanhTienChiTiet());
-            double muc = i == ds.size() - 1 ? tong
-                    : (hang == 0.0 ? 0.0 : tron(tong * luyKeHang / hang));
-            double tien = tron(muc - daPhanBo);
-            kq.put(d.getSanPham().getMaSanPham(), tien);
-            daPhanBo = tron(daPhanBo + tien);
-        }
-        return kq;
+    public static List<Object[]> phanBo(List<ChiTietHoaDon> ds, int diem, double thue) {
+        HoaDon h = new HoaDon(); h.setDiemSuDung(diem); h.setThueSuatVAT(thue);
+        return h.phanBoTienThucTra(ds);
     }
 
     public static String tien(double n) {
         return new DecimalFormat("#,##0.##", DecimalFormatSymbols.getInstance(Locale.US)).format(tron(n));
     }
 
-    // Ô nhập tiền dùng dấu phẩy hàng nghìn và dấu chấm thập phân.
     public static double soTien(String s) {
         double giaTri = Double.parseDouble(s.trim().replace(",", ""));
         if (!Double.isFinite(giaTri) || !Double.isFinite(giaTri * 100.0))
@@ -199,7 +168,6 @@ public final class InHoaDon {
         }
     }
 
-    /** Đọc cả PNG lẫn toàn bộ SVG (ảnh nền, chữ, logo và các ô QR dạng vector). */
     private static BufferedImage docAnhQR(byte[] data) throws IOException {
         BufferedImage anh = ImageIO.read(new ByteArrayInputStream(data));
         if (anh != null) return anh;
@@ -228,7 +196,6 @@ public final class InHoaDon {
         }
     }
 
-    /** Xuất PDF từ hóa đơn đã lưu; chỉ đọc dữ liệu, không ghi lại thanh toán. */
     public static File xuatFilePDF(String ma) throws Exception {
         HoaDon h = new dao.HoaDon_DAO().tim(ma);
         if (h == null || !"Đã thanh toán".equals(h.getTrangThaiThanhToan()))
@@ -269,15 +236,18 @@ public final class InHoaDon {
             String tenNV = hd.getNhanVien() == null ? "---" : hd.getNhanVien().getHoTen();
             if (tenNV == null || tenNV.isBlank()) tenNV = hd.getNhanVien().getMaNhanVien();
             String pttt = hd.getHinhThucThanhToan();
-            Map<String, String> cacKM = new LinkedHashMap<>();
+            List<String> maKM = new ArrayList<>(), tenKM = new ArrayList<>();
             for (ChiTietHoaDon ct : gioHang) {
                 entity.ChuongTrinhKhuyenMai km = ct.getChuongTrinhKhuyenMai();
-                if (km != null) cacKM.put(km.getMaKhuyenMai(), km.getTenChuongTrinh() == null
-                        || km.getTenChuongTrinh().isBlank() ? km.getMaKhuyenMai() : km.getTenChuongTrinh());
+                if (km != null && !maKM.contains(km.getMaKhuyenMai())) {
+                    maKM.add(km.getMaKhuyenMai());
+                    tenKM.add(km.getTenChuongTrinh() == null || km.getTenChuongTrinh().isBlank()
+                            ? km.getMaKhuyenMai() : km.getTenChuongTrinh());
+                }
             }
-            double giamGia = tron(tongHang(gioHang) - sauKhuyenMai(gioHang));
-            String khuyenMai = cacKM.isEmpty() ? (giamGia == 0 ? "Không" : "Giảm theo sản phẩm")
-                    : String.join(", ", cacKM.values());
+            double giamGia = hd.getTongGiamKhuyenMai(gioHang);
+            String khuyenMai = tenKM.isEmpty() ? (giamGia == 0 ? "Không" : "Giảm theo sản phẩm")
+                    : String.join(", ", tenKM);
             document.add(new Paragraph()
                     .add("Mã HĐ     : " + hd.getMaHoaDon() + "\n")
                     .add("Ngày      : " + (hd.getNgayLap() == null ? "" : hd.getNgayLap()
@@ -307,10 +277,10 @@ public final class InHoaDon {
             }
             document.add(table.setFontSize(10));
 
-            double tienDiem = MOT_DIEM * hd.getDiemSuDung();
-            double truocVAT = tron(sauKhuyenMai(gioHang) - tienDiem);
-            double tienVAT = vat(gioHang, hd.getDiemSuDung(), hd.getThueSuatVAT());
-            double thanhToan = phaiTra(gioHang, hd.getDiemSuDung(), hd.getThueSuatVAT());
+            double tienDiem = hd.getTienGiamTuDiem();
+            double truocVAT = hd.getTongTruocVAT(gioHang);
+            double tienVAT = hd.getTienVAT(gioHang);
+            double thanhToan = hd.getTongThanhToan(gioHang);
             String thueSuat = tien(hd.getThueSuatVAT() * 100.0);
             Div tong = new Div().setKeepTogether(true).setMarginTop(18);
             tong.add(new Paragraph("Tổng tiền hàng : " + tien(tongHang(gioHang)) + " VND").setTextAlignment(TextAlignment.RIGHT));

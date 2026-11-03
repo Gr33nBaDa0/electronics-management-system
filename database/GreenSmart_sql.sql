@@ -1,14 +1,9 @@
-
+﻿
 
 USE [master];
 GO
-IF DB_ID(N'GreenSmart') IS NOT NULL
-BEGIN
-    ALTER DATABASE [GreenSmart] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE [GreenSmart];
-END
-GO
-CREATE DATABASE [GreenSmart];
+IF DB_ID(N'GreenSmart') IS NULL
+    EXEC(N'CREATE DATABASE [GreenSmart]');
 GO
 USE [GreenSmart];
 GO
@@ -42,7 +37,7 @@ VALUES
 CREATE TABLE TaiKhoan (
     TenDangNhap VARCHAR(5) NOT NULL PRIMARY KEY,
     Quyen VARCHAR(10) NOT NULL,
-    MatKhau NVARCHAR(128) NOT NULL,
+    MatKhau VARBINARY(64) NOT NULL,
     MaNhanVien VARCHAR(5) NOT NULL UNIQUE,
     CONSTRAINT FK_TaiKhoan_NhanVien FOREIGN KEY(MaNhanVien) REFERENCES NhanVien(MaNhanVien)
 );
@@ -51,10 +46,10 @@ INSERT INTO TaiKhoan (
     TenDangNhap, Quyen, MatKhau, MaNhanVien
 )
 VALUES
-('QL001', 'ADMIN',N'Green@123' , 'QL001'),
-('NV001', 'BAN_HANG',N'Green@123' , 'NV001'),
-('NV002', 'BAN_HANG',N'Green@123', 'NV002'),
-('NV003', 'BAN_HANG',N'Green@123' , 'NV003');
+('QL001', 'ADMIN','Green@123' , 'QL001'),
+('NV001', 'BAN_HANG','Green@123' , 'NV001'),
+('NV002', 'BAN_HANG','Green@123', 'NV002'),
+('NV003', 'BAN_HANG','Green@123' , 'NV003');
 
 -- 3. CaLamViec
 CREATE TABLE CaLamViec (
@@ -79,8 +74,8 @@ CREATE TABLE PhanCongCa (
     Ngay DATE NOT NULL,
     GhiChu NVARCHAR(255) NULL,
     MaCa VARCHAR(4) NOT NULL FOREIGN KEY REFERENCES CaLamViec(MaCa),
-    TienQuyDauCa FLOAT(53) NOT NULL DEFAULT 0,
-    TienMatThucDem FLOAT(53) NULL,
+    TienQuyDauCa DECIMAL(18,2) NOT NULL DEFAULT 0,
+    TienMatThucDem DECIMAL(18,2) NULL,
     TrangThai NVARCHAR(20) NOT NULL DEFAULT N'Chưa mở',
     GioMoCa DATETIME2(0) NULL,
     GioDongCa DATETIME2(0) NULL,
@@ -130,8 +125,8 @@ CREATE TABLE SanPham (
     TenSanPham NVARCHAR(150) NOT NULL,
     LoaiHang NVARCHAR(50) NOT NULL,
     ThuongHieu NVARCHAR(50) NOT NULL,
-    DonGiaBan FLOAT(53) NOT NULL,
-    GiaNhap FLOAT(53) NOT NULL,
+    DonGiaBan DECIMAL(18,2) NOT NULL,
+    GiaNhap DECIMAL(18,2) NOT NULL,
     ThongSoKiThuat NVARCHAR(MAX) NULL,
     XuatXu NVARCHAR(50) NOT NULL,
     TrangThai NVARCHAR(20) NOT NULL DEFAULT N'Đang bán',
@@ -144,28 +139,28 @@ INSERT INTO SanPham (
     MaSanPham, TenSanPham, LoaiHang, ThuongHieu, DonGiaBan, GiaNhap, ThongSoKiThuat, XuatXu, TrangThai, ThoiHanBaoHanh, SoLuongTon, HinhAnh
 )
 VALUES
-('SP0001', 'Smart TV Sony 4K 55 inch', 'Tivi', 'Sony', 14990000, 12500000, '55 inch; 4K; Google TV; Wi-Fi; HDMI', 'Malaysia', N'Đang bán', 24, 23, N'resource/hinhanh/SP0001.png'),
-('SP0002', N'Tủ lạnh LG Inverter 315 lít', N'Tủ lạnh', 'LG', 8990000, 7200000, N'315 lít; Inverter; ngăn đá trên', N'Việt Nam', N'Đang bán', 24, 27, N'resource/hinhanh/SP0002.png'),
-('SP0003', N'Máy giặt Samsung 10 kg', N'Máy giặt', 'Samsung', 11990000, 9500000, N'10 kg; cửa trước; Digital Inverter', N'Việt Nam', N'Đang bán', 24, 29, N'resource/hinhanh/SP0003.png'),
-('SP0004', N'Điều hòa Panasonic 1 HP', N'Điều hòa', 'Panasonic', 9990000, 8000000, N'1 HP; Inverter; lọc bụi; tiết kiệm điện', N'Thái Lan', N'Đang bán', 12, 30, N'resource/hinhanh/SP0004.png'),
-('SP0005', N'Nồi cơm điện Sharp 1.8 lít', N'Gia dụng', 'Sharp', 1190000, 850000, N'1.8 lít; chống dính; giữ ấm', N'Thái Lan', N'Đang bán', 12, 30, N'resource/hinhanh/SP0005.png'),
-('SP0006', N'Máy hút bụi Electrolux 1800 W', N'Gia dụng', 'Electrolux', 2490000, 1800000, N'1800 W; hộp bụi 1.5 lít; lọc HEPA', N'Trung Quốc', N'Đang bán', 24, 30, N'resource/hinhanh/SP0006.png'),
-('SP0007', N'Lò vi sóng Toshiba 23 lít', N'Gia dụng', 'Toshiba', 2290000, 1700000, N'23 lít; 800 W; rã đông nhanh', N'Thái Lan', N'Đang bán', 12, 30, N'resource/hinhanh/SP0007.jpg'),
-('SP0008', N'Quạt đứng Senko 65 W', N'Gia dụng', 'Senko', 590000, 400000, N'65 W; 3 tốc độ; điều chỉnh độ cao', N'Việt Nam', N'Đang bán', 12, 28, N'resource/hinhanh/SP0008.png'),
-('SP0009', N'Máy lọc không khí Xiaomi 4 Lite', N'Gia dụng', 'Xiaomi', 2990000, 2200000, N'Lọc HEPA; diện tích 43 m²; cảm biến bụi', N'Trung Quốc', N'Đang bán', 12, 30, N'resource/hinhanh/SP0009.png'),
-('SP0010', N'Bếp điện từ Philips 2100 W', N'Gia dụng', 'Philips', 1790000, 1250000, N'2100 W; mặt kính; điều khiển cảm ứng', N'Trung Quốc', N'Đang bán', 24, 30, N'resource/hinhanh/SP0010.png'),
-('SP0011', 'Smart TV Samsung 4K 43 inch', 'Tivi', 'Samsung', 8490000, 6700000, '43 inch; 4K; Tizen OS; Bluetooth', N'Việt Nam', N'Đang bán', 24, 30, N'resource/hinhanh/SP0011.jpg'),
-('SP0012', N'Tủ lạnh Panasonic 234 lít', N'Tủ lạnh', 'Panasonic', 6990000, 5400000, N'234 lít; Inverter; kháng khuẩn', N'Việt Nam', N'Đang bán', 24, 30, N'resource/hinhanh/SP0012.png'),
-('SP0013', N'Máy giặt LG 9 kg', N'Máy giặt', 'LG', 8990000, 7100000, N'9 kg; cửa trước; giặt hơi nước', N'Việt Nam', N'Đang bán', 24, 30, N'resource/hinhanh/SP0013.png'),
-('SP0014', N'Ấm siêu tốc Sunhouse 1.8 lít', N'Gia dụng', 'Sunhouse', 390000, 250000, N'1.8 lít; inox; tự ngắt khi sôi', N'Việt Nam', N'Đang bán', 12, 3, N'resource/hinhanh/SP0014.jpg'),
-('SP0015', N'Máy sấy tóc Panasonic 1600 W', N'Gia dụng', 'Panasonic', 490000, 320000, N'1600 W; gấp gọn; 3 chế độ sấy', N'Thái Lan', N'Đang bán', 12, 3, N'resource/hinhanh/SP0015.jpg'),
-('SP0016', N'Bàn ủi hơi nước Philips 2000 W', N'Gia dụng', 'Philips', 990000, 700000, N'2000 W; chống dính; phun hơi liên tục', N'Trung Quốc', N'Đang bán', 24, 30, N'resource/hinhanh/SP0016.png');
+('SP0001', 'Smart TV Sony 4K 55 inch', 'Tivi', 'Sony', 14990000, 12500000, '55 inch; 4K; Google TV; Wi-Fi; HDMI', 'Malaysia', N'Đang bán', 24, 23, N'resource/sanpham/SP0001.png'),
+('SP0002', N'Tủ lạnh LG Inverter 315 lít', N'Tủ lạnh', 'LG', 8990000, 7200000, N'315 lít; Inverter; ngăn đá trên', N'Việt Nam', N'Đang bán', 24, 27, N'resource/sanpham/SP0002.png'),
+('SP0003', N'Máy giặt Samsung 10 kg', N'Máy giặt', 'Samsung', 11990000, 9500000, N'10 kg; cửa trước; Digital Inverter', N'Việt Nam', N'Đang bán', 24, 29, N'resource/sanpham/SP0003.png'),
+('SP0004', N'Điều hòa Panasonic 1 HP', N'Điều hòa', 'Panasonic', 9990000, 8000000, N'1 HP; Inverter; lọc bụi; tiết kiệm điện', N'Thái Lan', N'Đang bán', 12, 30, N'resource/sanpham/SP0004.png'),
+('SP0005', N'Nồi cơm điện Sharp 1.8 lít', N'Gia dụng', 'Sharp', 1190000, 850000, N'1.8 lít; chống dính; giữ ấm', N'Thái Lan', N'Đang bán', 12, 30, N'resource/sanpham/SP0005.png'),
+('SP0006', N'Máy hút bụi Electrolux 1800 W', N'Gia dụng', 'Electrolux', 2490000, 1800000, N'1800 W; hộp bụi 1.5 lít; lọc HEPA', N'Trung Quốc', N'Đang bán', 24, 30, N'resource/sanpham/SP0006.png'),
+('SP0007', N'Lò vi sóng Toshiba 23 lít', N'Gia dụng', 'Toshiba', 2290000, 1700000, N'23 lít; 800 W; rã đông nhanh', N'Thái Lan', N'Đang bán', 12, 30, N'resource/sanpham/SP0007.jpg'),
+('SP0008', N'Quạt đứng Senko 65 W', N'Gia dụng', 'Senko', 590000, 400000, N'65 W; 3 tốc độ; điều chỉnh độ cao', N'Việt Nam', N'Đang bán', 12, 28, N'resource/sanpham/SP0008.png'),
+('SP0009', N'Máy lọc không khí Xiaomi 4 Lite', N'Gia dụng', 'Xiaomi', 2990000, 2200000, N'Lọc HEPA; diện tích 43 m²; cảm biến bụi', N'Trung Quốc', N'Đang bán', 12, 30, N'resource/sanpham/SP0009.png'),
+('SP0010', N'Bếp điện từ Philips 2100 W', N'Gia dụng', 'Philips', 1790000, 1250000, N'2100 W; mặt kính; điều khiển cảm ứng', N'Trung Quốc', N'Đang bán', 24, 30, N'resource/sanpham/SP0010.png'),
+('SP0011', 'Smart TV Samsung 4K 43 inch', 'Tivi', 'Samsung', 8490000, 6700000, '43 inch; 4K; Tizen OS; Bluetooth', N'Việt Nam', N'Đang bán', 24, 30, N'resource/sanpham/SP0011.jpg'),
+('SP0012', N'Tủ lạnh Panasonic 234 lít', N'Tủ lạnh', 'Panasonic', 6990000, 5400000, N'234 lít; Inverter; kháng khuẩn', N'Việt Nam', N'Đang bán', 24, 30, N'resource/sanpham/SP0012.png'),
+('SP0013', N'Máy giặt LG 9 kg', N'Máy giặt', 'LG', 8990000, 7100000, N'9 kg; cửa trước; giặt hơi nước', N'Việt Nam', N'Đang bán', 24, 30, N'resource/sanpham/SP0013.png'),
+('SP0014', N'Ấm siêu tốc Sunhouse 1.8 lít', N'Gia dụng', 'Sunhouse', 390000, 250000, N'1.8 lít; inox; tự ngắt khi sôi', N'Việt Nam', N'Đang bán', 12, 3, N'resource/sanpham/SP0014.jpg'),
+('SP0015', N'Máy sấy tóc Panasonic 1600 W', N'Gia dụng', 'Panasonic', 490000, 320000, N'1600 W; gấp gọn; 3 chế độ sấy', N'Thái Lan', N'Đang bán', 12, 3, N'resource/sanpham/SP0015.jpg'),
+('SP0016', N'Bàn ủi hơi nước Philips 2000 W', N'Gia dụng', 'Philips', 990000, 700000, N'2000 W; chống dính; phun hơi liên tục', N'Trung Quốc', N'Đang bán', 24, 30, N'resource/sanpham/SP0016.png');
 
 -- 7. ChuongTrinhKhuyenMai
 CREATE TABLE ChuongTrinhKhuyenMai (
     MaKhuyenMai VARCHAR(9) NOT NULL PRIMARY KEY,
     TenChuongTrinh NVARCHAR(100) NOT NULL,
-    GiaTriGiam FLOAT(53) NOT NULL,
+    GiaTriGiam DECIMAL(5,2) NOT NULL,
     NgayBatDau DATE NOT NULL,
     NgayKetThuc DATE NOT NULL,
     TrangThai NVARCHAR(20) NOT NULL DEFAULT N'Đang áp dụng'
@@ -188,7 +183,7 @@ CREATE TABLE HoaDon (
     NgayLap DATETIME2(0) NOT NULL DEFAULT SYSDATETIME(),
     HinhThucThanhToan NVARCHAR(30) NULL,
     TrangThaiThanhToan NVARCHAR(20) NOT NULL DEFAULT N'Chưa thanh toán',
-    ThueSuatVAT FLOAT(53) NOT NULL DEFAULT 0.10,
+    ThueSuatVAT DECIMAL(3,2) NOT NULL DEFAULT 0.10,
     MaPhanCong VARCHAR(20) NOT NULL,
     DiemSuDung INT NOT NULL DEFAULT 0,
     CONSTRAINT FK_HoaDon_PhanCong FOREIGN KEY(MaPhanCong,MaNhanVien) REFERENCES PhanCongCa(MaPhanCong,MaNhanVien)
@@ -210,9 +205,9 @@ CREATE TABLE ChiTietHoaDon (
     MaSanPham VARCHAR(6) NOT NULL FOREIGN KEY REFERENCES SanPham(MaSanPham),
     SoLuong INT NOT NULL,
     MaKhuyenMai VARCHAR(9) NULL FOREIGN KEY REFERENCES ChuongTrinhKhuyenMai(MaKhuyenMai),
-    DonGia FLOAT(53) NOT NULL,
-    GiamGia FLOAT(53) NOT NULL DEFAULT 0,
-    ThanhTienChiTiet AS CONVERT(FLOAT(53), ROUND(SoLuong*DonGia-GiamGia, 2)),
+    DonGia DECIMAL(18,2) NOT NULL,
+    GiamGia DECIMAL(18,2) NOT NULL DEFAULT 0,
+    ThanhTienChiTiet AS CONVERT(DECIMAL(18,2), SoLuong*DonGia-GiamGia),
     PRIMARY KEY(MaHoaDon,MaSanPham)
 );
 
@@ -254,8 +249,8 @@ CREATE TABLE ChiTietPhieuNhapHang (
     MaPhieuNhap VARCHAR(20) NOT NULL FOREIGN KEY REFERENCES PhieuNhapHang(MaPhieuNhap),
     MaSanPham VARCHAR(6) NOT NULL FOREIGN KEY REFERENCES SanPham(MaSanPham),
     SoLuong INT NOT NULL,
-    DonGiaNhap FLOAT(53) NOT NULL,
-    ThanhTien AS CONVERT(FLOAT(53), ROUND(SoLuong*DonGiaNhap, 2)),
+    DonGiaNhap DECIMAL(18,2) NOT NULL,
+    ThanhTien AS CONVERT(DECIMAL(18,2),SoLuong*DonGiaNhap),
     PRIMARY KEY(MaPhieuNhap,MaSanPham)
 );
 
@@ -316,7 +311,7 @@ CREATE TABLE ChiTietDoiTra (
     MaSanPham VARCHAR(6) NOT NULL,
     SoLuongTra INT NOT NULL,
     TinhTrangHang NVARCHAR(255) NOT NULL,
-    TienHoan FLOAT(53) NOT NULL DEFAULT 0,
+    TienHoan DECIMAL(18,2) NOT NULL DEFAULT 0,
     PRIMARY KEY(MaPhieuDoiTra,MaHoaDon,MaSanPham),
     CONSTRAINT FK_ChiTietDoiTra_DongGoc FOREIGN KEY(MaHoaDon,MaSanPham) REFERENCES ChiTietHoaDon(MaHoaDon,MaSanPham),
     CONSTRAINT FK_ChiTietDoiTra_PhieuGoc FOREIGN KEY(MaPhieuDoiTra,MaHoaDon) REFERENCES PhieuDoiTra(MaPhieuDoiTra,MaHoaDonGoc)

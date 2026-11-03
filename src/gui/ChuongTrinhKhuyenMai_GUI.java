@@ -31,8 +31,10 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 public class ChuongTrinhKhuyenMai_GUI extends JPanel implements ActionListener {
-    // Màu dùng chung được khai báo ở đầu lớp.
-    private static final Color PRIMARY = GiaoDien.PRIMARY,
+
+    private static final long serialVersionUID = 1L;
+
+	private static final Color PRIMARY = GiaoDien.PRIMARY,
             DARK = GiaoDien.DARK,
             BACKGROUND = GiaoDien.BACKGROUND,
             SURFACE = GiaoDien.SURFACE,
@@ -72,6 +74,8 @@ public class ChuongTrinhKhuyenMai_GUI extends JPanel implements ActionListener {
         this.tk = tk;
         GiaoDien.boCuc(this);
 
+        maKhuyenMai.setEditable(false);
+        maKhuyenMai.setToolTipText("Mã khuyến mãi được tạo tự động khi lưu");
         ngayBatDau.setToolTipText("Nhập theo yyyy-MM-dd, ví dụ 2026-11-01");
         ngayKetThuc.setToolTipText("Nhập theo yyyy-MM-dd, ví dụ 2026-11-30");
         JPanel form =
@@ -122,6 +126,7 @@ public class ChuongTrinhKhuyenMai_GUI extends JPanel implements ActionListener {
         btnXoa.setEnabled(quanLy);
         ganPhimTat();
         loadDataToTable();
+        taoMoi();
     }
 
     private void loadDataToTable() {
@@ -191,6 +196,17 @@ public class ChuongTrinhKhuyenMai_GUI extends JPanel implements ActionListener {
         trangThai.setSelectedItem(sp.getTrangThai());
     }
 
+    private void hienMaTiepTheo() {
+        maKhuyenMai.setEditable(false);
+        try {
+            maKhuyenMai.setText(dao.layMaTiepTheo());
+            maKhuyenMai.setToolTipText("Mã tự sinh khi tạo mới, không chỉnh sửa");
+        } catch (SQLException e) {
+            maKhuyenMai.setText("");
+            maKhuyenMai.setToolTipText("Chưa lấy được mã: " + e.getMessage());
+        }
+    }
+
     private void taoMoi() {
         maCu = null;
         table.clearSelection();
@@ -200,28 +216,26 @@ public class ChuongTrinhKhuyenMai_GUI extends JPanel implements ActionListener {
         ngayBatDau.setText("");
         ngayKetThuc.setText("");
         trangThai.setSelectedIndex(0);
-        maKhuyenMai.setEditable(true);
+        hienMaTiepTheo();
+        tenChuongTrinh.requestFocusInWindow();
     }
 
     private void luu() throws Exception {
         ChuongTrinhKhuyenMai sp = new ChuongTrinhKhuyenMai();
-        kiemTraRong(maKhuyenMai.getText().trim(), "Mã KM (KM2026001)");
-        sp.setMaKhuyenMai(maKhuyenMai.getText().trim());
+        sp.setMaKhuyenMai(maCu);
         kiemTraRong(tenChuongTrinh.getText().trim(), "Tên chương trình");
         sp.setTenChuongTrinh(tenChuongTrinh.getText().trim());
         sp.setGiaTriGiam(InHoaDon.soTien(giaTriGiam.getText().trim()));
         sp.setNgayBatDau(LocalDate.parse(ngayBatDau.getText().trim()));
         sp.setNgayKetThuc(LocalDate.parse(ngayKetThuc.getText().trim()));
         sp.setTrangThai((String) trangThai.getSelectedItem());
-        if (!maKhuyenMai.getText().matches("KM\\d{7}"))
-            throw new IllegalArgumentException("Mã chưa đúng định dạng ví dụ trên nhãn.");
         if (maCu == null) {
             dao.insertChuongTrinhKhuyenMai(sp, tk);
         } else {
             dao.updateChuongTrinhKhuyenMai(sp, tk);
         }
-        taoMoi();
         loadDataToTable();
+        taoMoi();
     }
 
     @Override
@@ -234,12 +248,13 @@ public class ChuongTrinhKhuyenMai_GUI extends JPanel implements ActionListener {
             else if (o.equals(btnTai)) {
                 txtTim.setText("");
                 loadDataToTable();
+                taoMoi();
             } else if (o.equals(btnXoa)) {
                 if (maCu == null) throw new IllegalArgumentException("Chọn dòng cần xóa.");
                 if (xacNhan(this, "Xóa dữ liệu chưa có liên kết?")) {
                     dao.deleteChuongTrinhKhuyenMai(maCu, tk);
-                    taoMoi();
                     loadDataToTable();
+                    taoMoi();
                 }
             }
         } catch (java.sql.SQLException ex) {

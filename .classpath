@@ -7,5 +7,13 @@
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="lib/sqljdbc42.jar"/>
+	<classpathentry kind="lib" path="T:/SaveForMemory/IUH/HK1 26-27/Phát Triễn Ứng Dụng/electronics-management-system/lib/mssql-jdbc-13.6.0.jre11.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-nop-1.7.36.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.7.36.jar"/>
+	<classpathentry kind="lib" path="lib/layout-7.2.6.jar"/>
+	<classpathentry kind="lib" path="lib/kernel-7.2.6.jar"/>
+	<classpathentry kind="lib" path="lib/jsvg-2.2.0.jar"/>
+	<classpathentry kind="lib" path="lib/io-7.2.6.jar"/>
+	<classpathentry kind="lib" path="lib/commons-7.2.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

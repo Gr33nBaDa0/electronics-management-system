@@ -76,6 +76,13 @@ public class ChuongTrinhKhuyenMai {
         this.trangThai = trangThai;
     }
 
+    public boolean isDangHieuLuc(java.time.LocalDate ngay) {
+        return ngay != null && ngayBatDau != null && ngayKetThuc != null
+                && "Đang áp dụng".equals(trangThai)
+                && !ngay.isBefore(ngayBatDau) && !ngay.isAfter(ngayKetThuc)
+                && Double.isFinite(giaTriGiam) && giaTriGiam >= 0 && giaTriGiam <= 50.0;
+    }
+
     @Override
     public String toString() {
         return String.valueOf(tenChuongTrinh);

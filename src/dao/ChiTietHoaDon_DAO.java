@@ -7,6 +7,8 @@ import entity.ChuongTrinhKhuyenMai;
 import entity.HoaDon;
 import entity.SanPham;
 
+import until.InHoaDon;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,15 +25,21 @@ public class ChiTietHoaDon_DAO {
 
     public List<ChiTietHoaDon> getTheoHoaDon(Connection con, String ma) throws SQLException {
         List<ChiTietHoaDon> ds = new ArrayList<>();
+        HoaDon hoaDon = HoaDon_DAO.tim(con, ma, false);
+        if (hoaDon == null) return ds;
         String sql =
-                "SELECT d.*,s.* FROM dbo.ChiTietHoaDon d JOIN dbo.SanPham s ON"
-                        + " s.MaSanPham=d.MaSanPham WHERE d.MaHoaDon=? ORDER BY d.MaSanPham";
+                "SELECT d.*,s.*,km.TenChuongTrinh AS TenKhuyenMai,km.GiaTriGiam,"
+                        + " km.NgayBatDau AS KMBatDau,km.NgayKetThuc AS KMKetThuc,"
+                        + " km.TrangThai AS TrangThaiKM FROM dbo.ChiTietHoaDon d"
+                        + " JOIN dbo.SanPham s ON s.MaSanPham=d.MaSanPham"
+                        + " LEFT JOIN dbo.ChuongTrinhKhuyenMai km ON km.MaKhuyenMai=d.MaKhuyenMai"
+                        + " WHERE d.MaHoaDon=? ORDER BY d.MaSanPham";
         try (PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setString(1, ma);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     ChiTietHoaDon d = new ChiTietHoaDon();
-                    d.setHoaDon(new HoaDon(ma));
+                    d.setHoaDon(hoaDon);
                     SanPham sanPham = new SanPham();
                     sanPham.setMaSanPham(rs.getString("MaSanPham"));
                     sanPham.setTenSanPham(rs.getString("TenSanPham"));
@@ -47,9 +55,16 @@ public class ChiTietHoaDon_DAO {
                     d.setSanPham(sanPham);
                     d.setSoLuong(rs.getInt("SoLuong"));
                     String km = rs.getString("MaKhuyenMai");
-                    d.setChuongTrinhKhuyenMai(km == null ? null : new ChuongTrinhKhuyenMai(km));
+                    if (km != null) {
+                        ChuongTrinhKhuyenMai khuyenMai = new ChuongTrinhKhuyenMai(km);
+                        khuyenMai.setTenChuongTrinh(rs.getString("TenKhuyenMai"));
+                        khuyenMai.setGiaTriGiam(rs.getDouble("GiaTriGiam"));
+                        khuyenMai.setNgayBatDau(rs.getDate("KMBatDau").toLocalDate());
+                        khuyenMai.setNgayKetThuc(rs.getDate("KMKetThuc").toLocalDate());
+                        khuyenMai.setTrangThai(rs.getString("TrangThaiKM"));
+                        d.setChuongTrinhKhuyenMai(khuyenMai);
+                    }
                     d.setDonGia(rs.getDouble("DonGia"));
-                    d.setGiamGia(rs.getDouble("GiamGia"));
                     ds.add(d);
                 }
             }
@@ -61,8 +76,8 @@ public class ChiTietHoaDon_DAO {
         for (ChiTietHoaDon d : ds) {
             String sql =
                     "INSERT INTO"
-                        + " dbo.ChiTietHoaDon(MaHoaDon,MaSanPham,SoLuong,MaKhuyenMai,DonGia,GiamGia)"
-                        + " VALUES(?,?,?,?,?,?)";
+                        + " dbo.ChiTietHoaDon(MaHoaDon,MaSanPham,SoLuong,MaKhuyenMai,DonGia)"
+                        + " VALUES(?,?,?,?,?)";
             try (PreparedStatement stmt = con.prepareStatement(sql)) {
                 stmt.setString(1, hd.getMaHoaDon());
                 stmt.setString(2, d.getSanPham().getMaSanPham());
@@ -73,7 +88,6 @@ public class ChiTietHoaDon_DAO {
                                 ? null
                                 : d.getChuongTrinhKhuyenMai().getMaKhuyenMai());
                 stmt.setDouble(5, d.getDonGia());
-                stmt.setDouble(6, d.getGiamGia());
                 stmt.executeUpdate();
             }
         }

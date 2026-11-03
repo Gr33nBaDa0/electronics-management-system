@@ -131,7 +131,7 @@ public class HoaDon_DAO {
             }
             soDu = Integer.parseInt(diem);
         }
-        if (h.getDiemSuDung() > InHoaDon.diemToiDa(InHoaDon.sauKhuyenMai(ds), soDu)) {
+        if (h.getDiemSuDung() > h.getDiemSuDungToiDa(ds, soDu)) {
             throw new SQLException("Điểm vượt số dư hoặc mức giảm 50% trước VAT.");
         }
         if (!Double.isFinite(h.getThueSuatVAT())
@@ -185,13 +185,11 @@ public class HoaDon_DAO {
                 if (!(ChuongTrinhKhuyenMai_DAO.hieuLuc(km, LocalDate.now()))) {
                     throw new SQLException("Khuyến mãi hết hiệu lực. Mở lại và sửa đơn.");
                 }
+                if (luu) d.setChuongTrinhKhuyenMai(km);
                 giam =
-                        InHoaDon.tron(
-                                d.getDonGia() * d.getSoLuong() * km.getGiaTriGiam() / 100.0);
+                        new ChiTietHoaDon(d.getHoaDon(), d.getSanPham(), d.getSoLuong(), km, d.getDonGia()).getGiamGia();
             }
-            if (luu) {
-                d.setGiamGia(giam);
-            } else {
+            if (!luu) {
                 if (InHoaDon.soSanhTien(d.getGiamGia(), giam) != 0) {
                     throw new SQLException("Mức giảm đã đổi. Lưu lại đơn trước khi thanh toán.");
                 }
@@ -321,7 +319,7 @@ public class HoaDon_DAO {
             List<ChiTietHoaDon> ds = ct.getTheoHoaDon(con, ma);
             kiemTraDong(con, ds, false);
             kiemTraKhach(con, h, ds);
-            double total = InHoaDon.phaiTra(ds, h.getDiemSuDung(), h.getThueSuatVAT());
+            double total = h.getTongThanhToan(ds);
             if (!("Tiền mặt".equals(hinhThuc)) && !("Chuyển khoản QR".equals(hinhThuc))) {
                 throw new SQLException("Hình thức không hợp lệ.");
             }
@@ -346,7 +344,7 @@ public class HoaDon_DAO {
                 KhachHang_DAO.doiDiem(
                         con,
                         h.getKhachHang().getMaKhachHang(),
-                        InHoaDon.diemCong(total) - h.getDiemSuDung());
+                        h.getDiemDuocCong(ds) - h.getDiemSuDung());
             }
             String sql =
                     "UPDATE dbo.HoaDon SET TrangThaiThanhToan=N'Đã thanh toán',HinhThucThanhToan=?"
@@ -361,7 +359,7 @@ public class HoaDon_DAO {
                 throw new SQLException("Trạng thái đơn đã thay đổi.");
             }
             con.commit();
-            return "Tiền mặt".equals(hinhThuc) ? InHoaDon.tron(tienNhan - total) : 0.0;
+            return "Tiền mặt".equals(hinhThuc) ? h.getTienThua(ds, tienNhan) : 0.0;
         } catch (SQLException | RuntimeException e) {
             con.rollback();
             throw e;
