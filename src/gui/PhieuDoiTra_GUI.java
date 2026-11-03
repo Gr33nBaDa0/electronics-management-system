@@ -13,7 +13,7 @@ import entity.HoaDon;
 import entity.PhieuDoiTra;
 import entity.TaiKhoan;
 
-import until.GiaoDien;
+import util.GiaoDien;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -40,7 +40,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.table.DefaultTableModel;
 
 public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
-    // Màu dùng chung được khai báo ở đầu lớp.
+    // MÃ u dÃ¹ng chung Ä‘Æ°á»£c khai bÃ¡o á»Ÿ Ä‘áº§u lá»›p.
     private static final Color PRIMARY = GiaoDien.PRIMARY,
             DARK = GiaoDien.DARK,
             BACKGROUND = GiaoDien.BACKGROUND,
@@ -61,47 +61,47 @@ public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
             tu = new JTextField("2020-01-01", 10),
             den = new JTextField(java.time.LocalDate.now().toString(), 10);
     private final JComboBox<ChiTietHoaDon> dongGoc = new JComboBox<>();
-    private final JComboBox<String> tinhTrang = new JComboBox<>(new String[] {"Nguyên vẹn", "Lỗi"}),
+    private final JComboBox<String> tinhTrang = new JComboBox<>(new String[] {"NguyÃªn váº¹n", "Lá»—i"}),
             loc =
                     new JComboBox<>(
                             new String[] {
-                                "Tất cả", "Chờ duyệt", "Đã duyệt", "Hoàn tất", "Từ chối"
+                                "Táº¥t cáº£", "Chá» duyá»‡t", "ÄÃ£ duyá»‡t", "HoÃ n táº¥t", "Tá»« chá»‘i"
                             });
     private final JSpinner sl = new JSpinner(new SpinnerNumberModel(1, 1, 100000, 1));
-    private final JButton btnTai = taoNut("Tìm / lọc"),
-            btnMoi = taoNut("Phiếu mới"),
-            btnSua = taoNut("Mở sửa / xem"),
-            btnXoa = taoNut("Xóa phiếu"),
-            btnDuyet = taoNut("Duyệt"),
-            btnTuChoi = taoNut("Từ chối"),
-            btnHoan = taoNut("Xác nhận hoàn tất"),
-            btnTaiHD = taoNut("Lấy dòng hóa đơn"),
-            btnThem = taoNut("Thêm dòng trả"),
-            btnBo = taoNut("Bỏ dòng"),
-            btnLuu = taoNut("Lưu chờ duyệt");
-    private final JLabel lblMa = new JLabel("Phiếu mới");
+    private final JButton btnTai = taoNut("TÃ¬m / lá»c"),
+            btnMoi = taoNut("Phiáº¿u má»›i"),
+            btnSua = taoNut("Má»Ÿ sá»­a / xem"),
+            btnXoa = taoNut("XÃ³a phiáº¿u"),
+            btnDuyet = taoNut("Duyá»‡t"),
+            btnTuChoi = taoNut("Tá»« chá»‘i"),
+            btnHoan = taoNut("XÃ¡c nháº­n hoÃ n táº¥t"),
+            btnTaiHD = taoNut("Láº¥y dÃ²ng hÃ³a Ä‘Æ¡n"),
+            btnThem = taoNut("ThÃªm dÃ²ng tráº£"),
+            btnBo = taoNut("Bá» dÃ²ng"),
+            btnLuu = taoNut("LÆ°u chá» duyá»‡t");
+    private final JLabel lblMa = new JLabel("Phiáº¿u má»›i");
     private final DefaultTableModel
             model =
                     taoModel(
-                            "Mã phiếu",
-                            "Hóa đơn gốc",
-                            "Ngày lập",
-                            "Người lập",
-                            "Trạng thái",
-                            "Điểm hoàn",
-                            "Điểm thu hồi",
-                            "Lý do"),
-            modelCT = taoModel("Mã SP", "SL trả", "Tình trạng", "Tiền hoàn dự kiến / đã chốt");
+                            "MÃ£ phiáº¿u",
+                            "HÃ³a Ä‘Æ¡n gá»‘c",
+                            "NgÃ y láº­p",
+                            "NgÆ°á»i láº­p",
+                            "Tráº¡ng thÃ¡i",
+                            "Äiá»ƒm hoÃ n",
+                            "Äiá»ƒm thu há»“i",
+                            "LÃ½ do"),
+            modelCT = taoModel("MÃ£ SP", "SL tráº£", "TÃ¬nh tráº¡ng", "Tiá»n hoÃ n dá»± kiáº¿n / Ä‘Ã£ chá»‘t");
     private final JTable table = taoBang(model), tableCT = taoBang(modelCT);
 
     public PhieuDoiTra_GUI(TaiKhoan tk) {
         this.tk = tk;
-        hienThiLuaChon(dongGoc, "Chọn dòng gốc", 300);
+        hienThiLuaChon(dongGoc, "Chá»n dÃ²ng gá»‘c", 300);
         GiaoDien.boCuc(this);
 
-        btnTaiHD.setText("Lấy sản phẩm");
-        btnHoan.setText("Hoàn tất trả hàng");
-        btnSua.setText("Mở / xem phiếu");
+        btnTaiHD.setText("Láº¥y sáº£n pháº©m");
+        btnHoan.setText("HoÃ n táº¥t tráº£ hÃ ng");
+        btnSua.setText("Má»Ÿ / xem phiáº¿u");
         JPanel danhSach = new JPanel(new BorderLayout(0, 8));
         danhSach.setOpaque(false);
         txtTim.setColumns(14);
@@ -109,27 +109,27 @@ public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
                 GiaoDien.doc(
                         GiaoDien.form(
                                 4,
-                                "Phiếu / HĐ / SĐT / NV",
+                                "Phiáº¿u / HÄ / SÄT / NV",
                                 txtTim,
-                                "Trạng thái",
+                                "Tráº¡ng thÃ¡i",
                                 loc,
-                                "Từ ngày (yyyy-MM-dd)",
+                                "Tá»« ngÃ y (yyyy-MM-dd)",
                                 tu,
-                                "Đến ngày (yyyy-MM-dd)",
+                                "Äáº¿n ngÃ y (yyyy-MM-dd)",
                                 den),
                         taoDong(btnTai)),
                 BorderLayout.NORTH);
         danhSach.add(GiaoDien.cuon(table), BorderLayout.CENTER);
         JPanel tren =
                 GiaoDien.the(
-                        "Danh sách phiếu đổi trả",
+                        "Danh sÃ¡ch phiáº¿u Ä‘á»•i tráº£",
                         danhSach,
                         taoDong(btnMoi, btnSua, btnXoa, btnDuyet, btnTuChoi, btnHoan));
         JPanel hoaDonGoc = new JPanel(new BorderLayout(8, 0));
         hoaDonGoc.setOpaque(false);
         hoaDonGoc.add(hd, BorderLayout.CENTER);
         hoaDonGoc.add(btnTaiHD, BorderLayout.EAST);
-        JPanel form = GiaoDien.form(2, "Hóa đơn gốc", hoaDonGoc, "Lý do đổi trả", lyDo);
+        JPanel form = GiaoDien.form(2, "HÃ³a Ä‘Æ¡n gá»‘c", hoaDonGoc, "LÃ½ do Ä‘á»•i tráº£", lyDo);
         JPanel nhapDong = new JPanel(new BorderLayout(8, 0));
         nhapDong.setOpaque(false);
         nhapDong.add(dongGoc, BorderLayout.CENTER);
@@ -142,11 +142,11 @@ public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
         chiTiet.add(GiaoDien.cuon(tableCT), BorderLayout.CENTER);
         JPanel duoi =
                 GiaoDien.the(
-                        "Nội dung phiếu",
+                        "Ná»™i dung phiáº¿u",
                         chiTiet,
-                        taoDong(btnLuu, new JLabel("Hàng nguyên vẹn được cộng tồn khi hoàn tất.")));
-        tabs.addTab("Danh sách phiếu", tren);
-        tabs.addTab("Chi tiết phiếu", duoi);
+                        taoDong(btnLuu, new JLabel("HÃ ng nguyÃªn váº¹n Ä‘Æ°á»£c cá»™ng tá»“n khi hoÃ n táº¥t.")));
+        tabs.addTab("Danh sÃ¡ch phiáº¿u", tren);
+        tabs.addTab("Chi tiáº¿t phiáº¿u", duoi);
         add(tabs, BorderLayout.CENTER);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         GiaoDien.trangTri(this);
@@ -160,8 +160,8 @@ public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
                         e -> {
                             if (!e.getValueIsAdjusting()) capNhatNutPhieu();
                         });
-        tu.setToolTipText("Ngày lập từ: yyyy-MM-dd");
-        den.setToolTipText("Ngày lập đến: yyyy-MM-dd");
+        tu.setToolTipText("NgÃ y láº­p tá»«: yyyy-MM-dd");
+        den.setToolTipText("NgÃ y láº­p Ä‘áº¿n: yyyy-MM-dd");
         ganPhimTat();
         loadDataToTable();
         capNhatForm();
@@ -182,7 +182,7 @@ public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
             String t = txtTim.getText().trim().toLowerCase(java.util.Locale.ROOT);
             java.time.LocalDate a = java.time.LocalDate.parse(tu.getText()),
                     b = java.time.LocalDate.parse(den.getText());
-            if (b.isBefore(a)) throw new IllegalArgumentException("Khoảng ngày không hợp lệ.");
+            if (b.isBefore(a)) throw new IllegalArgumentException("Khoáº£ng ngÃ y khÃ´ng há»£p lá»‡.");
             java.util.Set<String> maHD = new java.util.HashSet<>();
             if (!t.isEmpty())
                 for (HoaDon h : new HoaDon_DAO().timKiem(t, a, b, "", ""))
@@ -218,7 +218,7 @@ public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
                 for (PhieuDoiTra p : ds) {
                     if (ma.equals(p.getMaPhieuDoiTra())) {
                         phieuDangMo = p;
-                        lblMa.setText(ma + " — " + p.getTrangThai());
+                        lblMa.setText(ma + " â€” " + p.getTrangThai());
                         break;
                     }
                 }
@@ -237,12 +237,12 @@ public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
             e.printStackTrace();
             JOptionPane.showMessageDialog(
                     this,
-                    "Lỗi tải dữ liệu SQL:\n" + e.getMessage(),
-                    "Lỗi SQL",
+                    "Lá»—i táº£i dá»¯ liá»‡u SQL:\n" + e.getMessage(),
+                    "Lá»—i SQL",
                     JOptionPane.ERROR_MESSAGE);
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(
-                    this, e.getMessage(), "Thông báo", JOptionPane.WARNING_MESSAGE);
+                    this, e.getMessage(), "ThÃ´ng bÃ¡o", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -254,7 +254,7 @@ public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
                         d.getChiTietHoaDon().getSanPham().getMaSanPham(),
                         d.getSoLuongTra(),
                         d.getTinhTrangHang(),
-                        d.getPhieuDoiTra() == null ? "Tính khi lưu" : formatGia(d.getTienHoan())
+                        d.getPhieuDoiTra() == null ? "TÃ­nh khi lÆ°u" : formatGia(d.getTienHoan())
                     });
         capNhatForm();
     }
@@ -262,9 +262,9 @@ public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
     private void taiDongHD() throws Exception {
         dongGoc.removeAllItems();
         HoaDon h = new HoaDon_DAO().tim(hd.getText().trim());
-        if (h == null || !"Đã thanh toán".equals(h.getTrangThaiThanhToan()))
+        if (h == null || !"ÄÃ£ thanh toÃ¡n".equals(h.getTrangThaiThanhToan()))
             throw new IllegalArgumentException(
-                    "Nhập mã hóa đơn đã thanh toán. Tra SĐT trong mục Hóa đơn để lấy mã.");
+                    "Nháº­p mÃ£ hÃ³a Ä‘Æ¡n Ä‘Ã£ thanh toÃ¡n. Tra SÄT trong má»¥c HÃ³a Ä‘Æ¡n Ä‘á»ƒ láº¥y mÃ£.");
         for (ChiTietHoaDon d : new ChiTietHoaDon_DAO().getTheoHoaDon(h.getMaHoaDon()))
             dongGoc.addItem(d);
     }
@@ -287,7 +287,7 @@ public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
                 lyDo.setText("");
                 dong.clear();
                 dongGoc.removeAllItems();
-                lblMa.setText("Phiếu mới");
+                lblMa.setText("Phiáº¿u má»›i");
                 hienDong();
                 tabs.setSelectedIndex(1);
                 return;
@@ -298,21 +298,21 @@ public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
             }
             if (o.equals(btnThem)) {
                 ChiTietHoaDon g = (ChiTietHoaDon) dongGoc.getSelectedItem();
-                if (g == null) throw new IllegalArgumentException("Lấy dòng hóa đơn trước.");
+                if (g == null) throw new IllegalArgumentException("Láº¥y dÃ²ng hÃ³a Ä‘Æ¡n trÆ°á»›c.");
                 if (!hd.getText().trim().equals(g.getHoaDon().getMaHoaDon()))
-                    throw new IllegalArgumentException("Mã hóa đơn đã đổi, lấy lại dòng.");
+                    throw new IllegalArgumentException("MÃ£ hÃ³a Ä‘Æ¡n Ä‘Ã£ Ä‘á»•i, láº¥y láº¡i dÃ²ng.");
                 for (ChiTietDoiTra a : dong)
                     if (a.getChiTietHoaDon()
                             .getSanPham()
                             .getMaSanPham()
                             .equals(g.getSanPham().getMaSanPham()))
                         throw new IllegalArgumentException(
-                                "Dòng đã có, bỏ rồi thêm lại để đổi SL.");
+                                "DÃ²ng Ä‘Ã£ cÃ³, bá» rá»“i thÃªm láº¡i Ä‘á»ƒ Ä‘á»•i SL.");
                 int n = (Integer) sl.getValue();
                 if (ma == null
                         && n > dao.soConTra(hd.getText().trim(), g.getSanPham().getMaSanPham()))
                     throw new IllegalArgumentException(
-                            "Vượt số còn được trả, đã tính phiếu đang xử lý.");
+                            "VÆ°á»£t sá»‘ cÃ²n Ä‘Æ°á»£c tráº£, Ä‘Ã£ tÃ­nh phiáº¿u Ä‘ang xá»­ lÃ½.");
                 ChiTietDoiTra d = new ChiTietDoiTra();
                 d.setChiTietHoaDon(g);
                 d.setSoLuongTra(n);
@@ -333,13 +333,13 @@ public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
                 ma = dao.luu(ma, hd.getText().trim(), lyDo.getText(), dong, tk);
                 dong.clear();
                 dong.addAll(new ChiTietDoiTra_DAO().getTheoPhieu(ma));
-                lblMa.setText(ma + " — Chờ duyệt");
+                lblMa.setText(ma + " â€” Chá» duyá»‡t");
                 hienDong();
                 loadDataToTable();
                 return;
             }
             int i = table.getSelectedRow();
-            if (i < 0) throw new IllegalArgumentException("Chọn phiếu.");
+            if (i < 0) throw new IllegalArgumentException("Chá»n phiáº¿u.");
             PhieuDoiTra p = hienThi.get(i);
             if (o.equals(btnSua)) {
                 phieuDangMo = p;
@@ -349,39 +349,39 @@ public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
                 lyDo.setText(p.getLyDo());
                 dong.clear();
                 dong.addAll(new ChiTietDoiTra_DAO().getTheoPhieu(ma));
-                lblMa.setText(ma + " — " + p.getTrangThai());
+                lblMa.setText(ma + " â€” " + p.getTrangThai());
                 taiDongHD();
                 hienDong();
                 tabs.setSelectedIndex(1);
             } else if (o.equals(btnXoa)) {
-                if (xacNhan(this, "Xóa phiếu chờ của mình?")) dao.xoa(p.getMaPhieuDoiTra(), tk);
+                if (xacNhan(this, "XÃ³a phiáº¿u chá» cá»§a mÃ¬nh?")) dao.xoa(p.getMaPhieuDoiTra(), tk);
             } else if (o.equals(btnDuyet)) {
-                if (xacNhan(this, "Duyệt phiếu? Bước này chưa hoàn tiền, tồn hoặc điểm."))
+                if (xacNhan(this, "Duyá»‡t phiáº¿u? BÆ°á»›c nÃ y chÆ°a hoÃ n tiá»n, tá»“n hoáº·c Ä‘iá»ƒm."))
                     dao.duyet(p.getMaPhieuDoiTra(), true, null, tk);
             } else if (o.equals(btnTuChoi)) {
-                String reason = JOptionPane.showInputDialog(this, "Lý do từ chối:");
+                String reason = JOptionPane.showInputDialog(this, "LÃ½ do tá»« chá»‘i:");
                 if (reason != null) dao.duyet(p.getMaPhieuDoiTra(), false, reason, tk);
             } else if (o.equals(btnHoan)) {
                 double tien = dao.duTinh(p.getMaPhieuDoiTra(), tk);
                 HoaDon h = new HoaDon_DAO().tim(p.getHoaDonGoc().getMaHoaDon());
                 if (xacNhan(
                         this,
-                        "Hoàn "
+                        "HoÃ n "
                                 + formatGia(tien)
                                 + " VND theo "
                                 + h.getHinhThucThanhToan()
-                                + ". Đã kiểm tra giao dịch hoàn thực tế?\n"
-                                + "Chỉ xác nhận sau khi hoàn tiền cho khách.")) {
+                                + ". ÄÃ£ kiá»ƒm tra giao dá»‹ch hoÃ n thá»±c táº¿?\n"
+                                + "Chá»‰ xÃ¡c nháº­n sau khi hoÃ n tiá»n cho khÃ¡ch.")) {
                     dao.hoanTat(p.getMaPhieuDoiTra(), tien, tk);
                     JOptionPane.showMessageDialog(
-                            this, "Đã ghi nhận hoàn tất. Tồn và điểm cập nhật cùng giao dịch.");
+                            this, "ÄÃ£ ghi nháº­n hoÃ n táº¥t. Tá»“n vÃ  Ä‘iá»ƒm cáº­p nháº­t cÃ¹ng giao dá»‹ch.");
                 }
             }
             loadDataToTable();
         } catch (java.sql.SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(
-                    this, "Lỗi SQL:\n" + ex.getMessage(), "Lỗi SQL", JOptionPane.ERROR_MESSAGE);
+                    this, "Lá»—i SQL:\n" + ex.getMessage(), "Lá»—i SQL", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             thongBaoLoi(this, ex);
         }
@@ -402,21 +402,21 @@ public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
 
     private void capNhatNutPhieu() {
         PhieuDoiTra p = phieuDangChon();
-        boolean choDuyet = p != null && "Chờ duyệt".equals(p.getTrangThai());
+        boolean choDuyet = p != null && "Chá» duyá»‡t".equals(p.getTrangThai());
         boolean quanLy = "ADMIN".equals(tk.getQuyen());
         btnSua.setEnabled(p != null);
         btnXoa.setEnabled(choDuyet && cuaMinh(p));
         btnDuyet.setEnabled(choDuyet && quanLy);
         btnTuChoi.setEnabled(choDuyet && quanLy);
-        btnHoan.setEnabled(p != null && "Đã duyệt".equals(p.getTrangThai()));
+        btnHoan.setEnabled(p != null && "ÄÃ£ duyá»‡t".equals(p.getTrangThai()));
     }
 
-    /** Chỉ sửa phiếu chờ duyệt của chính nhân viên đang đăng nhập. */
+    /** Chá»‰ sá»­a phiáº¿u chá» duyá»‡t cá»§a chÃ­nh nhÃ¢n viÃªn Ä‘ang Ä‘Äƒng nháº­p. */
     private void capNhatForm() {
         boolean sua =
                 ma == null
                         || (phieuDangMo != null
-                                && "Chờ duyệt".equals(phieuDangMo.getTrangThai())
+                                && "Chá» duyá»‡t".equals(phieuDangMo.getTrangThai())
                                 && cuaMinh(phieuDangMo));
         hd.setEditable(sua && ma == null && dong.isEmpty());
         lyDo.setEditable(sua);
@@ -481,7 +481,7 @@ public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
 
     private void thongBaoLoi(Component c, Exception e) {
         JOptionPane.showMessageDialog(
-                c, e.getMessage(), "Không thực hiện được", JOptionPane.ERROR_MESSAGE);
+                c, e.getMessage(), "KhÃ´ng thá»±c hiá»‡n Ä‘Æ°á»£c", JOptionPane.ERROR_MESSAGE);
     }
 
     private DefaultTableModel taoModel(String... cot) {
@@ -502,7 +502,7 @@ public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
     }
 
     private boolean xacNhan(Component c, String s) {
-        return JOptionPane.showConfirmDialog(c, s, "Xác nhận", JOptionPane.YES_NO_OPTION)
+        return JOptionPane.showConfirmDialog(c, s, "XÃ¡c nháº­n", JOptionPane.YES_NO_OPTION)
                 == JOptionPane.YES_OPTION;
     }
 

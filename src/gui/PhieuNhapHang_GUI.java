@@ -11,8 +11,8 @@ import entity.PhieuNhapHang;
 import entity.SanPham;
 import entity.TaiKhoan;
 
-import until.GiaoDien;
-import until.InHoaDon;
+import util.GiaoDien;
+import util.InHoaDon;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -39,7 +39,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.table.DefaultTableModel;
 
 public class PhieuNhapHang_GUI extends JPanel implements ActionListener {
-    // Màu dùng chung được khai báo ở đầu lớp.
+    // MÃ u dÃ¹ng chung Ä‘Æ°á»£c khai bÃ¡o á»Ÿ Ä‘áº§u lá»›p.
     private static final Color PRIMARY = GiaoDien.PRIMARY,
             DARK = GiaoDien.DARK,
             BACKGROUND = GiaoDien.BACKGROUND,
@@ -62,52 +62,52 @@ public class PhieuNhapHang_GUI extends JPanel implements ActionListener {
     private final JSpinner sl = new JSpinner(new SpinnerNumberModel(1, 1, 100000, 1));
     private final JComboBox<SanPham> sp = new JComboBox<>();
     private final JComboBox<String> loc =
-            new JComboBox<>(new String[] {"Tất cả", "Chờ duyệt", "Đã nhập", "Từ chối"});
-    private final JButton btnTai = taoNut("Tải lại / lọc"),
-            btnMoi = taoNut("Phiếu mới"),
-            btnSua = taoNut("Mở sửa / chi tiết"),
-            btnXoa = taoNut("Xóa phiếu"),
-            btnDuyet = taoNut("Duyệt hàng thực nhận"),
-            btnTuChoi = taoNut("Từ chối"),
-            btnThem = taoNut("Thêm dòng"),
-            btnBo = taoNut("Bỏ dòng"),
-            btnLuu = taoNut("Lưu chờ duyệt");
-    private final JLabel lblMa = new JLabel("Phiếu mới"), lblTong = new JLabel();
+            new JComboBox<>(new String[] {"Táº¥t cáº£", "Chá» duyá»‡t", "ÄÃ£ nháº­p", "Tá»« chá»‘i"});
+    private final JButton btnTai = taoNut("Táº£i láº¡i / lá»c"),
+            btnMoi = taoNut("Phiáº¿u má»›i"),
+            btnSua = taoNut("Má»Ÿ sá»­a / chi tiáº¿t"),
+            btnXoa = taoNut("XÃ³a phiáº¿u"),
+            btnDuyet = taoNut("Duyá»‡t hÃ ng thá»±c nháº­n"),
+            btnTuChoi = taoNut("Tá»« chá»‘i"),
+            btnThem = taoNut("ThÃªm dÃ²ng"),
+            btnBo = taoNut("Bá» dÃ²ng"),
+            btnLuu = taoNut("LÆ°u chá» duyá»‡t");
+    private final JLabel lblMa = new JLabel("Phiáº¿u má»›i"), lblTong = new JLabel();
     private final DefaultTableModel
             model =
                     taoModel(
-                            "Mã phiếu",
-                            "Ngày lập",
-                            "Nhà cung cấp",
-                            "Người lập",
-                            "Trạng thái",
-                            "Người duyệt",
-                            "Lý do từ chối"),
-            modelCT = taoModel("Mã SP", "Tên", "Số lượng", "Giá nhập", "Thành tiền");
+                            "MÃ£ phiáº¿u",
+                            "NgÃ y láº­p",
+                            "NhÃ  cung cáº¥p",
+                            "NgÆ°á»i láº­p",
+                            "Tráº¡ng thÃ¡i",
+                            "NgÆ°á»i duyá»‡t",
+                            "LÃ½ do tá»« chá»‘i"),
+            modelCT = taoModel("MÃ£ SP", "TÃªn", "Sá»‘ lÆ°á»£ng", "GiÃ¡ nháº­p", "ThÃ nh tiá»n");
     private final JTable table = taoBang(model), tableCT = taoBang(modelCT);
 
     public PhieuNhapHang_GUI(TaiKhoan tk) {
         this.tk = tk;
-        hienThiLuaChon(sp, "Chọn sản phẩm", 260);
+        hienThiLuaChon(sp, "Chá»n sáº£n pháº©m", 260);
         GiaoDien.boCuc(this);
 
         JPanel danhSach = new JPanel(new BorderLayout(0, 8));
         danhSach.setOpaque(false);
-        danhSach.add(taoDong(new JLabel("Tìm phiếu:"), txtTim, loc, btnTai), BorderLayout.NORTH);
+        danhSach.add(taoDong(new JLabel("TÃ¬m phiáº¿u:"), txtTim, loc, btnTai), BorderLayout.NORTH);
         danhSach.add(GiaoDien.cuon(table), BorderLayout.CENTER);
         JPanel tren =
                 GiaoDien.the(
-                        "Danh sách phiếu nhập",
+                        "Danh sÃ¡ch phiáº¿u nháº­p",
                         danhSach,
                         taoDong(btnMoi, btnSua, btnXoa, btnDuyet, btnTuChoi));
         JPanel thongTin =
                 GiaoDien.form(
-                        3, "Nhà cung cấp", nhaCC, "Số chứng từ", chungTu, "Người giao", nguoiGiao);
+                        3, "NhÃ  cung cáº¥p", nhaCC, "Sá»‘ chá»©ng tá»«", chungTu, "NgÆ°á»i giao", nguoiGiao);
         JPanel nhapDong = new JPanel(new BorderLayout(8, 0));
         nhapDong.setOpaque(false);
         nhapDong.add(sp, BorderLayout.CENTER);
         nhapDong.add(
-                taoDong(new JLabel("SL:"), sl, new JLabel("Giá nhập:"), gia, btnThem, btnBo),
+                taoDong(new JLabel("SL:"), sl, new JLabel("GiÃ¡ nháº­p:"), gia, btnThem, btnBo),
                 BorderLayout.EAST);
         lblMa.setForeground(PRIMARY);
         lblMa.setFont(GiaoDien.phong(Font.BOLD, 14));
@@ -117,9 +117,9 @@ public class PhieuNhapHang_GUI extends JPanel implements ActionListener {
         noiDung.add(GiaoDien.cuon(tableCT), BorderLayout.CENTER);
         lblTong.setForeground(PRIMARY);
         lblTong.setFont(GiaoDien.phong(Font.BOLD, 16));
-        JPanel duoi = GiaoDien.the("Chi tiết hàng nhập", noiDung, taoDong(btnLuu, lblTong));
-        tabs.addTab("Danh sách phiếu", tren);
-        tabs.addTab("Chi tiết phiếu", duoi);
+        JPanel duoi = GiaoDien.the("Chi tiáº¿t hÃ ng nháº­p", noiDung, taoDong(btnLuu, lblTong));
+        tabs.addTab("Danh sÃ¡ch phiáº¿u", tren);
+        tabs.addTab("Chi tiáº¿t phiáº¿u", duoi);
         add(tabs, BorderLayout.CENTER);
         GiaoDien.trangTri(this);
         for (JButton b :
@@ -188,7 +188,7 @@ public class PhieuNhapHang_GUI extends JPanel implements ActionListener {
                 for (PhieuNhapHang p : ds) {
                     if (ma.equals(p.getMaPhieuNhap())) {
                         phieuDangMo = p;
-                        lblMa.setText(ma + " — " + p.getTrangThai());
+                        lblMa.setText(ma + " â€” " + p.getTrangThai());
                         break;
                     }
                 }
@@ -207,12 +207,12 @@ public class PhieuNhapHang_GUI extends JPanel implements ActionListener {
             e.printStackTrace();
             JOptionPane.showMessageDialog(
                     this,
-                    "Lỗi tải dữ liệu SQL:\n" + e.getMessage(),
-                    "Lỗi SQL",
+                    "Lá»—i táº£i dá»¯ liá»‡u SQL:\n" + e.getMessage(),
+                    "Lá»—i SQL",
                     JOptionPane.ERROR_MESSAGE);
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(
-                    this, e.getMessage(), "Thông báo", JOptionPane.WARNING_MESSAGE);
+                    this, e.getMessage(), "ThÃ´ng bÃ¡o", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -230,7 +230,7 @@ public class PhieuNhapHang_GUI extends JPanel implements ActionListener {
                     });
             total = InHoaDon.tron(total + d.getThanhTien());
         }
-        lblTong.setText("Tổng nhập: " + formatGia(total));
+        lblTong.setText("Tá»•ng nháº­p: " + formatGia(total));
     }
 
     @Override
@@ -250,7 +250,7 @@ public class PhieuNhapHang_GUI extends JPanel implements ActionListener {
                 nhaCC.setText("");
                 chungTu.setText("");
                 nguoiGiao.setText("");
-                lblMa.setText("Phiếu mới");
+                lblMa.setText("Phiáº¿u má»›i");
                 hienDong();
                 capNhatForm();
                 tabs.setSelectedIndex(1);
@@ -258,11 +258,11 @@ public class PhieuNhapHang_GUI extends JPanel implements ActionListener {
             }
             if (o.equals(btnThem)) {
                 SanPham x = (SanPham) sp.getSelectedItem();
-                if (x == null) throw new IllegalArgumentException("Chưa có sản phẩm.");
+                if (x == null) throw new IllegalArgumentException("ChÆ°a cÃ³ sáº£n pháº©m.");
                 for (ChiTietPhieuNhapHang d : dong)
                     if (d.getSanPham().getMaSanPham().equals(x.getMaSanPham()))
                         throw new IllegalArgumentException(
-                                "Sản phẩm đã có, bỏ dòng cũ rồi thêm lại để đổi số lượng.");
+                                "Sáº£n pháº©m Ä‘Ã£ cÃ³, bá» dÃ²ng cÅ© rá»“i thÃªm láº¡i Ä‘á»ƒ Ä‘á»•i sá»‘ lÆ°á»£ng.");
                 ChiTietPhieuNhapHang d = new ChiTietPhieuNhapHang();
                 d.setSanPham(x);
                 d.setSoLuong((Integer) sl.getValue());
@@ -283,12 +283,12 @@ public class PhieuNhapHang_GUI extends JPanel implements ActionListener {
                 p.setNguoiGiao(nguoiGiao.getText());
                 p.setSoChungTu(chungTu.getText());
                 ma = dao.luu(p, dong, tk);
-                lblMa.setText(ma + " — Chờ duyệt");
+                lblMa.setText(ma + " â€” Chá» duyá»‡t");
                 loadDataToTable();
                 return;
             }
             int i = table.getSelectedRow();
-            if (i < 0) throw new IllegalArgumentException("Chọn phiếu.");
+            if (i < 0) throw new IllegalArgumentException("Chá»n phiáº¿u.");
             PhieuNhapHang p = hienThi.get(i);
             if (o.equals(btnSua)) {
                 phieuDangMo = p;
@@ -298,24 +298,24 @@ public class PhieuNhapHang_GUI extends JPanel implements ActionListener {
                 nguoiGiao.setText(p.getNguoiGiao());
                 dong.clear();
                 dong.addAll(new ChiTietPhieuNhapHang_DAO().getTheoPhieu(ma));
-                lblMa.setText(ma + " — " + p.getTrangThai());
+                lblMa.setText(ma + " â€” " + p.getTrangThai());
                 hienDong();
                 capNhatForm();
                 tabs.setSelectedIndex(1);
             } else if (o.equals(btnXoa)) {
-                if (xacNhan(this, "Xóa phiếu chờ duyệt của mình?")) dao.xoa(p.getMaPhieuNhap(), tk);
+                if (xacNhan(this, "XÃ³a phiáº¿u chá» duyá»‡t cá»§a mÃ¬nh?")) dao.xoa(p.getMaPhieuNhap(), tk);
             } else if (o.equals(btnDuyet)) {
-                if (xacNhan(this, "Đã kiểm đếm hàng thực nhận và đồng ý cộng tồn?"))
+                if (xacNhan(this, "ÄÃ£ kiá»ƒm Ä‘áº¿m hÃ ng thá»±c nháº­n vÃ  Ä‘á»“ng Ã½ cá»™ng tá»“n?"))
                     dao.duyet(p.getMaPhieuNhap(), true, null, tk);
             } else if (o.equals(btnTuChoi)) {
-                String lyDo = JOptionPane.showInputDialog(this, "Lý do từ chối:");
+                String lyDo = JOptionPane.showInputDialog(this, "LÃ½ do tá»« chá»‘i:");
                 if (lyDo != null) dao.duyet(p.getMaPhieuNhap(), false, lyDo, tk);
             }
             loadDataToTable();
         } catch (java.sql.SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(
-                    this, "Lỗi SQL:\n" + ex.getMessage(), "Lỗi SQL", JOptionPane.ERROR_MESSAGE);
+                    this, "Lá»—i SQL:\n" + ex.getMessage(), "Lá»—i SQL", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             thongBaoLoi(this, ex);
         }
@@ -331,7 +331,7 @@ public class PhieuNhapHang_GUI extends JPanel implements ActionListener {
         int i = table.getSelectedRow();
         PhieuNhapHang p =
                 i < 0 || i >= hienThi.size() ? null : hienThi.get(table.convertRowIndexToModel(i));
-        boolean cho = p != null && "Chờ duyệt".equals(p.getTrangThai());
+        boolean cho = p != null && "Chá» duyá»‡t".equals(p.getTrangThai());
         boolean duyet = cho && "ADMIN".equals(tk.getQuyen()) && !cuaMinh(p);
         btnSua.setEnabled(p != null);
         btnXoa.setEnabled(cho && cuaMinh(p));
@@ -343,7 +343,7 @@ public class PhieuNhapHang_GUI extends JPanel implements ActionListener {
         boolean sua =
                 ma == null
                         || (phieuDangMo != null
-                                && "Chờ duyệt".equals(phieuDangMo.getTrangThai())
+                                && "Chá» duyá»‡t".equals(phieuDangMo.getTrangThai())
                                 && cuaMinh(phieuDangMo));
         nhaCC.setEditable(sua);
         chungTu.setEditable(sua);
@@ -401,7 +401,7 @@ public class PhieuNhapHang_GUI extends JPanel implements ActionListener {
 
     private void thongBaoLoi(Component c, Exception e) {
         JOptionPane.showMessageDialog(
-                c, e.getMessage(), "Không thực hiện được", JOptionPane.ERROR_MESSAGE);
+                c, e.getMessage(), "KhÃ´ng thá»±c hiá»‡n Ä‘Æ°á»£c", JOptionPane.ERROR_MESSAGE);
     }
 
     private DefaultTableModel taoModel(String... cot) {
@@ -422,7 +422,7 @@ public class PhieuNhapHang_GUI extends JPanel implements ActionListener {
     }
 
     private boolean xacNhan(Component c, String s) {
-        return JOptionPane.showConfirmDialog(c, s, "Xác nhận", JOptionPane.YES_NO_OPTION)
+        return JOptionPane.showConfirmDialog(c, s, "XÃ¡c nháº­n", JOptionPane.YES_NO_OPTION)
                 == JOptionPane.YES_OPTION;
     }
 

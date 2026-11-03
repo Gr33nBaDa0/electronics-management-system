@@ -11,7 +11,7 @@ import entity.PhanCongCa;
 import entity.PhieuDoiTra;
 import entity.TaiKhoan;
 
-import until.InHoaDon;
+import util.InHoaDon;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -65,17 +65,17 @@ public class PhieuDoiTra_DAO {
         try {
             new TaiKhoan_DAO().kiemTraQuyen(tk, false);
             HoaDon h = HoaDon_DAO.tim(con, hd, true);
-            if (h == null || !("Đã thanh toán".equals(h.getTrangThaiThanhToan()))) {
-                throw new SQLException("Chỉ trả hàng từ hóa đơn đã thanh toán.");
+            if (h == null || !("ÄÃ£ thanh toÃ¡n".equals(h.getTrangThaiThanhToan()))) {
+                throw new SQLException("Chá»‰ tráº£ hÃ ng tá»« hÃ³a Ä‘Æ¡n Ä‘Ã£ thanh toÃ¡n.");
             }
             int ngay = docSoThietLap("returns.days", 14);
             if (ngay <= 0
                     || h.getNgayLap().toLocalDate().isBefore(LocalDate.now().minusDays(ngay))) {
                 throw new SQLException(
-                        "Hóa đơn đã quá hạn trả " + ngay + " ngày tính từ ngày lập.");
+                        "HÃ³a Ä‘Æ¡n Ä‘Ã£ quÃ¡ háº¡n tráº£ " + ngay + " ngÃ y tÃ­nh tá»« ngÃ y láº­p.");
             }
             if (ds.isEmpty() || lyDo == null || lyDo.trim().isEmpty()) {
-                throw new SQLException("Cần lý do và ít nhất một dòng trả.");
+                throw new SQLException("Cáº§n lÃ½ do vÃ  Ã­t nháº¥t má»™t dÃ²ng tráº£.");
             }
             if (id == null) {
                 id =
@@ -99,7 +99,7 @@ public class PhieuDoiTra_DAO {
             } else {
                 String sql2 =
                         "UPDATE dbo.PhieuDoiTra SET LyDo=? WHERE MaPhieuDoiTra=? AND MaHoaDonGoc=?"
-                                + " AND MaNhanVienLap=? AND TrangThai=N'Chờ duyệt'";
+                                + " AND MaNhanVienLap=? AND TrangThai=N'Chá» duyá»‡t'";
                 int ketQua6;
                 try (PreparedStatement stmt3 = con.prepareStatement(sql2)) {
                     stmt3.setString(1, lyDo);
@@ -109,7 +109,7 @@ public class PhieuDoiTra_DAO {
                     ketQua6 = stmt3.executeUpdate();
                 }
                 if (ketQua6 != 1) {
-                    throw new SQLException("Chỉ sửa phiếu chờ duyệt của mình, cùng hóa đơn gốc.");
+                    throw new SQLException("Chá»‰ sá»­a phiáº¿u chá» duyá»‡t cá»§a mÃ¬nh, cÃ¹ng hÃ³a Ä‘Æ¡n gá»‘c.");
                 }
                 String sql3 = "DELETE FROM dbo.ChiTietDoiTra WHERE MaPhieuDoiTra=?";
                 try (PreparedStatement stmt4 = con.prepareStatement(sql3)) {
@@ -131,12 +131,12 @@ public class PhieuDoiTra_DAO {
                 }
                 if (g == null || !(seen.add(sp)) || d.getSoLuongTra() <= 0) {
                     throw new SQLException(
-                            "Sản phẩm ngoài hóa đơn, bị trùng hoặc lượng trả không hợp lệ.");
+                            "Sáº£n pháº©m ngoÃ i hÃ³a Ä‘Æ¡n, bá»‹ trÃ¹ng hoáº·c lÆ°á»£ng tráº£ khÃ´ng há»£p lá»‡.");
                 }
                 String sql5 =
                         "SELECT COALESCE(SUM(d.SoLuongTra),0) FROM dbo.ChiTietDoiTra d JOIN"
                                 + " dbo.PhieuDoiTra p ON p.MaPhieuDoiTra=d.MaPhieuDoiTra WHERE"
-                                + " d.MaHoaDon=? AND d.MaSanPham=? AND p.TrangThai<>N'Từ chối'";
+                                + " d.MaHoaDon=? AND d.MaSanPham=? AND p.TrangThai<>N'Tá»« chá»‘i'";
                 int ketQua12 = 0;
                 try (PreparedStatement stmt6 = con.prepareStatement(sql5)) {
                     stmt6.setString(1, hd);
@@ -150,11 +150,11 @@ public class PhieuDoiTra_DAO {
                 int da = ketQua12;
                 if (da + d.getSoLuongTra() > g.getSoLuong()) {
                     throw new SQLException(
-                            "Số trả vượt số còn lại (đã tính phiếu chờ / đã duyệt): " + sp);
+                            "Sá»‘ tráº£ vÆ°á»£t sá»‘ cÃ²n láº¡i (Ä‘Ã£ tÃ­nh phiáº¿u chá» / Ä‘Ã£ duyá»‡t): " + sp);
                 }
-                if (!("Nguyên vẹn".equals(d.getTinhTrangHang()))
-                        && !("Lỗi".equals(d.getTinhTrangHang()))) {
-                    throw new SQLException("Chọn tình trạng Nguyên vẹn hoặc Lỗi.");
+                if (!("NguyÃªn váº¹n".equals(d.getTinhTrangHang()))
+                        && !("Lá»—i".equals(d.getTinhTrangHang()))) {
+                    throw new SQLException("Chá»n tÃ¬nh tráº¡ng NguyÃªn váº¹n hoáº·c Lá»—i.");
                 }
                 double tien = InHoaDon.luyKe(phanBo.get(sp), d.getSoLuongTra(), g.getSoLuong());
                 String sql6 =
@@ -192,7 +192,7 @@ public class PhieuDoiTra_DAO {
             new TaiKhoan_DAO().kiemTraQuyen(tk, false);
             String sql =
                     "SELECT MaPhieuDoiTra FROM dbo.PhieuDoiTra WITH (UPDLOCK,HOLDLOCK) WHERE"
-                            + " MaPhieuDoiTra=? AND MaNhanVienLap=? AND TrangThai=N'Chờ duyệt'";
+                            + " MaPhieuDoiTra=? AND MaNhanVienLap=? AND TrangThai=N'Chá» duyá»‡t'";
             String ketQua3 = null;
             try (PreparedStatement stmt = con.prepareStatement(sql)) {
                 stmt.setString(1, id);
@@ -204,7 +204,7 @@ public class PhieuDoiTra_DAO {
                 }
             }
             if (ketQua3 == null) {
-                throw new SQLException("Chỉ xóa phiếu chờ của mình.");
+                throw new SQLException("Chá»‰ xÃ³a phiáº¿u chá» cá»§a mÃ¬nh.");
             }
             String sql2 = "DELETE FROM dbo.ChiTietDoiTra WHERE MaPhieuDoiTra=?";
             try (PreparedStatement stmt3 = con.prepareStatement(sql2)) {
@@ -235,22 +235,22 @@ public class PhieuDoiTra_DAO {
         try {
             new TaiKhoan_DAO().kiemTraQuyen(tk, true);
             if (!chapNhan && (lyDo == null || lyDo.trim().isEmpty())) {
-                throw new SQLException("Từ chối cần lý do.");
+                throw new SQLException("Tá»« chá»‘i cáº§n lÃ½ do.");
             }
             String sql =
                     "UPDATE dbo.PhieuDoiTra SET"
                         + " TrangThai=?,MaQuanLyDuyet=?,NgayDuyet=SYSDATETIME(),LyDoTuChoi=? WHERE"
-                        + " MaPhieuDoiTra=? AND TrangThai=N'Chờ duyệt'";
+                        + " MaPhieuDoiTra=? AND TrangThai=N'Chá» duyá»‡t'";
             int ketQua3;
             try (PreparedStatement stmt = con.prepareStatement(sql)) {
-                stmt.setString(1, chapNhan ? "Đã duyệt" : "Từ chối");
+                stmt.setString(1, chapNhan ? "ÄÃ£ duyá»‡t" : "Tá»« chá»‘i");
                 stmt.setString(2, tk.getNhanVien().getMaNhanVien());
                 stmt.setString(3, chapNhan ? null : lyDo);
                 stmt.setString(4, id);
                 ketQua3 = stmt.executeUpdate();
             }
             if (ketQua3 != 1) {
-                throw new SQLException("Phiếu không còn chờ duyệt.");
+                throw new SQLException("Phiáº¿u khÃ´ng cÃ²n chá» duyá»‡t.");
             }
             con.commit();
         } catch (SQLException | RuntimeException e) {
@@ -279,7 +279,7 @@ public class PhieuDoiTra_DAO {
         String sql2 =
                 "SELECT COALESCE(SUM(d.SoLuongTra),0) FROM dbo.ChiTietDoiTra d JOIN dbo.PhieuDoiTra"
                     + " p ON p.MaPhieuDoiTra=d.MaPhieuDoiTra WHERE d.MaHoaDon=? AND d.MaSanPham=?"
-                    + " AND p.TrangThai<>N'Từ chối'";
+                    + " AND p.TrangThai<>N'Tá»« chá»‘i'";
         int ketQua7 = 0;
         try (PreparedStatement stmt3 = con.prepareStatement(sql2)) {
             stmt3.setString(1, hd);
@@ -323,8 +323,8 @@ public class PhieuDoiTra_DAO {
             }
             String hd = ketQua3;
             HoaDon h = HoaDon_DAO.tim(con, hd, true);
-            if (h == null || !("Đã thanh toán".equals(h.getTrangThaiThanhToan()))) {
-                throw new SQLException("Hóa đơn gốc không hợp lệ.");
+            if (h == null || !("ÄÃ£ thanh toÃ¡n".equals(h.getTrangThaiThanhToan()))) {
+                throw new SQLException("HÃ³a Ä‘Æ¡n gá»‘c khÃ´ng há»£p lá»‡.");
             }
             String sql2 =
                     "SELECT TrangThai FROM dbo.PhieuDoiTra WITH (UPDLOCK,HOLDLOCK) WHERE"
@@ -339,8 +339,8 @@ public class PhieuDoiTra_DAO {
                 }
             }
             String trangThai = ketQua7;
-            if (!("Đã duyệt".equals(trangThai))) {
-                throw new SQLException("Chỉ hoàn tất phiếu đã duyệt, chưa hoàn tất.");
+            if (!("ÄÃ£ duyá»‡t".equals(trangThai))) {
+                throw new SQLException("Chá»‰ hoÃ n táº¥t phiáº¿u Ä‘Ã£ duyá»‡t, chÆ°a hoÃ n táº¥t.");
             }
             String ca = new PhanCongCa_DAO().layMaCaDangMo(con, tk);
             List<ChiTietHoaDon> goc = new ChiTietHoaDon_DAO().getTheoHoaDon(con, hd);
@@ -348,12 +348,12 @@ public class PhieuDoiTra_DAO {
                     InHoaDon.phanBo(goc, h.getDiemSuDung(), h.getThueSuatVAT());
             double total = InHoaDon.phaiTra(goc, h.getDiemSuDung(), h.getThueSuatVAT());
             if (total <= 0) {
-                throw new SQLException("Hóa đơn không có giá trị để hoàn.");
+                throw new SQLException("HÃ³a Ä‘Æ¡n khÃ´ng cÃ³ giÃ¡ trá»‹ Ä‘á»ƒ hoÃ n.");
             }
             String sql3 =
                     "SELECT COALESCE(SUM(d.TienHoan),0) FROM dbo.ChiTietDoiTra d JOIN"
                             + " dbo.PhieuDoiTra p ON p.MaPhieuDoiTra=d.MaPhieuDoiTra WHERE"
-                            + " p.MaHoaDonGoc=? AND p.TrangThai=N'Hoàn tất'";
+                            + " p.MaHoaDonGoc=? AND p.TrangThai=N'HoÃ n táº¥t'";
             double ketQua11 = 0.0;
             try (PreparedStatement stmt4 = con.prepareStatement(sql3)) {
                 stmt4.setString(1, hd);
@@ -366,7 +366,7 @@ public class PhieuDoiTra_DAO {
             double truoc = ketQua11, hoan = 0.0;
             List<ChiTietDoiTra> ds = new ChiTietDoiTra_DAO().getTheoPhieu(con, id);
             if (ds.isEmpty()) {
-                throw new SQLException("Phiếu chưa có dòng trả.");
+                throw new SQLException("Phiáº¿u chÆ°a cÃ³ dÃ²ng tráº£.");
             }
             for (ChiTietDoiTra d : ds) {
                 String sp = d.getChiTietHoaDon().getSanPham().getMaSanPham();
@@ -377,12 +377,12 @@ public class PhieuDoiTra_DAO {
                     }
                 }
                 if (g == null || d.getSoLuongTra() <= 0) {
-                    throw new SQLException("Dòng gốc không hợp lệ.");
+                    throw new SQLException("DÃ²ng gá»‘c khÃ´ng há»£p lá»‡.");
                 }
                 String from =
                         " FROM dbo.ChiTietDoiTra d JOIN dbo.PhieuDoiTra p ON"
                                 + " p.MaPhieuDoiTra=d.MaPhieuDoiTra WHERE d.MaHoaDon=? AND"
-                                + " d.MaSanPham=? AND p.TrangThai=N'Hoàn tất'";
+                                + " d.MaSanPham=? AND p.TrangThai=N'HoÃ n táº¥t'";
                 String sql4 = "SELECT COALESCE(SUM(d.SoLuongTra),0)" + from;
                 int ketQua15 = 0;
                 try (PreparedStatement stmt5 = con.prepareStatement(sql4)) {
@@ -408,12 +408,12 @@ public class PhieuDoiTra_DAO {
                 }
                 double tienDa = ketQua19;
                 if (da + d.getSoLuongTra() > g.getSoLuong()) {
-                    throw new SQLException("Đã trả vượt số lượng mua.");
+                    throw new SQLException("ÄÃ£ tráº£ vÆ°á»£t sá»‘ lÆ°á»£ng mua.");
                 }
                 double tien =
                         InHoaDon.tron(InHoaDon.luyKe(phanBo.get(sp), da + d.getSoLuongTra(), g.getSoLuong()) - tienDa);
                 if (tien < 0) {
-                    throw new SQLException("Số tiền hoàn gốc không nhất quán.");
+                    throw new SQLException("Sá»‘ tiá»n hoÃ n gá»‘c khÃ´ng nháº¥t quÃ¡n.");
                 }
                 hoan = InHoaDon.tron(hoan + tien);
                 String sql7 =
@@ -425,18 +425,18 @@ public class PhieuDoiTra_DAO {
                     stmt8.setString(3, sp);
                     stmt8.executeUpdate();
                 }
-                if ("Nguyên vẹn".equals(d.getTinhTrangHang())) {
+                if ("NguyÃªn váº¹n".equals(d.getTinhTrangHang())) {
                     SanPham_DAO.doiTon(con, sp, d.getSoLuongTra());
                 }
             }
             if (InHoaDon.soSanhTien(truoc + hoan, total) > 0) {
-                throw new SQLException("Tổng hoàn vượt tiền thực trả.");
+                throw new SQLException("Tá»•ng hoÃ n vÆ°á»£t tiá»n thá»±c tráº£.");
             }
             int diemHoan = 0, diemThu = 0;
             if (h.getKhachHang() != null) {
                 String sql8 =
                         "SELECT COALESCE(SUM(DiemHoanLai),0) FROM dbo.PhieuDoiTra WHERE"
-                                + " MaHoaDonGoc=? AND TrangThai=N'Hoàn tất'";
+                                + " MaHoaDonGoc=? AND TrangThai=N'HoÃ n táº¥t'";
                 int ketQua26 = 0;
                 try (PreparedStatement stmt9 = con.prepareStatement(sql8)) {
                     stmt9.setString(1, hd);
@@ -449,7 +449,7 @@ public class PhieuDoiTra_DAO {
                 int daHoan = ketQua26;
                 String sql10 =
                         "SELECT COALESCE(SUM(DiemThuHoi),0) FROM dbo.PhieuDoiTra WHERE"
-                                + " MaHoaDonGoc=? AND TrangThai=N'Hoàn tất'";
+                                + " MaHoaDonGoc=? AND TrangThai=N'HoÃ n táº¥t'";
                 int ketQua30 = 0;
                 try (PreparedStatement stmt11 = con.prepareStatement(sql10)) {
                     stmt11.setString(1, hd);
@@ -467,16 +467,16 @@ public class PhieuDoiTra_DAO {
                         (int) Math.floor(Math.nextUp(InHoaDon.diemCong(total) * (InHoaDon.tron(truoc + hoan) / total)))
                                 - daThu;
                 if (diemHoan < 0 || diemThu < 0) {
-                    throw new SQLException("Điểm hoàn trước đây không nhất quán.");
+                    throw new SQLException("Äiá»ƒm hoÃ n trÆ°á»›c Ä‘Ã¢y khÃ´ng nháº¥t quÃ¡n.");
                 }
                 KhachHang_DAO.doiDiem(con, h.getKhachHang().getMaKhachHang(), diemHoan - diemThu);
             }
             if (ghi && (!Double.isFinite(daXacNhan) || InHoaDon.soSanhTien(hoan, daXacNhan) != 0)) {
-                throw new SQLException("Số tiền hoàn đã thay đổi. Kiểm tra và xác nhận lại.");
+                throw new SQLException("Sá»‘ tiá»n hoÃ n Ä‘Ã£ thay Ä‘á»•i. Kiá»ƒm tra vÃ  xÃ¡c nháº­n láº¡i.");
             }
             String sql11 =
-                    "UPDATE dbo.PhieuDoiTra SET TrangThai=N'Hoàn"
-                            + " tất',MaPhanCongHoanTien=?,DiemHoanLai=?,DiemThuHoi=? WHERE"
+                    "UPDATE dbo.PhieuDoiTra SET TrangThai=N'HoÃ n"
+                            + " táº¥t',MaPhanCongHoanTien=?,DiemHoanLai=?,DiemThuHoi=? WHERE"
                             + " MaPhieuDoiTra=?";
             try (PreparedStatement stmt12 = con.prepareStatement(sql11)) {
                 stmt12.setString(1, ca);

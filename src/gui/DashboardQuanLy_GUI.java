@@ -8,8 +8,8 @@ import dao.TaiKhoan_DAO;
 
 import entity.TaiKhoan;
 
-import until.GiaoDien;
-import until.InHoaDon;
+import util.GiaoDien;
+import util.InHoaDon;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -31,23 +31,23 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
             ERROR = GiaoDien.ERROR;
     private final TaiKhoan tk;
     private final MainFrame main;
-    private final JLabel thu = new JLabel("—"),
-            don = new JLabel("—"),
-            nhap = new JLabel("—"),
-            tra = new JLabel("—"),
-            lblKeHoach = GiaoDien.nhan("Chưa đặt mục tiêu hôm nay", 14, true, PRIMARY),
+    private final JLabel thu = new JLabel("â€”"),
+            don = new JLabel("â€”"),
+            nhap = new JLabel("â€”"),
+            tra = new JLabel("â€”"),
+            lblKeHoach = GiaoDien.nhan("ChÆ°a Ä‘áº·t má»¥c tiÃªu hÃ´m nay", 14, true, PRIMARY),
             lblCapNhat = GiaoDien.nhan(" ", 12, false, MUTED),
             lblLoi = GiaoDien.nhan(" ", 12, false, ERROR),
             lblViec = GiaoDien.nhan(" ", 12, false, MUTED),
             lblTon = GiaoDien.nhan(" ", 12, false, MUTED);
     private final JProgressBar tienDo = new JProgressBar(0, 100);
-    private final JButton btnTai = GiaoDien.nut("Tải lại · F5"),
-            btnMucTieu = GiaoDien.nut("Đặt mục tiêu"),
-            btnXem = GiaoDien.nutChinh("Xử lý phiếu đã chọn"),
-            btnSP = GiaoDien.nut("Xem sản phẩm");
+    private final JButton btnTai = GiaoDien.nut("Táº£i láº¡i Â· F5"),
+            btnMucTieu = GiaoDien.nut("Äáº·t má»¥c tiÃªu"),
+            btnXem = GiaoDien.nutChinh("Xá»­ lÃ½ phiáº¿u Ä‘Ã£ chá»n"),
+            btnSP = GiaoDien.nut("Xem sáº£n pháº©m");
     private final DefaultTableModel
-            model = GiaoDien.model("Loại", "Mã phiếu", "NV lập", "Ngày", "Giá trị dự kiến"),
-            modelSP = GiaoDien.model("Mã SP", "Sản phẩm", "Tồn", "Chú ý");
+            model = GiaoDien.model("Loáº¡i", "MÃ£ phiáº¿u", "NV láº­p", "NgÃ y", "GiÃ¡ trá»‹ dá»± kiáº¿n"),
+            modelSP = GiaoDien.model("MÃ£ SP", "Sáº£n pháº©m", "Tá»“n", "ChÃº Ã½");
     private final JTable table = GiaoDien.bang(model), tableSP = GiaoDien.bang(modelSP);
     private final BieuDoThu bieuDo = new BieuDoThu();
     private List<Object[]> phieu = new ArrayList<>();
@@ -65,10 +65,10 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
         chiSo.setOpaque(false);
         chiSo.add(
                 GiaoDien.soLieu(
-                        "Thu sau hoàn hôm nay", thu, "Tiền thu trừ tiền hoàn theo ngày ca"));
-        chiSo.add(GiaoDien.soLieu("Hóa đơn thanh toán", don, "Của cửa hàng trong ngày ca"));
-        chiSo.add(GiaoDien.soLieu("Nhập hàng chờ duyệt", nhap, "Cần kiểm tra hàng và chứng từ"));
-        chiSo.add(GiaoDien.soLieu("Đổi trả chờ duyệt", tra, "Cần xem xét điều kiện đổi trả"));
+                        "Thu sau hoÃ n hÃ´m nay", thu, "Tiá»n thu trá»« tiá»n hoÃ n theo ngÃ y ca"));
+        chiSo.add(GiaoDien.soLieu("HÃ³a Ä‘Æ¡n thanh toÃ¡n", don, "Cá»§a cá»­a hÃ ng trong ngÃ y ca"));
+        chiSo.add(GiaoDien.soLieu("Nháº­p hÃ ng chá» duyá»‡t", nhap, "Cáº§n kiá»ƒm tra hÃ ng vÃ  chá»©ng tá»«"));
+        chiSo.add(GiaoDien.soLieu("Äá»•i tráº£ chá» duyá»‡t", tra, "Cáº§n xem xÃ©t Ä‘iá»u kiá»‡n Ä‘á»•i tráº£"));
         tienDo.setStringPainted(true);
         tienDo.setForeground(PRIMARY);
         tienDo.setBackground(GiaoDien.PRIMARY_SOFT);
@@ -82,15 +82,15 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
                 BorderLayout.NORTH);
         JPanel choDuyet =
                 GiaoDien.the(
-                        "Phiếu cần duyệt",
+                        "Phiáº¿u cáº§n duyá»‡t",
                         GiaoDien.cuon(table),
                         GiaoDien.doc(lblViec, GiaoDien.dong(btnXem)));
         JPanel ton =
                 GiaoDien.the(
-                        "Sản phẩm cần xem",
+                        "Sáº£n pháº©m cáº§n xem",
                         GiaoDien.cuon(tableSP),
                         GiaoDien.doc(lblTon, GiaoDien.dong(btnSP)));
-        JPanel xuHuong = GiaoDien.the("Thu sau hoàn · 7 ngày gần nhất", bieuDo, null);
+        JPanel xuHuong = GiaoDien.the("Thu sau hoÃ n Â· 7 ngÃ y gáº§n nháº¥t", bieuDo, null);
         ton.setMinimumSize(new Dimension(300, 170));
         xuHuong.setMinimumSize(new Dimension(300, 155));
         JSplitPane phai = GiaoDien.tach(JSplitPane.VERTICAL_SPLIT, ton, xuHuong, .64);
@@ -119,7 +119,7 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
                 ngay.put(n, InHoaDon.tron(ngay.getOrDefault(n, 0.0) + ((Number) r[5]).doubleValue()));
             }
             thucTe = InHoaDon.tron(((Number) a[0]).doubleValue() - ((Number) a[1]).doubleValue());
-            thu.setText(InHoaDon.tien(thucTe) + " đ");
+            thu.setText(InHoaDon.tien(thucTe) + " Ä‘");
             thu.setForeground(thucTe < 0 ? ERROR : PRIMARY);
             don.setText(a[2].toString());
             nhap.setText(a[4].toString());
@@ -135,7 +135,7 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
                             r[2],
                             ((LocalDateTime) r[3])
                                     .format(DateTimeFormatter.ofPattern("dd/MM HH:mm")),
-                            InHoaDon.tien(((Number) r[4]).doubleValue()) + " đ"
+                            InHoaDon.tien(((Number) r[4]).doubleValue()) + " Ä‘"
                         });
             for (Object[] r : sp) modelSP.addRow(r);
             table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -146,16 +146,16 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
             }
             lblViec.setText(
                     ds.isEmpty()
-                            ? "Không có phiếu đang chờ duyệt."
+                            ? "KhÃ´ng cÃ³ phiáº¿u Ä‘ang chá» duyá»‡t."
                             : ds.size()
-                                    + " phiếu đang chờ · "
+                                    + " phiáº¿u Ä‘ang chá» Â· "
                                     + a[6]
-                                    + " phiếu trả đã duyệt chờ hoàn.");
+                                    + " phiáº¿u tráº£ Ä‘Ã£ duyá»‡t chá» hoÃ n.");
             lblTon.setText(
                     sp.isEmpty()
-                            ? "Các sản phẩm đang bán đều trên ngưỡng tồn thấp."
+                            ? "CÃ¡c sáº£n pháº©m Ä‘ang bÃ¡n Ä‘á»u trÃªn ngÆ°á»¡ng tá»“n tháº¥p."
                             : sp.size()
-                                    + " sản phẩm đang bán có tồn ≤ "
+                                    + " sáº£n pháº©m Ä‘ang bÃ¡n cÃ³ tá»“n â‰¤ "
                                     + Dashboard_DAO.NGUONG_TON_THAP
                                     + ".");
             bieuDo.duLieu = ngay;
@@ -163,23 +163,23 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
             mucTieu = docMucTieu();
             hienKeHoach();
             lblCapNhat.setText(
-                    "Hôm nay "
+                    "HÃ´m nay "
                             + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-                            + " · Cập nhật "
+                            + " Â· Cáº­p nháº­t "
                             + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
             lblLoi.setText(" ");
         } catch (Exception e) {
             e.printStackTrace();
-            lblLoi.setText("Chưa tải được dữ liệu. Nhấn Tải lại để thử tiếp.");
+            lblLoi.setText("ChÆ°a táº£i Ä‘Æ°á»£c dá»¯ liá»‡u. Nháº¥n Táº£i láº¡i Ä‘á»ƒ thá»­ tiáº¿p.");
             lblLoi.setToolTipText(e.getMessage());
         }
     }
 
     private void hienKeHoach() {
         if (mucTieu <= 0) {
-            lblKeHoach.setText("Chưa đặt mục tiêu thu sau hoàn hôm nay");
+            lblKeHoach.setText("ChÆ°a Ä‘áº·t má»¥c tiÃªu thu sau hoÃ n hÃ´m nay");
             tienDo.setValue(0);
-            tienDo.setString("Chưa đặt mục tiêu");
+            tienDo.setString("ChÆ°a Ä‘áº·t má»¥c tiÃªu");
             return;
         }
         double pt =
@@ -188,12 +188,12 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
                 InHoaDon.tien(thucTe)
                         + " / "
                         + InHoaDon.tien(mucTieu)
-                        + " đ · "
+                        + " Ä‘ Â· "
                         + (InHoaDon.soSanhTien(thucTe, mucTieu) >= 0
-                                ? "Đã đạt mục tiêu"
-                                : "Còn " + InHoaDon.tien(InHoaDon.tron(mucTieu - thucTe)) + " đ"));
+                                ? "ÄÃ£ Ä‘áº¡t má»¥c tiÃªu"
+                                : "CÃ²n " + InHoaDon.tien(InHoaDon.tron(mucTieu - thucTe)) + " Ä‘"));
         tienDo.setValue((int) Math.max(0.0, Math.min(100.0, pt)));
-        tienDo.setString(String.format(java.util.Locale.US, "%.1f", pt) + "% mục tiêu");
+        tienDo.setString(String.format(java.util.Locale.US, "%.1f", pt) + "% má»¥c tiÃªu");
     }
 
     private Properties docThietLap() throws java.io.IOException {
@@ -221,12 +221,12 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
         String s =
                 JOptionPane.showInputDialog(
                         this,
-                        "Mục tiêu thu sau hoàn hôm nay (VND):",
+                        "Má»¥c tiÃªu thu sau hoÃ n hÃ´m nay (VND):",
                         mucTieu > 0 ? InHoaDon.tien(mucTieu).replace(",", "") : "");
         if (s == null) return;
         double tien = InHoaDon.soTien(s);
         if (tien <= 0 || !Double.isFinite(tien) || tien >= 1.0E18)
-            throw new IllegalArgumentException("Nhập mục tiêu dương, tối đa 18 chữ số.");
+            throw new IllegalArgumentException("Nháº­p má»¥c tiÃªu dÆ°Æ¡ng, tá»‘i Ä‘a 18 chá»¯ sá»‘.");
         Properties p = docThietLap();
         p.setProperty("dashboard.target." + LocalDate.now(), InHoaDon.tien(tien).replace(",", ""));
         try (java.io.Writer w = Files.newBufferedWriter(Paths.get("config.properties"))) {
@@ -244,19 +244,19 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
             else if (o == btnMucTieu) nhapMucTieu();
             else if (o == btnXem) {
                 int i = table.getSelectedRow();
-                if (i < 0) throw new IllegalArgumentException("Chọn phiếu cần xử lý.");
+                if (i < 0) throw new IllegalArgumentException("Chá»n phiáº¿u cáº§n xá»­ lÃ½.");
                 Object[] r = phieu.get(table.convertRowIndexToModel(i));
                 main.moCongViec(r[0].toString(), r[1].toString());
             } else if (o == btnSP) {
                 int i = tableSP.getSelectedRow();
-                if (i < 0) throw new IllegalArgumentException("Chọn sản phẩm cần xem.");
+                if (i < 0) throw new IllegalArgumentException("Chá»n sáº£n pháº©m cáº§n xem.");
                 main.moCongViec(
-                        "Sản phẩm",
+                        "Sáº£n pháº©m",
                         modelSP.getValueAt(tableSP.convertRowIndexToModel(i), 0).toString());
             }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(
-                    this, ex.getMessage(), "Thông báo", JOptionPane.WARNING_MESSAGE);
+                    this, ex.getMessage(), "ThÃ´ng bÃ¡o", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -266,7 +266,7 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
         BieuDoThu() {
             setOpaque(false);
             setPreferredSize(new Dimension(400, 170));
-            setToolTipText("Thu sau hoàn theo ngày ca; nhãn biểu đồ tính bằng triệu đồng.");
+            setToolTipText("Thu sau hoÃ n theo ngÃ y ca; nhÃ£n biá»ƒu Ä‘á»“ tÃ­nh báº±ng triá»‡u Ä‘á»“ng.");
         }
 
         @Override
@@ -276,7 +276,7 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             if (duLieu.isEmpty()) {
                 g.setColor(MUTED);
-                g.drawString("Chưa có dữ liệu", 12, 30);
+                g.drawString("ChÆ°a cÃ³ dá»¯ liá»‡u", 12, 30);
                 g.dispose();
                 return;
             }
@@ -289,7 +289,7 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
                 g.setColor(MUTED);
                 g.setFont(GiaoDien.phong(Font.PLAIN, 12));
                 g.drawString(
-                        "Thu sau hoàn bằng 0 trong cả 7 ngày.", 10, Math.max(24, getHeight() / 2));
+                        "Thu sau hoÃ n báº±ng 0 trong cáº£ 7 ngÃ y.", 10, Math.max(24, getHeight() / 2));
                 g.dispose();
                 return;
             }
@@ -323,7 +323,7 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
                 i++;
             }
             g.setFont(GiaoDien.phong(Font.PLAIN, 10));
-            g.drawString("Triệu đồng", 10, 11);
+            g.drawString("Triá»‡u Ä‘á»“ng", 10, 11);
             g.dispose();
         }
     }

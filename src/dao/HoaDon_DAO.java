@@ -11,7 +11,7 @@ import entity.PhanCongCa;
 import entity.SanPham;
 import entity.TaiKhoan;
 
-import until.InHoaDon;
+import util.InHoaDon;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -67,7 +67,7 @@ public class HoaDon_DAO {
             String tuKhoa, LocalDate tu, LocalDate den, String trangThai, String hinhThuc)
             throws SQLException {
         if (den.isBefore(tu)) {
-            throw new SQLException("Khoảng ngày không hợp lệ.");
+            throw new SQLException("Khoáº£ng ngÃ y khÃ´ng há»£p lá»‡.");
         }
         List<HoaDon> ds = new ArrayList<>();
         String sql =
@@ -109,7 +109,7 @@ public class HoaDon_DAO {
     private void kiemTraKhach(Connection con, HoaDon h, List<ChiTietHoaDon> ds)
             throws SQLException {
         if (h.getDiemSuDung() < 0) {
-            throw new SQLException("Điểm sử dụng không được âm.");
+            throw new SQLException("Äiá»ƒm sá»­ dá»¥ng khÃ´ng Ä‘Æ°á»£c Ã¢m.");
         }
         int soDu = 0;
         if (h.getKhachHang() != null) {
@@ -127,30 +127,30 @@ public class HoaDon_DAO {
             }
             String diem = ketQua3;
             if (diem == null) {
-                throw new SQLException("Khách hàng không tồn tại.");
+                throw new SQLException("KhÃ¡ch hÃ ng khÃ´ng tá»“n táº¡i.");
             }
             soDu = Integer.parseInt(diem);
         }
         if (h.getDiemSuDung() > InHoaDon.diemToiDa(InHoaDon.sauKhuyenMai(ds), soDu)) {
-            throw new SQLException("Điểm vượt số dư hoặc mức giảm 50% trước VAT.");
+            throw new SQLException("Äiá»ƒm vÆ°á»£t sá»‘ dÆ° hoáº·c má»©c giáº£m 50% trÆ°á»›c VAT.");
         }
         if (!Double.isFinite(h.getThueSuatVAT())
                 || h.getThueSuatVAT() < 0 || h.getThueSuatVAT() >= 1) {
-            throw new SQLException("Thuế suất VAT không hợp lệ.");
+            throw new SQLException("Thuáº¿ suáº¥t VAT khÃ´ng há»£p lá»‡.");
         }
     }
 
     private void kiemTraDong(Connection con, List<ChiTietHoaDon> ds, boolean luu)
             throws SQLException {
         if (ds == null || ds.isEmpty()) {
-            throw new SQLException("Hóa đơn phải có sản phẩm.");
+            throw new SQLException("HÃ³a Ä‘Æ¡n pháº£i cÃ³ sáº£n pháº©m.");
         }
         Set<String> ids = new HashSet<>();
         ds.sort(Comparator.comparing(d -> d.getSanPham().getMaSanPham()));
         for (ChiTietHoaDon d : ds) {
             String ma = d.getSanPham().getMaSanPham();
             if (!(ids.add(ma)) || d.getSoLuong() <= 0) {
-                throw new SQLException("Mỗi sản phẩm một dòng, số lượng phải > 0.");
+                throw new SQLException("Má»—i sáº£n pháº©m má»™t dÃ²ng, sá»‘ lÆ°á»£ng pháº£i > 0.");
             }
             String sql =
                     "SELECT MaSanPham FROM dbo.SanPham WITH (UPDLOCK,HOLDLOCK) WHERE MaSanPham=?";
@@ -164,17 +164,17 @@ public class HoaDon_DAO {
                 }
             }
             SanPham sp = SanPham_DAO.tim(con, ma);
-            if (sp == null || !("Đang bán".equals(sp.getTrangThai()))) {
-                throw new SQLException("Sản phẩm không còn bán: " + ma);
+            if (sp == null || !("Äang bÃ¡n".equals(sp.getTrangThai()))) {
+                throw new SQLException("Sáº£n pháº©m khÃ´ng cÃ²n bÃ¡n: " + ma);
             }
             if (d.getSoLuong() > sp.getSoLuongTon()) {
-                throw new SQLException("Không đủ tồn: " + sp.getTenSanPham());
+                throw new SQLException("KhÃ´ng Ä‘á»§ tá»“n: " + sp.getTenSanPham());
             }
             if (luu) {
                 d.setDonGia(sp.getDonGiaBan());
             } else {
                 if (InHoaDon.soSanhTien(d.getDonGia(), sp.getDonGiaBan()) != 0) {
-                    throw new SQLException("Giá đã đổi. Mở lại đơn, lưu lại trước khi thanh toán.");
+                    throw new SQLException("GiÃ¡ Ä‘Ã£ Ä‘á»•i. Má»Ÿ láº¡i Ä‘Æ¡n, lÆ°u láº¡i trÆ°á»›c khi thanh toÃ¡n.");
                 }
             }
             double giam = 0.0;
@@ -183,7 +183,7 @@ public class HoaDon_DAO {
                         ChuongTrinhKhuyenMai_DAO.tim(
                                 con, d.getChuongTrinhKhuyenMai().getMaKhuyenMai());
                 if (!(ChuongTrinhKhuyenMai_DAO.hieuLuc(km, LocalDate.now()))) {
-                    throw new SQLException("Khuyến mãi hết hiệu lực. Mở lại và sửa đơn.");
+                    throw new SQLException("Khuyáº¿n mÃ£i háº¿t hiá»‡u lá»±c. Má»Ÿ láº¡i vÃ  sá»­a Ä‘Æ¡n.");
                 }
                 giam =
                         InHoaDon.tron(
@@ -193,7 +193,7 @@ public class HoaDon_DAO {
                 d.setGiamGia(giam);
             } else {
                 if (InHoaDon.soSanhTien(d.getGiamGia(), giam) != 0) {
-                    throw new SQLException("Mức giảm đã đổi. Lưu lại đơn trước khi thanh toán.");
+                    throw new SQLException("Má»©c giáº£m Ä‘Ã£ Ä‘á»•i. LÆ°u láº¡i Ä‘Æ¡n trÆ°á»›c khi thanh toÃ¡n.");
                 }
             }
         }
@@ -239,7 +239,7 @@ public class HoaDon_DAO {
                 String max = ketQua7;
                 int stt = max == null ? 1 : Integer.parseInt(max.substring(14)) + 1;
                 if (stt > 999) {
-                    throw new SQLException("Ca đã đủ 999 hóa đơn trong ngày.");
+                    throw new SQLException("Ca Ä‘Ã£ Ä‘á»§ 999 hÃ³a Ä‘Æ¡n trong ngÃ y.");
                 }
                 String id = prefix + String.format("%03d", stt);
                 String sql3 =
@@ -259,11 +259,11 @@ public class HoaDon_DAO {
                 h.setMaHoaDon(id);
             } else {
                 HoaDon cu = tim(con, h.getMaHoaDon(), true);
-                if (cu == null || !("Chưa thanh toán".equals(cu.getTrangThaiThanhToan()))) {
-                    throw new SQLException("Chỉ sửa đơn chưa thanh toán.");
+                if (cu == null || !("ChÆ°a thanh toÃ¡n".equals(cu.getTrangThaiThanhToan()))) {
+                    throw new SQLException("Chá»‰ sá»­a Ä‘Æ¡n chÆ°a thanh toÃ¡n.");
                 }
                 if (!(cu.getNhanVien().getMaNhanVien().equals(tk.getNhanVien().getMaNhanVien()))) {
-                    throw new SQLException("Chỉ sửa đơn do mình lập.");
+                    throw new SQLException("Chá»‰ sá»­a Ä‘Æ¡n do mÃ¬nh láº­p.");
                 }
                 String sql4 =
                         "UPDATE dbo.HoaDon SET"
@@ -307,36 +307,36 @@ public class HoaDon_DAO {
         try {
             new TaiKhoan_DAO().kiemTraQuyen(tk, false);
             HoaDon h = tim(con, ma, true);
-            if (h == null || !("Chưa thanh toán".equals(h.getTrangThaiThanhToan()))) {
-                throw new SQLException("Hóa đơn đã thanh toán, đã hủy hoặc không tồn tại.");
+            if (h == null || !("ChÆ°a thanh toÃ¡n".equals(h.getTrangThaiThanhToan()))) {
+                throw new SQLException("HÃ³a Ä‘Æ¡n Ä‘Ã£ thanh toÃ¡n, Ä‘Ã£ há»§y hoáº·c khÃ´ng tá»“n táº¡i.");
             }
             if (!(h.getNhanVien().getMaNhanVien().equals(tk.getNhanVien().getMaNhanVien()))) {
-                throw new SQLException("Chỉ thanh toán đơn của mình.");
+                throw new SQLException("Chá»‰ thanh toÃ¡n Ä‘Æ¡n cá»§a mÃ¬nh.");
             }
             String pc = new PhanCongCa_DAO().layMaCaDangMo(con, tk);
             if (!(pc.equals(h.getPhanCongCa().getMaPhanCong()))) {
                 throw new SQLException(
-                        "Đơn không thuộc ca hiện tại. Mở lại và lưu đơn vào ca này.");
+                        "ÄÆ¡n khÃ´ng thuá»™c ca hiá»‡n táº¡i. Má»Ÿ láº¡i vÃ  lÆ°u Ä‘Æ¡n vÃ o ca nÃ y.");
             }
             List<ChiTietHoaDon> ds = ct.getTheoHoaDon(con, ma);
             kiemTraDong(con, ds, false);
             kiemTraKhach(con, h, ds);
             double total = InHoaDon.phaiTra(ds, h.getDiemSuDung(), h.getThueSuatVAT());
-            if (!("Tiền mặt".equals(hinhThuc)) && !("Chuyển khoản QR".equals(hinhThuc))) {
-                throw new SQLException("Hình thức không hợp lệ.");
+            if (!("Tiá»n máº·t".equals(hinhThuc)) && !("Chuyá»ƒn khoáº£n QR".equals(hinhThuc))) {
+                throw new SQLException("HÃ¬nh thá»©c khÃ´ng há»£p lá»‡.");
             }
-            if ("Tiền mặt".equals(hinhThuc)) {
+            if ("Tiá»n máº·t".equals(hinhThuc)) {
                 if (!Double.isFinite(tienNhan) || InHoaDon.soSanhTien(tienNhan, total) < 0) {
-                    throw new SQLException("Tiền khách đưa chưa đủ.");
+                    throw new SQLException("Tiá»n khÃ¡ch Ä‘Æ°a chÆ°a Ä‘á»§.");
                 }
             } else {
                 if (!(xacNhanQR)) {
-                    throw new SQLException("Chưa xác nhận tiền chuyển khoản đã vào.");
+                    throw new SQLException("ChÆ°a xÃ¡c nháº­n tiá»n chuyá»ƒn khoáº£n Ä‘Ã£ vÃ o.");
                 }
-                until.InHoaDon.kiemTraCauHinhQR();
+                util.InHoaDon.kiemTraCauHinhQR();
                 if (!Double.isFinite(total) || total <= 0
                         || total != Math.rint(total) || total > 9999999999999.0) {
-                    throw new SQLException("QR cần số tiền nguyên VND dương, tối đa 13 chữ số.");
+                    throw new SQLException("QR cáº§n sá»‘ tiá»n nguyÃªn VND dÆ°Æ¡ng, tá»‘i Ä‘a 13 chá»¯ sá»‘.");
                 }
             }
             for (ChiTietHoaDon d : ds) {
@@ -349,8 +349,8 @@ public class HoaDon_DAO {
                         InHoaDon.diemCong(total) - h.getDiemSuDung());
             }
             String sql =
-                    "UPDATE dbo.HoaDon SET TrangThaiThanhToan=N'Đã thanh toán',HinhThucThanhToan=?"
-                            + " WHERE MaHoaDon=? AND TrangThaiThanhToan=N'Chưa thanh toán'";
+                    "UPDATE dbo.HoaDon SET TrangThaiThanhToan=N'ÄÃ£ thanh toÃ¡n',HinhThucThanhToan=?"
+                            + " WHERE MaHoaDon=? AND TrangThaiThanhToan=N'ChÆ°a thanh toÃ¡n'";
             int ketQua3;
             try (PreparedStatement stmt = con.prepareStatement(sql)) {
                 stmt.setString(1, hinhThuc);
@@ -358,10 +358,10 @@ public class HoaDon_DAO {
                 ketQua3 = stmt.executeUpdate();
             }
             if (ketQua3 != 1) {
-                throw new SQLException("Trạng thái đơn đã thay đổi.");
+                throw new SQLException("Tráº¡ng thÃ¡i Ä‘Æ¡n Ä‘Ã£ thay Ä‘á»•i.");
             }
             con.commit();
-            return "Tiền mặt".equals(hinhThuc) ? InHoaDon.tron(tienNhan - total) : 0.0;
+            return "Tiá»n máº·t".equals(hinhThuc) ? InHoaDon.tron(tienNhan - total) : 0.0;
         } catch (SQLException | RuntimeException e) {
             con.rollback();
             throw e;
@@ -380,16 +380,16 @@ public class HoaDon_DAO {
         try {
             new TaiKhoan_DAO().kiemTraQuyen(tk, false);
             HoaDon h = tim(con, ma, true);
-            if (h == null || !("Chưa thanh toán".equals(h.getTrangThaiThanhToan()))) {
-                throw new SQLException("Chỉ hủy hóa đơn chưa thanh toán.");
+            if (h == null || !("ChÆ°a thanh toÃ¡n".equals(h.getTrangThaiThanhToan()))) {
+                throw new SQLException("Chá»‰ há»§y hÃ³a Ä‘Æ¡n chÆ°a thanh toÃ¡n.");
             }
             if (!("ADMIN".equals(tk.getQuyen()))
                     && !(h.getNhanVien()
                             .getMaNhanVien()
                             .equals(tk.getNhanVien().getMaNhanVien()))) {
-                throw new SQLException("Không được hủy đơn của người khác.");
+                throw new SQLException("KhÃ´ng Ä‘Æ°á»£c há»§y Ä‘Æ¡n cá»§a ngÆ°á»i khÃ¡c.");
             }
-            String sql = "UPDATE dbo.HoaDon SET TrangThaiThanhToan=N'Đã hủy' WHERE MaHoaDon=?";
+            String sql = "UPDATE dbo.HoaDon SET TrangThaiThanhToan=N'ÄÃ£ há»§y' WHERE MaHoaDon=?";
             try (PreparedStatement stmt = con.prepareStatement(sql)) {
                 stmt.setString(1, ma);
                 stmt.executeUpdate();

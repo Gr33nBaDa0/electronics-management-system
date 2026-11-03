@@ -9,8 +9,8 @@ import entity.ChiTietHoaDon;
 import entity.HoaDon;
 import entity.TaiKhoan;
 
-import until.*;
-import until.GiaoDien;
+import util.*;
+import util.GiaoDien;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -34,7 +34,7 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 public class HoaDon_GUI extends JPanel implements ActionListener {
-    // Màu dùng chung được khai báo ở đầu lớp.
+    // MÃ u dÃ¹ng chung Ä‘Æ°á»£c khai bÃ¡o á»Ÿ Ä‘áº§u lá»›p.
     private static final Color PRIMARY = GiaoDien.PRIMARY,
             DARK = GiaoDien.DARK,
             BACKGROUND = GiaoDien.BACKGROUND,
@@ -50,24 +50,24 @@ public class HoaDon_GUI extends JPanel implements ActionListener {
             tu = new JTextField(LocalDate.now().minusMonths(1).toString(), 10),
             den = new JTextField(LocalDate.now().toString(), 10);
     private final JComboBox<String>
-            tt = new JComboBox<>(new String[] {"", "Chưa thanh toán", "Đã thanh toán", "Đã hủy"}),
-            ht = new JComboBox<>(new String[] {"", "Tiền mặt", "Chuyển khoản QR"});
-    private final JButton btnTim = taoNut("Tìm / lọc"),
-            btnXem = taoNut("Xem chi tiết"),
-            btnIn = taoNut("In hóa đơn"),
-            btnMo = taoNut("Mở đơn tại POS"),
-            btnHuy = taoNut("Hủy đơn"),
-            btnBo = taoNut("Bỏ lọc"),
-            btnBH = taoNut("Tra bảo hành");
+            tt = new JComboBox<>(new String[] {"", "ChÆ°a thanh toÃ¡n", "ÄÃ£ thanh toÃ¡n", "ÄÃ£ há»§y"}),
+            ht = new JComboBox<>(new String[] {"", "Tiá»n máº·t", "Chuyá»ƒn khoáº£n QR"});
+    private final JButton btnTim = taoNut("TÃ¬m / lá»c"),
+            btnXem = taoNut("Xem chi tiáº¿t"),
+            btnIn = taoNut("In hÃ³a Ä‘Æ¡n"),
+            btnMo = taoNut("Má»Ÿ Ä‘Æ¡n táº¡i POS"),
+            btnHuy = taoNut("Há»§y Ä‘Æ¡n"),
+            btnBo = taoNut("Bá» lá»c"),
+            btnBH = taoNut("Tra báº£o hÃ nh");
     private final DefaultTableModel model =
             taoModel(
-                    "Mã hóa đơn",
-                    "Ngày lập",
-                    "Nhân viên",
-                    "Khách",
-                    "Trạng thái",
-                    "Hình thức",
-                    "Điểm dùng");
+                    "MÃ£ hÃ³a Ä‘Æ¡n",
+                    "NgÃ y láº­p",
+                    "NhÃ¢n viÃªn",
+                    "KhÃ¡ch",
+                    "Tráº¡ng thÃ¡i",
+                    "HÃ¬nh thá»©c",
+                    "Äiá»ƒm dÃ¹ng");
     private final JTable table = taoBang(model);
 
     public HoaDon_GUI(TaiKhoan tk, BanHang_GUI pos) {
@@ -82,15 +82,15 @@ public class HoaDon_GUI extends JPanel implements ActionListener {
         JPanel loc =
                 GiaoDien.form(
                         3,
-                        "Mã hóa đơn / SĐT",
+                        "MÃ£ hÃ³a Ä‘Æ¡n / SÄT",
                         txtTim,
-                        "Từ ngày (yyyy-MM-dd)",
+                        "Tá»« ngÃ y (yyyy-MM-dd)",
                         tu,
-                        "Đến ngày (yyyy-MM-dd)",
+                        "Äáº¿n ngÃ y (yyyy-MM-dd)",
                         den,
-                        "Trạng thái",
+                        "Tráº¡ng thÃ¡i",
                         tt,
-                        "Hình thức thanh toán",
+                        "HÃ¬nh thá»©c thanh toÃ¡n",
                         ht);
         tt.setRenderer(
                 new javax.swing.DefaultListCellRenderer() {
@@ -99,7 +99,7 @@ public class HoaDon_GUI extends JPanel implements ActionListener {
                             javax.swing.JList<?> l, Object v, int i, boolean s, boolean f) {
                         return super.getListCellRendererComponent(
                                 l,
-                                v == null || v.toString().isEmpty() ? "Tất cả trạng thái" : v,
+                                v == null || v.toString().isEmpty() ? "Táº¥t cáº£ tráº¡ng thÃ¡i" : v,
                                 i,
                                 s,
                                 f);
@@ -112,18 +112,18 @@ public class HoaDon_GUI extends JPanel implements ActionListener {
                             javax.swing.JList<?> l, Object v, int i, boolean s, boolean f) {
                         return super.getListCellRendererComponent(
                                 l,
-                                v == null || v.toString().isEmpty() ? "Tất cả hình thức" : v,
+                                v == null || v.toString().isEmpty() ? "Táº¥t cáº£ hÃ¬nh thá»©c" : v,
                                 i,
                                 s,
                                 f);
                     }
                 });
         add(
-                GiaoDien.doc(GiaoDien.the("Bộ lọc hóa đơn", loc, taoDong(btnTim, btnBo))),
+                GiaoDien.doc(GiaoDien.the("Bá»™ lá»c hÃ³a Ä‘Æ¡n", loc, taoDong(btnTim, btnBo))),
                 BorderLayout.NORTH);
         add(
                 GiaoDien.the(
-                        "Danh sách hóa đơn",
+                        "Danh sÃ¡ch hÃ³a Ä‘Æ¡n",
                         GiaoDien.cuon(table),
                         taoDong(btnXem, btnIn, btnMo, btnHuy, btnBH)),
                 BorderLayout.CENTER);
@@ -157,7 +157,7 @@ public class HoaDon_GUI extends JPanel implements ActionListener {
                             h.getNgayLap(),
                             h.getNhanVien().getMaNhanVien(),
                             h.getKhachHang() == null
-                                    ? "Vãng lai"
+                                    ? "VÃ£ng lai"
                                     : h.getKhachHang().getMaKhachHang(),
                             h.getTrangThaiThanhToan(),
                             h.getHinhThucThanhToan(),
@@ -167,12 +167,12 @@ public class HoaDon_GUI extends JPanel implements ActionListener {
             e.printStackTrace();
             JOptionPane.showMessageDialog(
                     this,
-                    "Lỗi tải dữ liệu SQL:\n" + e.getMessage(),
-                    "Lỗi SQL",
+                    "Lá»—i táº£i dá»¯ liá»‡u SQL:\n" + e.getMessage(),
+                    "Lá»—i SQL",
                     JOptionPane.ERROR_MESSAGE);
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(
-                    this, e.getMessage(), "Thông báo", JOptionPane.WARNING_MESSAGE);
+                    this, e.getMessage(), "ThÃ´ng bÃ¡o", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -194,28 +194,28 @@ public class HoaDon_GUI extends JPanel implements ActionListener {
                 return;
             }
             int i = table.getSelectedRow();
-            if (i < 0) throw new IllegalArgumentException("Chọn hóa đơn.");
+            if (i < 0) throw new IllegalArgumentException("Chá»n hÃ³a Ä‘Æ¡n.");
             i = table.convertRowIndexToModel(i);
             HoaDon h = new HoaDon_DAO().tim(ds.get(i).getMaHoaDon());
             if (o.equals(btnIn)) {
                 java.io.File file = InHoaDon.xuatFilePDF(h.getMaHoaDon());
                 try {
                     if (!InHoaDon.moFilePDF(file))
-                        JOptionPane.showMessageDialog(this, "Đã xuất hóa đơn: " + file.getAbsolutePath());
+                        JOptionPane.showMessageDialog(this, "ÄÃ£ xuáº¥t hÃ³a Ä‘Æ¡n: " + file.getAbsolutePath());
                 } catch (Exception | LinkageError loiMo) {
-                    JOptionPane.showMessageDialog(this, "Đã xuất hóa đơn: " + file.getAbsolutePath()
-                            + "\nChưa mở được PDF tự động. Bạn có thể mở file đã lưu trong ổ D.");
+                    JOptionPane.showMessageDialog(this, "ÄÃ£ xuáº¥t hÃ³a Ä‘Æ¡n: " + file.getAbsolutePath()
+                            + "\nChÆ°a má»Ÿ Ä‘Æ°á»£c PDF tá»± Ä‘á»™ng. Báº¡n cÃ³ thá»ƒ má»Ÿ file Ä‘Ã£ lÆ°u trong á»• D.");
                 }
             } else if (o.equals(btnBH)) {
-                if (!"Đã thanh toán".equals(h.getTrangThaiThanhToan()))
-                    throw new IllegalArgumentException("Chỉ tra hóa đơn đã thanh toán.");
+                if (!"ÄÃ£ thanh toÃ¡n".equals(h.getTrangThaiThanhToan()))
+                    throw new IllegalArgumentException("Chá»‰ tra hÃ³a Ä‘Æ¡n Ä‘Ã£ thanh toÃ¡n.");
                 List<ChiTietHoaDon> ds = new ChiTietHoaDon_DAO().getTheoHoaDon(h.getMaHoaDon());
                 ChiTietHoaDon d =
                         (ChiTietHoaDon)
                                 JOptionPane.showInputDialog(
                                         this,
-                                        "Chọn sản phẩm đã mua:",
-                                        "Tra bảo hành",
+                                        "Chá»n sáº£n pháº©m Ä‘Ã£ mua:",
+                                        "Tra báº£o hÃ nh",
                                         JOptionPane.PLAIN_MESSAGE,
                                         null,
                                         ds.toArray(),
@@ -225,36 +225,36 @@ public class HoaDon_GUI extends JPanel implements ActionListener {
                     JOptionPane.showMessageDialog(
                             this,
                             thang == 0
-                                    ? "Sản phẩm không áp dụng bảo hành."
-                                    : "Ngày lập hóa đơn: "
+                                    ? "Sáº£n pháº©m khÃ´ng Ã¡p dá»¥ng báº£o hÃ nh."
+                                    : "NgÃ y láº­p hÃ³a Ä‘Æ¡n: "
                                             + h.getNgayLap().toLocalDate()
-                                            + "\nThời hạn sản phẩm hiện tại: "
+                                            + "\nThá»i háº¡n sáº£n pháº©m hiá»‡n táº¡i: "
                                             + thang
-                                            + " tháng\nHạn tham khảo: "
+                                            + " thÃ¡ng\nHáº¡n tham kháº£o: "
                                             + h.getNgayLap().toLocalDate().plusMonths(thang)
                                             + "\n"
-                                            + "Vui lòng đối chiếu chứng từ và điều kiện bảo hành"
-                                            + " thực tế.");
+                                            + "Vui lÃ²ng Ä‘á»‘i chiáº¿u chá»©ng tá»« vÃ  Ä‘iá»u kiá»‡n báº£o hÃ nh"
+                                            + " thá»±c táº¿.");
                 }
             } else if (o.equals(btnHuy)) {
-                if (xacNhan(this, "Hủy hóa đơn chưa thanh toán?")) {
+                if (xacNhan(this, "Há»§y hÃ³a Ä‘Æ¡n chÆ°a thanh toÃ¡n?")) {
                     new HoaDon_DAO().huy(h.getMaHoaDon(), tk);
                     loadDataToTable();
                 }
             } else if (o.equals(btnMo)) {
                 pos.moHoaDon(h.getMaHoaDon());
-                JOptionPane.showMessageDialog(this, "Đã nạp đơn. Chọn menu Bán hàng để tiếp tục.");
+                JOptionPane.showMessageDialog(this, "ÄÃ£ náº¡p Ä‘Æ¡n. Chá»n menu BÃ¡n hÃ ng Ä‘á»ƒ tiáº¿p tá»¥c.");
             } else if (o.equals(btnXem)) {
                 List<ChiTietHoaDon> dong = new ChiTietHoaDon_DAO().getTheoHoaDon(h.getMaHoaDon());
                 JTextArea text = new JTextArea(InHoaDon.noiDung(h, dong), 25, 65);
                 text.setEditable(false);
                 JOptionPane.showMessageDialog(
-                        this, new JScrollPane(text), "Chi tiết hóa đơn", JOptionPane.PLAIN_MESSAGE);
+                        this, new JScrollPane(text), "Chi tiáº¿t hÃ³a Ä‘Æ¡n", JOptionPane.PLAIN_MESSAGE);
             }
         } catch (java.sql.SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(
-                    this, "Lỗi SQL:\n" + ex.getMessage(), "Lỗi SQL", JOptionPane.ERROR_MESSAGE);
+                    this, "Lá»—i SQL:\n" + ex.getMessage(), "Lá»—i SQL", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             thongBaoLoi(this, ex);
         }
@@ -270,7 +270,7 @@ public class HoaDon_GUI extends JPanel implements ActionListener {
 
     private void thongBaoLoi(Component c, Exception e) {
         JOptionPane.showMessageDialog(
-                c, e.getMessage(), "Không thực hiện được", JOptionPane.ERROR_MESSAGE);
+                c, e.getMessage(), "KhÃ´ng thá»±c hiá»‡n Ä‘Æ°á»£c", JOptionPane.ERROR_MESSAGE);
     }
 
     private DefaultTableModel taoModel(String... cot) {
@@ -291,7 +291,7 @@ public class HoaDon_GUI extends JPanel implements ActionListener {
     }
 
     private boolean xacNhan(Component c, String s) {
-        return JOptionPane.showConfirmDialog(c, s, "Xác nhận", JOptionPane.YES_NO_OPTION)
+        return JOptionPane.showConfirmDialog(c, s, "XÃ¡c nháº­n", JOptionPane.YES_NO_OPTION)
                 == JOptionPane.YES_OPTION;
     }
 

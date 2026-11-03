@@ -5,7 +5,7 @@ import dao.TaiKhoan_DAO;
 
 import entity.TaiKhoan;
 
-import until.GiaoDien;
+import util.GiaoDien;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -22,7 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class SaoLuu_GUI extends JPanel implements ActionListener {
-    // Màu dùng chung được khai báo ở đầu lớp.
+    // MÃ u dÃ¹ng chung Ä‘Æ°á»£c khai bÃ¡o á»Ÿ Ä‘áº§u lá»›p.
     private static final Color PRIMARY = GiaoDien.PRIMARY,
             DARK = GiaoDien.DARK,
             BACKGROUND = GiaoDien.BACKGROUND,
@@ -39,9 +39,9 @@ public class SaoLuu_GUI extends JPanel implements ActionListener {
             name = new JTextField(docThietLap("payment.accountName", ""), 24),
             bank = new JTextField(docThietLap("payment.bankName", ""), 18),
             minutes = new JTextField(docThietLap("backup.minutes", "0"), 8);
-    private final JButton btnBackup = taoNut("Sao lưu và kiểm tra"),
-            btnVerify = taoNut("Kiểm tra bản .bak"),
-            btnSave = taoNut("Lưu cấu hình");
+    private final JButton btnBackup = taoNut("Sao lÆ°u vÃ  kiá»ƒm tra"),
+            btnVerify = taoNut("Kiá»ƒm tra báº£n .bak"),
+            btnSave = taoNut("LÆ°u cáº¥u hÃ¬nh");
 
     public SaoLuu_GUI(TaiKhoan tk) {
         this.tk = tk;
@@ -51,36 +51,36 @@ public class SaoLuu_GUI extends JPanel implements ActionListener {
                 GiaoDien.doc(
                         GiaoDien.form(
                                 1,
-                                "Đường dẫn .bak trên máy SQL Server",
+                                "ÄÆ°á»ng dáº«n .bak trÃªn mÃ¡y SQL Server",
                                 path,
-                                "Chu kỳ sao lưu (phút), 0 = tắt",
+                                "Chu ká»³ sao lÆ°u (phÃºt), 0 = táº¯t",
                                 minutes),
                         GiaoDien.ghiChu(
-                                "Sao lưu tự động chạy khi ứng dụng còn mở và quản lý đang đăng"
-                                        + " nhập. Lưu thiết lập rồi đăng nhập lại để đổi lịch."));
+                                "Sao lÆ°u tá»± Ä‘á»™ng cháº¡y khi á»©ng dá»¥ng cÃ²n má»Ÿ vÃ  quáº£n lÃ½ Ä‘ang Ä‘Äƒng"
+                                        + " nháº­p. LÆ°u thiáº¿t láº­p rá»“i Ä‘Äƒng nháº­p láº¡i Ä‘á»ƒ Ä‘á»•i lá»‹ch."));
         JPanel nganHang =
                 GiaoDien.doc(
                         GiaoDien.form(
                                 1,
-                                "BIN ngân hàng (6 số)",
+                                "BIN ngÃ¢n hÃ ng (6 sá»‘)",
                                 bin,
-                                "Số tài khoản nhận tiền",
+                                "Sá»‘ tÃ i khoáº£n nháº­n tiá»n",
                                 account,
-                                "Tên chủ tài khoản",
+                                "TÃªn chá»§ tÃ i khoáº£n",
                                 name,
-                                "Tên ngân hàng",
+                                "TÃªn ngÃ¢n hÃ ng",
                                 bank),
                         GiaoDien.ghiChu(
-                                "Điền tài khoản thật của cửa hàng. Kiểm tra giao dịch ngân hàng"
-                                        + " trước khi xác nhận thanh toán."));
+                                "Äiá»n tÃ i khoáº£n tháº­t cá»§a cá»­a hÃ ng. Kiá»ƒm tra giao dá»‹ch ngÃ¢n hÃ ng"
+                                        + " trÆ°á»›c khi xÃ¡c nháº­n thanh toÃ¡n."));
         JPanel haiCot = new JPanel(new GridLayout(1, 2, 14, 0));
         haiCot.setOpaque(false);
         haiCot.add(
                 GiaoDien.the(
-                        "Sao lưu dữ liệu",
+                        "Sao lÆ°u dá»¯ liá»‡u",
                         GiaoDien.cuonForm(saoLuu),
                         taoDong(btnBackup, btnVerify)));
-        haiCot.add(GiaoDien.the("Thanh toán ngân hàng", GiaoDien.cuonForm(nganHang), null));
+        haiCot.add(GiaoDien.the("Thanh toÃ¡n ngÃ¢n hÃ ng", GiaoDien.cuonForm(nganHang), null));
         add(haiCot, BorderLayout.CENTER);
         add(taoDong(btnSave), BorderLayout.SOUTH);
         GiaoDien.trangTri(this);
@@ -98,7 +98,7 @@ public class SaoLuu_GUI extends JPanel implements ActionListener {
                 new TaiKhoan_DAO().kiemTraQuyen(tk, true);
                 int n = Integer.parseInt(minutes.getText());
                 if (n < 0 || n > 10080)
-                    throw new IllegalArgumentException("Chu kỳ từ 0 đến 10080 phút.");
+                    throw new IllegalArgumentException("Chu ká»³ tá»« 0 Ä‘áº¿n 10080 phÃºt.");
                 Properties p = new Properties();
                 p.setProperty("backup.file", path.getText().trim());
                 p.setProperty("backup.minutes", String.valueOf(n));
@@ -122,21 +122,21 @@ public class SaoLuu_GUI extends JPanel implements ActionListener {
                     daLuu.store(writer, "QR, han tra va sao luu");
                 }
                 JOptionPane.showMessageDialog(
-                        this, "Đã lưu cấu hình riêng máy. Đăng nhập lại để áp dụng lịch backup.");
+                        this, "ÄÃ£ lÆ°u cáº¥u hÃ¬nh riÃªng mÃ¡y. ÄÄƒng nháº­p láº¡i Ä‘á»ƒ Ã¡p dá»¥ng lá»‹ch backup.");
             } else if (o.equals(btnBackup)) {
-                if (xacNhan(this, "Sao lưu database đang kết nối tới đường dẫn đã nhập?")) {
+                if (xacNhan(this, "Sao lÆ°u database Ä‘ang káº¿t ná»‘i tá»›i Ä‘Æ°á»ng dáº«n Ä‘Ã£ nháº­p?")) {
                     new SaoLuu_DAO().saoLuu(path.getText().trim(), tk);
                     JOptionPane.showMessageDialog(
-                            this, "Sao lưu và RESTORE VERIFYONLY thành công.");
+                            this, "Sao lÆ°u vÃ  RESTORE VERIFYONLY thÃ nh cÃ´ng.");
                 }
             } else if (o.equals(btnVerify)) {
                 new SaoLuu_DAO().kiemTra(path.getText().trim(), tk);
-                JOptionPane.showMessageDialog(this, "SQL Server xác nhận bản backup đọc được.");
+                JOptionPane.showMessageDialog(this, "SQL Server xÃ¡c nháº­n báº£n backup Ä‘á»c Ä‘Æ°á»£c.");
             }
         } catch (java.sql.SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(
-                    this, "Lỗi SQL:\n" + ex.getMessage(), "Lỗi SQL", JOptionPane.ERROR_MESSAGE);
+                    this, "Lá»—i SQL:\n" + ex.getMessage(), "Lá»—i SQL", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             thongBaoLoi(this, ex);
         }
@@ -148,7 +148,7 @@ public class SaoLuu_GUI extends JPanel implements ActionListener {
 
     private void thongBaoLoi(Component c, Exception e) {
         JOptionPane.showMessageDialog(
-                c, e.getMessage(), "Không thực hiện được", JOptionPane.ERROR_MESSAGE);
+                c, e.getMessage(), "KhÃ´ng thá»±c hiá»‡n Ä‘Æ°á»£c", JOptionPane.ERROR_MESSAGE);
     }
 
     private JButton taoNut(String t) {
@@ -160,7 +160,7 @@ public class SaoLuu_GUI extends JPanel implements ActionListener {
     }
 
     private boolean xacNhan(Component c, String s) {
-        return JOptionPane.showConfirmDialog(c, s, "Xác nhận", JOptionPane.YES_NO_OPTION)
+        return JOptionPane.showConfirmDialog(c, s, "XÃ¡c nháº­n", JOptionPane.YES_NO_OPTION)
                 == JOptionPane.YES_OPTION;
     }
 

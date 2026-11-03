@@ -6,8 +6,8 @@ import dao.*;
 
 import entity.*;
 
-import until.GiaoDien;
-import until.InHoaDon;
+import util.GiaoDien;
+import util.InHoaDon;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -50,7 +50,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
                                 g.setColor(MUTED);
                                 g.setFont(GiaoDien.phong(Font.PLAIN, 13));
                                 g.drawString(
-                                        "Tìm mã hoặc tên sản phẩm… · F2",
+                                        "TÃ¬m mÃ£ hoáº·c tÃªn sáº£n pháº©mâ€¦ Â· F2",
                                         12,
                                         (getHeight() + g.getFontMetrics().getAscent()) / 2 - 2);
                             }
@@ -58,23 +58,23 @@ public class BanHang_GUI extends JPanel implements ActionListener {
                     },
             txtDiem = new JTextField("0", 5);
     private final JComboBox<KhachHang> cboKhach = new JComboBox<>();
-    private final JButton btnTai = GiaoDien.nut("Tải lại"),
-            btnBang = GiaoDien.nut("Xem bảng"),
-            btnKhach = GiaoDien.nut("Tìm"),
-            btnMoi = GiaoDien.nut("Đơn mới"),
-            btnLuu = GiaoDien.nut("Lưu đơn"),
-            btnTra = GiaoDien.nutChinh("Tiền mặt · F9"),
-            btnQR = GiaoDien.nutVang("QR · F10");
-    private final JLabel lblSoSP = nhan("Sản phẩm", 15, true, TEXT),
-            lblDon = nhan("Đơn mới", 12, false, MUTED),
-            lblSoDong = nhan("0 sản phẩm", 12, true, PRIMARY),
-            lblDiemCo = nhan("Khách vãng lai", 12, false, MUTED),
-            lblHang = nhan("0 đ", 13, false, TEXT),
-            lblGiam = nhan("0 đ", 13, false, PRIMARY),
-            lblQuyDoi = nhan("0 đ", 13, false, PRIMARY),
-            lblVAT = nhan("0 đ", 13, false, TEXT),
+    private final JButton btnTai = GiaoDien.nut("Táº£i láº¡i"),
+            btnBang = GiaoDien.nut("Xem báº£ng"),
+            btnKhach = GiaoDien.nut("TÃ¬m"),
+            btnMoi = GiaoDien.nut("ÄÆ¡n má»›i"),
+            btnLuu = GiaoDien.nut("LÆ°u Ä‘Æ¡n"),
+            btnTra = GiaoDien.nutChinh("Tiá»n máº·t Â· F9"),
+            btnQR = GiaoDien.nutVang("QR Â· F10");
+    private final JLabel lblSoSP = nhan("Sáº£n pháº©m", 15, true, TEXT),
+            lblDon = nhan("ÄÆ¡n má»›i", 12, false, MUTED),
+            lblSoDong = nhan("0 sáº£n pháº©m", 12, true, PRIMARY),
+            lblDiemCo = nhan("KhÃ¡ch vÃ£ng lai", 12, false, MUTED),
+            lblHang = nhan("0 Ä‘", 13, false, TEXT),
+            lblGiam = nhan("0 Ä‘", 13, false, PRIMARY),
+            lblQuyDoi = nhan("0 Ä‘", 13, false, PRIMARY),
+            lblVAT = nhan("0 Ä‘", 13, false, TEXT),
             lblTenVAT = nhan("VAT (10%)", 13, false, MUTED),
-            lblTong = nhan("0 đ", 24, true, PRIMARY),
+            lblTong = nhan("0 Ä‘", 24, true, PRIMARY),
             lblLoi = nhan(" ", 12, false, GiaoDien.ERROR);
     private final JPanel nhomLoai = GiaoDien.dong(),
             noiGio = new JPanel(new GridLayout(0, 1)),
@@ -82,7 +82,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
     private final LuoiSanPham luoi = new LuoiSanPham();
     private final JScrollPane cuonGio = GiaoDien.cuonForm(noiGio);
     private final DefaultTableModel modelSP =
-            new DefaultTableModel(new String[] {"Mã", "Sản phẩm", "Giá bán", "Tồn"}, 0) {
+            new DefaultTableModel(new String[] {"MÃ£", "Sáº£n pháº©m", "GiÃ¡ bÃ¡n", "Tá»“n"}, 0) {
                 public boolean isCellEditable(int r, int c) {
                     return false;
                 }
@@ -95,7 +95,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
         noiGio.setBackground(SURFACE);
         JPanel tim = new JPanel(new BorderLayout(8, 0));
         tim.setOpaque(false);
-        txtTim.setToolTipText("Tìm mã, tên, loại hàng hoặc thương hiệu · F2");
+        txtTim.setToolTipText("TÃ¬m mÃ£, tÃªn, loáº¡i hÃ ng hoáº·c thÆ°Æ¡ng hiá»‡u Â· F2");
         tim.add(txtTim, BorderLayout.CENTER);
         tim.add(btnTai, BorderLayout.EAST);
         JPanel dauSP = GiaoDien.doc(tim, hang(lblSoSP, btnBang), nhomLoai);
@@ -103,9 +103,9 @@ public class BanHang_GUI extends JPanel implements ActionListener {
         JScrollPane cuonSP = GiaoDien.cuon(luoi);
         cuonSP.setBorder(null);
         cuonSP.getViewport().setBackground(GiaoDien.BACKGROUND);
-        cheDoSP.add(cuonSP, "Lưới");
+        cheDoSP.add(cuonSP, "LÆ°á»›i");
         tableSP.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        cheDoSP.add(GiaoDien.cuon(tableSP), "Bảng");
+        cheDoSP.add(GiaoDien.cuon(tableSP), "Báº£ng");
         JPanel trai = new JPanel(new BorderLayout(0, 10));
         trai.setOpaque(false);
         trai.add(dauSP, BorderLayout.NORTH);
@@ -118,8 +118,8 @@ public class BanHang_GUI extends JPanel implements ActionListener {
                         return super.getListCellRendererComponent(
                                 l,
                                 k == null
-                                        ? "Khách vãng lai"
-                                        : k.getHoTen() + " · " + k.getSoDienThoai(),
+                                        ? "KhÃ¡ch vÃ£ng lai"
+                                        : k.getHoTen() + " Â· " + k.getSoDienThoai(),
                                 i,
                                 s,
                                 f);
@@ -128,13 +128,13 @@ public class BanHang_GUI extends JPanel implements ActionListener {
         JPanel khach = new JPanel(new BorderLayout(6, 0));
         khach.setOpaque(false);
         btnKhach.setPreferredSize(new Dimension(56, 34));
-        btnKhach.setToolTipText("Tìm khách bằng SĐT, tên hoặc mã");
+        btnKhach.setToolTipText("TÃ¬m khÃ¡ch báº±ng SÄT, tÃªn hoáº·c mÃ£");
         khach.add(cboKhach, BorderLayout.CENTER);
         khach.add(btnKhach, BorderLayout.EAST);
         JPanel dauGio =
                 cot(
                         6,
-                        hang(nhan("Giỏ hàng hiện tại", 18, true, TEXT), lblSoDong),
+                        hang(nhan("Giá» hÃ ng hiá»‡n táº¡i", 18, true, TEXT), lblSoDong),
                         lblDon,
                         khach,
                         lblDiemCo);
@@ -144,11 +144,11 @@ public class BanHang_GUI extends JPanel implements ActionListener {
         giua.add(cuonGio, BorderLayout.CENTER);
         JPanel diem = new JPanel(new BorderLayout(10, 0));
         diem.setOpaque(false);
-        diem.add(nhan("Điểm sử dụng", 13, false, TEXT), BorderLayout.WEST);
+        diem.add(nhan("Äiá»ƒm sá»­ dá»¥ng", 13, false, TEXT), BorderLayout.WEST);
         diem.add(txtDiem, BorderLayout.EAST);
         txtDiem.setHorizontalAlignment(JTextField.RIGHT);
         JPanel tong =
-                GiaoDien.the(null, hang(nhan("THÀNH TIỀN", 12, true, PRIMARY), lblTong), null);
+                GiaoDien.the(null, hang(nhan("THÃ€NH TIá»€N", 12, true, PRIMARY), lblTong), null);
         tong.setBackground(GiaoDien.PRIMARY_SOFT);
         JPanel thanhToan = new JPanel(new GridLayout(1, 2, 8, 0));
         thanhToan.setOpaque(false);
@@ -164,9 +164,9 @@ public class BanHang_GUI extends JPanel implements ActionListener {
                 cot(
                         6,
                         diem,
-                        hang(nhan("Tiền hàng", 13, false, MUTED), lblHang),
-                        hang(nhan("Giảm khuyến mãi", 13, false, MUTED), lblGiam),
-                        hang(nhan("Quy đổi điểm", 13, false, MUTED), lblQuyDoi),
+                        hang(nhan("Tiá»n hÃ ng", 13, false, MUTED), lblHang),
+                        hang(nhan("Giáº£m khuyáº¿n mÃ£i", 13, false, MUTED), lblGiam),
+                        hang(nhan("Quy Ä‘á»•i Ä‘iá»ƒm", 13, false, MUTED), lblQuyDoi),
                         hang(lblTenVAT, lblVAT),
                         lblLoi,
                         tong,
@@ -256,7 +256,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
         }
     }
 
-    /** Nạp List -> for -> model.addRow; cùng dữ liệu cho lưới và bảng. */
+    /** Náº¡p List -> for -> model.addRow; cÃ¹ng dá»¯ liá»‡u cho lÆ°á»›i vÃ  báº£ng. */
     private void locSanPham() {
         modelSP.setRowCount(0);
         hienThi.clear();
@@ -272,7 +272,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
                                     + " "
                                     + sp.getThuongHieu())
                             .toLowerCase(Locale.ROOT);
-            if (!"Đang bán".equals(sp.getTrangThai())
+            if (!"Äang bÃ¡n".equals(sp.getTrangThai())
                     || !noiDung.contains(tu)
                     || (loaiDangChon != null && !loaiDangChon.equals(sp.getLoaiHang()))) continue;
             hienThi.add(sp);
@@ -285,8 +285,8 @@ public class BanHang_GUI extends JPanel implements ActionListener {
                     });
             luoi.add(theSanPham(sp));
         }
-        lblSoSP.setText("Sản phẩm · " + hienThi.size());
-        if (hienThi.isEmpty()) luoi.add(nhan("Không có sản phẩm phù hợp.", 14, false, MUTED));
+        lblSoSP.setText("Sáº£n pháº©m Â· " + hienThi.size());
+        if (hienThi.isEmpty()) luoi.add(nhan("KhÃ´ng cÃ³ sáº£n pháº©m phÃ¹ há»£p.", 14, false, MUTED));
         luoi.revalidate();
         luoi.repaint();
     }
@@ -294,9 +294,9 @@ public class BanHang_GUI extends JPanel implements ActionListener {
     private void veNhomLoai() {
         nhomLoai.removeAll();
         java.util.Set<String> ds = new java.util.TreeSet<>();
-        for (SanPham s : sanPham) if ("Đang bán".equals(s.getTrangThai())) ds.add(s.getLoaiHang());
+        for (SanPham s : sanPham) if ("Äang bÃ¡n".equals(s.getTrangThai())) ds.add(s.getLoaiHang());
         if (loaiDangChon != null && !ds.contains(loaiDangChon)) loaiDangChon = null;
-        themNhom("Tất cả", null);
+        themNhom("Táº¥t cáº£", null);
         for (String loai : ds) themNhom(loai, loai);
         nhomLoai.revalidate();
         nhomLoai.repaint();
@@ -336,7 +336,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
         ten.setEditable(false);
         ten.setOpaque(false);
         ten.setPreferredSize(new Dimension(100, 34));
-        JButton them = GiaoDien.nut("+ Thêm");
+        JButton them = GiaoDien.nut("+ ThÃªm");
         them.setPreferredSize(new Dimension(100, 30));
         them.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
         them.setEnabled(sp.getSoLuongTon() > 0);
@@ -354,9 +354,9 @@ public class BanHang_GUI extends JPanel implements ActionListener {
                         nhan(sp.getMaSanPham(), 11, false, MUTED),
                         ten,
                         hang(
-                                nhan(formatGia(sp.getDonGiaBan()) + " đ", 13, true, PRIMARY),
+                                nhan(formatGia(sp.getDonGiaBan()) + " Ä‘", 13, true, PRIMARY),
                                 nhan(
-                                        "Tồn " + sp.getSoLuongTon(),
+                                        "Tá»“n " + sp.getSoLuongTon(),
                                         11,
                                         false,
                                         sp.getSoLuongTon() <= 5 ? GiaoDien.ERROR : MUTED)),
@@ -385,7 +385,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
                 doiSoLuong(d, d.getSoLuong() + 1);
                 return;
             }
-        if (sp.getSoLuongTon() < 1) throw new IllegalArgumentException("Sản phẩm đã hết hàng.");
+        if (sp.getSoLuongTon() < 1) throw new IllegalArgumentException("Sáº£n pháº©m Ä‘Ã£ háº¿t hÃ ng.");
         ChiTietHoaDon d = new ChiTietHoaDon();
         d.setSanPham(sp);
         d.setSoLuong(1);
@@ -404,7 +404,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
     private void doiSoLuong(ChiTietHoaDon d, int n) {
         if (n < 1 || n > tonHienTai(d))
             throw new IllegalArgumentException(
-                    "Số lượng phải từ 1 đến tồn hiện có: " + tonHienTai(d));
+                    "Sá»‘ lÆ°á»£ng pháº£i tá»« 1 Ä‘áº¿n tá»“n hiá»‡n cÃ³: " + tonHienTai(d));
         d.setSoLuong(n);
         d.setGiamGia(giam(d));
         capNhatGio();
@@ -430,9 +430,9 @@ public class BanHang_GUI extends JPanel implements ActionListener {
             noiGio.add(
                     GiaoDien.the(
                             null,
-                            GiaoDien.ghiChu("Giỏ đang trống. Chọn Thêm trên sản phẩm để bắt đầu."),
+                            GiaoDien.ghiChu("Giá» Ä‘ang trá»‘ng. Chá»n ThÃªm trÃªn sáº£n pháº©m Ä‘á»ƒ báº¯t Ä‘áº§u."),
                             null));
-        lblSoDong.setText(sl + " sản phẩm · " + gio.size() + " dòng");
+        lblSoDong.setText(sl + " sáº£n pháº©m Â· " + gio.size() + " dÃ²ng");
         noiGio.revalidate();
         noiGio.repaint();
         SwingUtilities.invokeLater(() -> cuonGio.getVerticalScrollBar().setValue(viTri));
@@ -448,14 +448,14 @@ public class BanHang_GUI extends JPanel implements ActionListener {
         ten.setForeground(TEXT);
         ten.setFont(GiaoDien.phong(Font.BOLD, 13));
         ten.setPreferredSize(new Dimension(100, 34));
-        JButton bo = GiaoDien.nutNho("×");
-        bo.setToolTipText("Bỏ sản phẩm khỏi giỏ");
+        JButton bo = GiaoDien.nutNho("Ã—");
+        bo.setToolTipText("Bá» sáº£n pháº©m khá»i giá»");
         bo.addActionListener(
                 e -> {
                     gio.remove(d);
                     capNhatGio();
                 });
-        JButton tru = GiaoDien.nutNho("−"), cong = GiaoDien.nutNho("+");
+        JButton tru = GiaoDien.nutNho("âˆ’"), cong = GiaoDien.nutNho("+");
         tru.setEnabled(d.getSoLuong() > 1);
         cong.setEnabled(d.getSoLuong() < tonHienTai(d));
         tru.addActionListener(
@@ -485,7 +485,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
         JButton km =
                 GiaoDien.nut(
                         d.getChuongTrinhKhuyenMai() == null
-                                ? "Chọn KM"
+                                ? "Chá»n KM"
                                 : "KM "
                                         + formatGia(d.getChuongTrinhKhuyenMai().getGiaTriGiam())
                                         + "%");
@@ -498,13 +498,13 @@ public class BanHang_GUI extends JPanel implements ActionListener {
                         hang(ten, bo),
                         hang(
                                 nhan(d.getSanPham().getMaSanPham(), 11, false, MUTED),
-                                nhan(formatGia(d.getDonGia()) + " đ / SP", 11, false, MUTED)),
-                        hang(dem, nhan(formatGia(d.getThanhTienChiTiet()) + " đ", 14, true, TEXT)),
+                                nhan(formatGia(d.getDonGia()) + " Ä‘ / SP", 11, false, MUTED)),
+                        hang(dem, nhan(formatGia(d.getThanhTienChiTiet()) + " Ä‘", 14, true, TEXT)),
                         hang(
                                 km,
                                 nhan(
                                         d.getGiamGia() > 0
-                                                ? "Giảm " + formatGia(d.getGiamGia()) + " đ"
+                                                ? "Giáº£m " + formatGia(d.getGiamGia()) + " Ä‘"
                                                 : "",
                                         11,
                                         false,
@@ -521,7 +521,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
         cb.addItem(null);
         LocalDate ngay = LocalDate.now();
         for (ChuongTrinhKhuyenMai k : khuyenMai)
-            if ("Đang áp dụng".equals(k.getTrangThai())
+            if ("Äang Ã¡p dá»¥ng".equals(k.getTrangThai())
                     && !ngay.isBefore(k.getNgayBatDau())
                     && !ngay.isAfter(k.getNgayKetThuc())) cb.addItem(k);
         cb.setRenderer(
@@ -529,7 +529,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
                     public Component getListCellRendererComponent(
                             JList<?> l, Object v, int i, boolean s, boolean f) {
                         return super.getListCellRendererComponent(
-                                l, v == null ? "Không khuyến mãi" : v, i, s, f);
+                                l, v == null ? "KhÃ´ng khuyáº¿n mÃ£i" : v, i, s, f);
                     }
                 });
         if (d.getChuongTrinhKhuyenMai() != null)
@@ -540,7 +540,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
         if (JOptionPane.showConfirmDialog(
                         this,
                         cb,
-                        "Khuyến mãi cho sản phẩm",
+                        "Khuyáº¿n mÃ£i cho sáº£n pháº©m",
                         JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.PLAIN_MESSAGE)
                 == JOptionPane.OK_OPTION) {
@@ -555,13 +555,13 @@ public class BanHang_GUI extends JPanel implements ActionListener {
         try {
             diem = Integer.parseInt(txtDiem.getText().trim());
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Nhập điểm nguyên không âm.");
+            throw new IllegalArgumentException("Nháº­p Ä‘iá»ƒm nguyÃªn khÃ´ng Ã¢m.");
         }
         KhachHang k = (KhachHang) cboKhach.getSelectedItem();
         int max =
                 InHoaDon.diemToiDa(InHoaDon.sauKhuyenMai(gio), k == null ? 0 : k.getDiemTichLuy());
         if (diem < 0 || diem > max)
-            throw new IllegalArgumentException("Điểm có thể dùng: 0 đến " + max + ".");
+            throw new IllegalArgumentException("Äiá»ƒm cÃ³ thá»ƒ dÃ¹ng: 0 Ä‘áº¿n " + max + ".");
         return diem;
     }
 
@@ -570,19 +570,19 @@ public class BanHang_GUI extends JPanel implements ActionListener {
         KhachHang k = (KhachHang) cboKhach.getSelectedItem();
         lblDiemCo.setText(
                 k == null
-                        ? "Khách vãng lai · Không dùng điểm"
-                        : "Điểm hiện có: " + k.getDiemTichLuy());
+                        ? "KhÃ¡ch vÃ£ng lai Â· KhÃ´ng dÃ¹ng Ä‘iá»ƒm"
+                        : "Äiá»ƒm hiá»‡n cÃ³: " + k.getDiemTichLuy());
         try {
             int diem = diemHopLe();
-            lblHang.setText(formatGia(InHoaDon.tongHang(gio)) + " đ");
+            lblHang.setText(formatGia(InHoaDon.tongHang(gio)) + " Ä‘");
             lblGiam.setText(
-                    "− "
+                    "âˆ’ "
                             + formatGia(InHoaDon.tron(InHoaDon.tongHang(gio) - InHoaDon.sauKhuyenMai(gio)))
-                            + " đ");
+                            + " Ä‘");
             lblQuyDoi.setText(
-                    "− " + formatGia(InHoaDon.MOT_DIEM * diem) + " đ");
-            lblVAT.setText(formatGia(InHoaDon.vat(gio, diem, thueSuat)) + " đ");
-            lblTong.setText(formatGia(InHoaDon.phaiTra(gio, diem, thueSuat)) + " đ");
+                    "âˆ’ " + formatGia(InHoaDon.MOT_DIEM * diem) + " Ä‘");
+            lblVAT.setText(formatGia(InHoaDon.vat(gio, diem, thueSuat)) + " Ä‘");
+            lblTong.setText(formatGia(InHoaDon.phaiTra(gio, diem, thueSuat)) + " Ä‘");
             lblTenVAT.setText(
                     "VAT ("
                             + formatGia(thueSuat * 100.0)
@@ -593,7 +593,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
             btnQR.setEnabled(!gio.isEmpty());
         } catch (IllegalArgumentException e) {
             lblLoi.setText(e.getMessage());
-            lblTong.setText("—");
+            lblTong.setText("â€”");
             btnLuu.setEnabled(false);
             btnTra.setEnabled(false);
             btnQR.setEnabled(false);
@@ -606,23 +606,23 @@ public class BanHang_GUI extends JPanel implements ActionListener {
         thueSuat = VAT;
         txtDiem.setText("0");
         cboKhach.setSelectedIndex(0);
-        lblDon.setText("Đơn mới");
+        lblDon.setText("ÄÆ¡n má»›i");
         loadDanhMuc();
         capNhatGio();
     }
 
     public void moHoaDon(String ma) throws Exception {
         HoaDon h = new HoaDon_DAO().tim(ma);
-        if (h == null || !"Chưa thanh toán".equals(h.getTrangThaiThanhToan()))
-            throw new IllegalArgumentException("Chỉ mở đơn chưa thanh toán.");
+        if (h == null || !"ChÆ°a thanh toÃ¡n".equals(h.getTrangThaiThanhToan()))
+            throw new IllegalArgumentException("Chá»‰ má»Ÿ Ä‘Æ¡n chÆ°a thanh toÃ¡n.");
         if (!tk.getNhanVien().getMaNhanVien().equals(h.getNhanVien().getMaNhanVien()))
-            throw new IllegalArgumentException("Chỉ mở đơn do mình lập.");
+            throw new IllegalArgumentException("Chá»‰ má»Ÿ Ä‘Æ¡n do mÃ¬nh láº­p.");
         if (!gio.isEmpty()
                 && !ma.equals(maHoaDon)
                 && JOptionPane.showConfirmDialog(
                                 this,
-                                "Thay giỏ hiện tại bằng đơn " + ma + "?",
-                                "Mở hóa đơn",
+                                "Thay giá» hiá»‡n táº¡i báº±ng Ä‘Æ¡n " + ma + "?",
+                                "Má»Ÿ hÃ³a Ä‘Æ¡n",
                                 JOptionPane.YES_NO_OPTION)
                         != JOptionPane.YES_OPTION) return;
         loadDanhMuc();
@@ -666,31 +666,31 @@ public class BanHang_GUI extends JPanel implements ActionListener {
             } else if (o == btnKhach) {
                 timKhachHang();
             } else if (o == btnBang) {
-                boolean bang = "Xem bảng".equals(btnBang.getText());
-                ((CardLayout) cheDoSP.getLayout()).show(cheDoSP, bang ? "Bảng" : "Lưới");
-                btnBang.setText(bang ? "Xem lưới" : "Xem bảng");
+                boolean bang = "Xem báº£ng".equals(btnBang.getText());
+                ((CardLayout) cheDoSP.getLayout()).show(cheDoSP, bang ? "Báº£ng" : "LÆ°á»›i");
+                btnBang.setText(bang ? "Xem lÆ°á»›i" : "Xem báº£ng");
             } else if (o == btnMoi) {
                 if (gio.isEmpty()
                         || JOptionPane.showConfirmDialog(
                                         this,
-                                        "Tạo đơn mới? Giỏ chưa lưu sẽ bị bỏ.",
-                                        "Đơn mới",
+                                        "Táº¡o Ä‘Æ¡n má»›i? Giá» chÆ°a lÆ°u sáº½ bá»‹ bá».",
+                                        "ÄÆ¡n má»›i",
                                         JOptionPane.YES_NO_OPTION)
                                 == JOptionPane.YES_OPTION) donMoi();
             } else if (o == btnLuu || o == btnTra || o == btnQR) {
-                if (gio.isEmpty()) throw new IllegalArgumentException("Giỏ hàng đang trống.");
+                if (gio.isEmpty()) throw new IllegalArgumentException("Giá» hÃ ng Ä‘ang trá»‘ng.");
                 HoaDon h = new HoaDon(maHoaDon);
                 h.setKhachHang((KhachHang) cboKhach.getSelectedItem());
                 h.setDiemSuDung(diemHopLe());
                 h.setThueSuatVAT(thueSuat);
                 maHoaDon = new HoaDon_DAO().luuNhap(h, gio, tk);
                 lblDon.setText(maHoaDon);
-                if (o == btnLuu) JOptionPane.showMessageDialog(this, "Đã lưu đơn chưa thanh toán.");
+                if (o == btnLuu) JOptionPane.showMessageDialog(this, "ÄÃ£ lÆ°u Ä‘Æ¡n chÆ°a thanh toÃ¡n.");
                 else {
                     ThanhToan_GUI p =
                             new ThanhToan_GUI(
                                     (Frame) SwingUtilities.getWindowAncestor(this), maHoaDon, tk);
-                    p.chonHinhThuc(o == btnQR ? "Chuyển khoản QR" : "Tiền mặt");
+                    p.chonHinhThuc(o == btnQR ? "Chuyá»ƒn khoáº£n QR" : "Tiá»n máº·t");
                     p.setVisible(true);
                     if (p.daThanhToan()) donMoi();
                 }
@@ -701,7 +701,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
     }
 
     private void timKhachHang() {
-        String tu = JOptionPane.showInputDialog(this, "Nhập số điện thoại, tên hoặc mã khách:");
+        String tu = JOptionPane.showInputDialog(this, "Nháº­p sá»‘ Ä‘iá»‡n thoáº¡i, tÃªn hoáº·c mÃ£ khÃ¡ch:");
         if (tu == null || tu.isBlank()) return;
         tu = tu.trim().toLowerCase(Locale.ROOT);
         List<KhachHang> ds = new ArrayList<>();
@@ -712,7 +712,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
                     .contains(tu)) ds.add(k);
         }
         if (ds.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Không tìm thấy khách hàng phù hợp.");
+            JOptionPane.showMessageDialog(this, "KhÃ´ng tÃ¬m tháº¥y khÃ¡ch hÃ ng phÃ¹ há»£p.");
         } else if (ds.size() == 1) {
             cboKhach.setSelectedItem(ds.get(0));
         } else {
@@ -722,7 +722,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
             if (JOptionPane.showConfirmDialog(
                             this,
                             chon,
-                            "Chọn khách hàng",
+                            "Chá»n khÃ¡ch hÃ ng",
                             JOptionPane.OK_CANCEL_OPTION,
                             JOptionPane.PLAIN_MESSAGE)
                     == JOptionPane.OK_OPTION) cboKhach.setSelectedItem(chon.getSelectedItem());
@@ -732,7 +732,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
     private void baoLoi(Exception e) {
         if (e instanceof SQLException) e.printStackTrace();
         JOptionPane.showMessageDialog(
-                this, e.getMessage(), "Không thực hiện được", JOptionPane.ERROR_MESSAGE);
+                this, e.getMessage(), "KhÃ´ng thá»±c hiá»‡n Ä‘Æ°á»£c", JOptionPane.ERROR_MESSAGE);
     }
 
     private String formatGia(double n) {
@@ -802,7 +802,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
         }
     }
 
-    /** Có thể đặt ảnh ở resource/sanpham/MaSP.png; thiếu ảnh vẫn có biểu tượng loại hàng. */
+    /** CÃ³ thá»ƒ Ä‘áº·t áº£nh á»Ÿ resource/sanpham/MaSP.png; thiáº¿u áº£nh váº«n cÃ³ biá»ƒu tÆ°á»£ng loáº¡i hÃ ng. */
     private Icon anhSanPham(SanPham sp) {
         for (String ext : new String[] {"png", "jpg", "jpeg"}) {
             File f = new File("resource/hinhanh/" + sp.getMaSanPham() + "." + ext);
@@ -836,12 +836,12 @@ public class BanHang_GUI extends JPanel implements ActionListener {
                         RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g.setStroke(new BasicStroke(3));
                 g.setColor(PRIMARY);
-                if (loai.contains("lạnh")) {
+                if (loai.contains("láº¡nh")) {
                     g.drawRoundRect(54, 4, 52, 76, 7, 7);
                     g.drawLine(54, 31, 106, 31);
                     g.drawLine(62, 15, 62, 24);
                     g.drawLine(62, 42, 62, 58);
-                } else if (loai.contains("laptop") || loai.contains("máy tính")) {
+                } else if (loai.contains("laptop") || loai.contains("mÃ¡y tÃ­nh")) {
                     g.drawRoundRect(35, 12, 90, 54, 6, 6);
                     g.drawLine(25, 74, 135, 74);
                     g.drawLine(35, 66, 25, 74);
@@ -850,7 +850,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
                     g.drawRoundRect(22, 9, 116, 62, 6, 6);
                     g.drawLine(65, 72, 57, 81);
                     g.drawLine(95, 72, 103, 81);
-                } else if (loai.contains("điều")) {
+                } else if (loai.contains("Ä‘iá»u")) {
                     g.drawRoundRect(20, 19, 120, 44, 10, 10);
                     g.drawLine(28, 49, 132, 49);
                     g.drawLine(42, 68, 39, 80);

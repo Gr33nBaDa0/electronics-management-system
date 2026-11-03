@@ -1,4 +1,4 @@
-﻿package gui;
+package gui;
 
 import connectDB.ConnectDB;
 
@@ -7,7 +7,7 @@ import dao.TaiKhoan_DAO;
 
 import entity.TaiKhoan;
 
-import until.GiaoDien;
+import util.GiaoDien;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -46,7 +46,7 @@ import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 
 public class MainFrame extends JFrame implements ActionListener {
-    // Màu và font đặt ở đầu lớp; navi sử dụng chính xác #1B5E20.
+    // MÃ u vÃ  font Ä‘áº·t á»Ÿ Ä‘áº§u lá»›p; navi sá»­ dá»¥ng chÃ­nh xÃ¡c #1B5E20.
     private static final Color MAU_NAVI = GiaoDien.DARK;
     private static final Color MAU_CHU_NAVI = GiaoDien.MENU_TEXT;
     private static final Color MAU_NHAN_NAVI = GiaoDien.MENU_MUTED;
@@ -61,37 +61,37 @@ public class MainFrame extends JFrame implements ActionListener {
     private BanHang_GUI pos;
     private javax.swing.Timer backup, dongHo, lamMoi;
 
-    // Nhóm menu: {nhãn, gợi ý phím, KeyStroke, chỉ quản lý (true/false)}
+    // NhÃ³m menu: {nhÃ£n, gá»£i Ã½ phÃ­m, KeyStroke, chá»‰ quáº£n lÃ½ (true/false)}
     private static final String[][] NHOM_BAN_HANG = {
-        {"Bán hàng POS", "Ctrl+1", "ctrl 1", "0"},
-        {"Hóa đơn", "Ctrl+2", "ctrl 2", "0"},
-        {"Đổi trả", "Ctrl+3", "ctrl 3", "0"},
-        {"Khách hàng", "Ctrl+4", "ctrl 4", "0"}
+        {"BÃ¡n hÃ ng POS", "Ctrl+1", "ctrl 1", "0"},
+        {"HÃ³a Ä‘Æ¡n", "Ctrl+2", "ctrl 2", "0"},
+        {"Äá»•i tráº£", "Ctrl+3", "ctrl 3", "0"},
+        {"KhÃ¡ch hÃ ng", "Ctrl+4", "ctrl 4", "0"}
     };
     private static final String[][] NHOM_KHO = {
-        {"Sản phẩm", "Ctrl+5", "ctrl 5", "0"},
-        {"Phiếu nhập hàng", "Ctrl+6", "ctrl 6", "0"},
-        {"Khuyến mãi", "Ctrl+7", "ctrl 7", "1"}
+        {"Sáº£n pháº©m", "Ctrl+5", "ctrl 5", "0"},
+        {"Phiáº¿u nháº­p hÃ ng", "Ctrl+6", "ctrl 6", "0"},
+        {"Khuyáº¿n mÃ£i", "Ctrl+7", "ctrl 7", "1"}
     };
     private static final String[][] NHOM_VAN_HANH = {
-        {"Ca làm việc", "Ctrl+8", "ctrl 8", "0"},
-        {"Danh mục ca", "Ctrl+9", "ctrl 9", "1"}
+        {"Ca lÃ m viá»‡c", "Ctrl+8", "ctrl 8", "0"},
+        {"Danh má»¥c ca", "Ctrl+9", "ctrl 9", "1"}
     };
     private static final String[][] NHOM_QUAN_TRI = {
-        {"Nhân viên / tài khoản", "Ctrl+0", "ctrl 0", "1"},
-        {"Báo cáo", "Ctrl+B", "ctrl B", "1"},
-        {"Sao lưu / thiết lập", "Ctrl+G", "ctrl G", "1"}
+        {"NhÃ¢n viÃªn / tÃ i khoáº£n", "Ctrl+0", "ctrl 0", "1"},
+        {"BÃ¡o cÃ¡o", "Ctrl+B", "ctrl B", "1"},
+        {"Sao lÆ°u / thiáº¿t láº­p", "Ctrl+G", "ctrl G", "1"}
     };
 
     public MainFrame(TaiKhoan tk) {
         this.tk = tk;
         GiaoDien.apDung();
-        setTitle("GreenSmart — " + tk.getNhanVien().getHoTen());
+        setTitle("GreenSmart â€” " + tk.getNhanVien().getHoTen());
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         Insets edges = Toolkit.getDefaultToolkit().getScreenInsets(getGraphicsConfiguration());
         int width = screen.width - edges.left - edges.right,
                 height = screen.height - edges.top - edges.bottom;
-        // Mở hết vùng làm việc; vẫn giữ thanh tiêu đề và nút đóng của Windows.
+        // Má»Ÿ háº¿t vÃ¹ng lÃ m viá»‡c; váº«n giá»¯ thanh tiÃªu Ä‘á» vÃ  nÃºt Ä‘Ã³ng cá»§a Windows.
         setSize(width, height);
         setMinimumSize(new Dimension(Math.min(1150, width), Math.min(700, height)));
         setLocationRelativeTo(null);
@@ -108,14 +108,14 @@ public class MainFrame extends JFrame implements ActionListener {
         add(phai, BorderLayout.CENTER);
 
         JPanel chao = taoTrangChao();
-        panels.put("Chào", chao);
-        noiDung.add(chao, "Chào");
+        panels.put("ChÃ o", chao);
+        noiDung.add(chao, "ChÃ o");
 
         addWindowListener(
                 new WindowAdapter() {
                     @Override
                     public void windowClosing(WindowEvent e) {
-                        if (xacNhan(MainFrame.this, "Thoát ứng dụng? Giỏ chưa lưu sẽ mất.")) {
+                        if (xacNhan(MainFrame.this, "ThoÃ¡t á»©ng dá»¥ng? Giá» chÆ°a lÆ°u sáº½ máº¥t.")) {
                             dungBackup();
                             if (dongHo != null) dongHo.stop();
                             dispose();
@@ -129,16 +129,16 @@ public class MainFrame extends JFrame implements ActionListener {
                 new javax.swing.Timer(
                         60000,
                         e -> {
-                            JPanel p = panels.get("Chào");
+                            JPanel p = panels.get("ChÃ o");
                             if (p != null && p.isShowing()) lamMoiDashboard();
                         });
         lamMoi.start();
         danhDauMenu(
-                "Chào",
-                "ADMIN".equals(tk.getQuyen()) ? "Dashboard · Quản lý" : "Dashboard · Nhân viên");
+                "ChÃ o",
+                "ADMIN".equals(tk.getQuyen()) ? "Dashboard Â· Quáº£n lÃ½" : "Dashboard Â· NhÃ¢n viÃªn");
     }
 
-    // ===== Thanh menu bên trái =====
+    // ===== Thanh menu bÃªn trÃ¡i =====
     private JPanel taoThanhMenu() {
         boolean admin = "ADMIN".equals(tk.getQuyen());
         JPanel navi = new JPanel(new BorderLayout());
@@ -155,7 +155,7 @@ public class MainFrame extends JFrame implements ActionListener {
         JLabel logo = new JLabel("GreenSmart");
         logo.setForeground(Color.WHITE);
         logo.setFont(FONT_THUONG_HIEU);
-        JLabel khau = new JLabel("QUẢN LÝ ĐIỆN MÁY");
+        JLabel khau = new JLabel("QUáº¢N LÃ ÄIá»†N MÃY");
         khau.setFont(GiaoDien.phong(Font.PLAIN, 10));
         khau.setForeground(MAU_NHAN_NAVI);
         JPanel chu = new JPanel(new java.awt.GridLayout(2, 1));
@@ -171,10 +171,10 @@ public class MainFrame extends JFrame implements ActionListener {
         dau.add(thuongHieu);
         dau.add(Box.createVerticalStrut(14));
         GiaoDien.NutMenu trangChu = new GiaoDien.NutMenu("Dashboard", "Alt+Home");
-        trangChu.setActionCommand("Chào");
+        trangChu.setActionCommand("ChÃ o");
         trangChu.addActionListener(this);
         trangChu.datHoatDong(true);
-        menu.put("Chào", trangChu);
+        menu.put("ChÃ o", trangChu);
         dau.add(trangChu);
 
         navi.add(dau, BorderLayout.NORTH);
@@ -182,10 +182,10 @@ public class MainFrame extends JFrame implements ActionListener {
         m.setLayout(new BoxLayout(m, BoxLayout.Y_AXIS));
         m.setBackground(MAU_NAVI);
         m.setBorder(BorderFactory.createEmptyBorder(0, 12, 0, 12));
-        themNhom(m, "BÁN HÀNG", NHOM_BAN_HANG, admin);
-        themNhom(m, "KHO VÀ DANH MỤC", NHOM_KHO, admin);
-        themNhom(m, "VẬN HÀNH", NHOM_VAN_HANH, admin);
-        if (admin) themNhom(m, "QUẢN TRỊ", NHOM_QUAN_TRI, admin);
+        themNhom(m, "BÃN HÃ€NG", NHOM_BAN_HANG, admin);
+        themNhom(m, "KHO VÃ€ DANH Má»¤C", NHOM_KHO, admin);
+        themNhom(m, "Váº¬N HÃ€NH", NHOM_VAN_HANH, admin);
+        if (admin) themNhom(m, "QUáº¢N TRá»Š", NHOM_QUAN_TRI, admin);
         JScrollPane sp = new JScrollPane(m);
         sp.setBorder(null);
         sp.setBackground(MAU_NAVI);
@@ -198,23 +198,23 @@ public class MainFrame extends JFrame implements ActionListener {
         cuoi.setLayout(new BoxLayout(cuoi, BoxLayout.Y_AXIS));
         cuoi.setBackground(MAU_NAVI);
         cuoi.setBorder(BorderFactory.createEmptyBorder(8, 12, 12, 12));
-        GiaoDien.NutMenu troGiup = new GiaoDien.NutMenu("Trợ giúp", "F1");
-        troGiup.setActionCommand("Trợ giúp");
+        GiaoDien.NutMenu troGiup = new GiaoDien.NutMenu("Trá»£ giÃºp", "F1");
+        troGiup.setActionCommand("Trá»£ giÃºp");
         troGiup.addActionListener(this);
-        menu.put("Trợ giúp", troGiup);
+        menu.put("Trá»£ giÃºp", troGiup);
         cuoi.add(troGiup);
         cuoi.add(Box.createVerticalStrut(6));
         cuoi.add(taoTheNguoiDung());
         cuoi.add(Box.createVerticalStrut(6));
         JPanel hangCuoi = new JPanel(new java.awt.GridLayout(1, 2, 6, 0));
         hangCuoi.setOpaque(false);
-        for (String ten : new String[] {"Đổi mật khẩu", "Đăng xuất"}) {
+        for (String ten : new String[] {"Äá»•i máº­t kháº©u", "ÄÄƒng xuáº¥t"}) {
             JButton nut = GiaoDien.nut(ten);
             nut.setActionCommand(ten);
             nut.addActionListener(this);
             nut.setPreferredSize(new Dimension(90, 32));
             nut.setFont(GiaoDien.phong(Font.BOLD, 12));
-            nut.setToolTipText(ten + ("Đăng xuất".equals(ten) ? " (Ctrl+L)" : " (Ctrl+Shift+P)"));
+            nut.setToolTipText(ten + ("ÄÄƒng xuáº¥t".equals(ten) ? " (Ctrl+L)" : " (Ctrl+Shift+P)"));
             hangCuoi.add(nut);
         }
         hangCuoi.setMaximumSize(new Dimension(Integer.MAX_VALUE, 32));
@@ -241,7 +241,7 @@ public class MainFrame extends JFrame implements ActionListener {
         }
     }
 
-    /** Thẻ nhỏ cuối menu: chữ cái đầu của tên trong vòng tròn, họ tên và vai trò. */
+    /** Tháº» nhá» cuá»‘i menu: chá»¯ cÃ¡i Ä‘áº§u cá»§a tÃªn trong vÃ²ng trÃ²n, há» tÃªn vÃ  vai trÃ². */
     private JPanel taoTheNguoiDung() {
         String ten = String.valueOf(tk.getNhanVien().getHoTen());
         String chu =
@@ -280,8 +280,8 @@ public class MainFrame extends JFrame implements ActionListener {
         hoTen.setFont(GiaoDien.phong(Font.BOLD, 13));
         JLabel vaiTro =
                 new JLabel(
-                        ("ADMIN".equals(tk.getQuyen()) ? "Quản lý" : "Bán hàng")
-                                + " · "
+                        ("ADMIN".equals(tk.getQuyen()) ? "Quáº£n lÃ½" : "BÃ¡n hÃ ng")
+                                + " Â· "
                                 + tk.getTenDangNhap());
         vaiTro.setForeground(MAU_CHU_NAVI);
         vaiTro.setFont(GiaoDien.phong(Font.PLAIN, 12));
@@ -299,7 +299,7 @@ public class MainFrame extends JFrame implements ActionListener {
         return the;
     }
 
-    // ===== Thanh tiêu đề và thanh trạng thái =====
+    // ===== Thanh tiÃªu Ä‘á» vÃ  thanh tráº¡ng thÃ¡i =====
     private JPanel taoThanhTieuDe() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBackground(GiaoDien.SURFACE);
@@ -323,7 +323,7 @@ public class MainFrame extends JFrame implements ActionListener {
                         BorderFactory.createMatteBorder(1, 0, 0, 0, GiaoDien.BORDER),
                         BorderFactory.createEmptyBorder(5, 20, 5, 20)));
         lblKetNoi.setFont(GiaoDien.phong(Font.PLAIN, 12));
-        JLabel goiY = new JLabel("F1: Trợ giúp · Shift+F1: phím tắt");
+        JLabel goiY = new JLabel("F1: Trá»£ giÃºp Â· Shift+F1: phÃ­m táº¯t");
         goiY.setFont(GiaoDien.phong(Font.PLAIN, 12));
         goiY.setForeground(GiaoDien.MUTED);
         p.add(lblKetNoi, BorderLayout.WEST);
@@ -339,13 +339,13 @@ public class MainFrame extends JFrame implements ActionListener {
         } catch (SQLException e) {
             noi = false;
         }
-        lblKetNoi.setText(noi ? "●  Đã kết nối SQL Server" : "●  Chưa kết nối SQL Server");
+        lblKetNoi.setText(noi ? "â—  ÄÃ£ káº¿t ná»‘i SQL Server" : "â—  ChÆ°a káº¿t ná»‘i SQL Server");
         lblKetNoi.setForeground(noi ? GiaoDien.SUCCESS : GiaoDien.ERROR);
         lblGio.setText(
                 LocalDateTime.now()
                         .format(
                                 DateTimeFormatter.ofPattern(
-                                        "EEEE, dd/MM/yyyy · HH:mm", new Locale("vi", "VN"))));
+                                        "EEEE, dd/MM/yyyy Â· HH:mm", new Locale("vi", "VN"))));
     }
 
     private void batDongHo() {
@@ -353,7 +353,7 @@ public class MainFrame extends JFrame implements ActionListener {
         dongHo.start();
     }
 
-    // ===== Trang chào =====
+    // ===== Trang chÃ o =====
     private JPanel taoTrangChao() {
         return "ADMIN".equals(tk.getQuyen())
                 ? new DashboardQuanLy_GUI(tk, this)
@@ -361,12 +361,12 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
     private void lamMoiDashboard() {
-        JPanel p = panels.get("Chào");
+        JPanel p = panels.get("ChÃ o");
         if (p instanceof DashboardQuanLy_GUI) ((DashboardQuanLy_GUI) p).taiDuLieu();
         if (p instanceof DashboardNhanVien_GUI) ((DashboardNhanVien_GUI) p).taiDuLieu();
     }
 
-    // ===== Phím tắt =====
+    // ===== PhÃ­m táº¯t =====
     private void ganPhimTat() {
         boolean admin = "ADMIN".equals(tk.getQuyen());
         String[][][] tatCa = {NHOM_BAN_HANG, NHOM_KHO, NHOM_VAN_HANH, NHOM_QUAN_TRI};
@@ -376,16 +376,16 @@ public class MainFrame extends JFrame implements ActionListener {
                 String ten = a[0];
                 GiaoDien.phimTat(getRootPane(), a[2], () -> moMan(ten));
             }
-        GiaoDien.phimTat(getRootPane(), "ctrl L", () -> moMan("Đăng xuất"));
-        GiaoDien.phimTat(getRootPane(), "ctrl shift P", () -> moMan("Đổi mật khẩu"));
-        GiaoDien.phimTat(getRootPane(), "F1", () -> moMan("Trợ giúp"));
+        GiaoDien.phimTat(getRootPane(), "ctrl L", () -> moMan("ÄÄƒng xuáº¥t"));
+        GiaoDien.phimTat(getRootPane(), "ctrl shift P", () -> moMan("Äá»•i máº­t kháº©u"));
+        GiaoDien.phimTat(getRootPane(), "F1", () -> moMan("Trá»£ giÃºp"));
         GiaoDien.phimTat(getRootPane(), "shift F1", this::hienPhimTat);
-        // Phím "Trang chủ": Alt+Home
+        // PhÃ­m "Trang chá»§": Alt+Home
         GiaoDien.phimTat(
                 getRootPane(),
                 "alt HOME",
                 () -> {
-                    moMan("Chào");
+                    moMan("ChÃ o");
                 });
     }
 
@@ -393,42 +393,42 @@ public class MainFrame extends JFrame implements ActionListener {
         JTextArea t =
                 new JTextArea(
                         GiaoDien.lietKe(
-                                "CHUYỂN MÀN HÌNH",
-                                "  Ctrl+1 Bán hàng POS     Ctrl+2 Hóa đơn      Ctrl+3 Đổi trả",
-                                "  Ctrl+4 Khách hàng       Ctrl+5 Sản phẩm     Ctrl+6 Phiếu nhập",
-                                "  Ctrl+7 Khuyến mãi (QL)  Ctrl+8 Ca làm việc  Ctrl+9 Danh mục ca"
+                                "CHUYá»‚N MÃ€N HÃŒNH",
+                                "  Ctrl+1 BÃ¡n hÃ ng POS     Ctrl+2 HÃ³a Ä‘Æ¡n      Ctrl+3 Äá»•i tráº£",
+                                "  Ctrl+4 KhÃ¡ch hÃ ng       Ctrl+5 Sáº£n pháº©m     Ctrl+6 Phiáº¿u nháº­p",
+                                "  Ctrl+7 Khuyáº¿n mÃ£i (QL)  Ctrl+8 Ca lÃ m viá»‡c  Ctrl+9 Danh má»¥c ca"
                                         + " (QL)",
-                                "  Ctrl+0 Nhân viên (QL)   Ctrl+B Báo cáo (QL) Ctrl+G Sao lưu/thiết"
-                                        + " lập (QL)",
-                                "  Alt+Home Dashboard      Ctrl+L Đăng xuất    Ctrl+Shift+P Đổi mật"
-                                        + " khẩu",
+                                "  Ctrl+0 NhÃ¢n viÃªn (QL)   Ctrl+B BÃ¡o cÃ¡o (QL) Ctrl+G Sao lÆ°u/thiáº¿t"
+                                        + " láº­p (QL)",
+                                "  Alt+Home Dashboard      Ctrl+L ÄÄƒng xuáº¥t    Ctrl+Shift+P Äá»•i máº­t"
+                                        + " kháº©u",
                                 "",
-                                "TRONG MÀN HÌNH DANH MỤC",
-                                "  Ctrl+N Tạo mới   Ctrl+S Lưu   Ctrl+D Xóa   F5 Tải lại   Ctrl+F Ô"
-                                        + " tìm kiếm",
+                                "TRONG MÃ€N HÃŒNH DANH Má»¤C",
+                                "  Ctrl+N Táº¡o má»›i   Ctrl+S LÆ°u   Ctrl+D XÃ³a   F5 Táº£i láº¡i   Ctrl+F Ã”"
+                                        + " tÃ¬m kiáº¿m",
                                 "",
-                                "BÁN HÀNG POS",
-                                "  F2 Tìm sản phẩm   Bấm Thêm trên thẻ / bấm đúp trong bảng",
-                                "  Trong giỏ: − / + đổi số lượng, × bỏ dòng, Chọn KM để giảm",
-                                "  F8 Lưu đơn   F9 Tiền mặt   F10 Chuyển khoản QR",
-                                "  Ctrl+N Đơn mới",
+                                "BÃN HÃ€NG POS",
+                                "  F2 TÃ¬m sáº£n pháº©m   Báº¥m ThÃªm trÃªn tháº» / báº¥m Ä‘Ãºp trong báº£ng",
+                                "  Trong giá»: âˆ’ / + Ä‘á»•i sá»‘ lÆ°á»£ng, Ã— bá» dÃ²ng, Chá»n KM Ä‘á»ƒ giáº£m",
+                                "  F8 LÆ°u Ä‘Æ¡n   F9 Tiá»n máº·t   F10 Chuyá»ƒn khoáº£n QR",
+                                "  Ctrl+N ÄÆ¡n má»›i",
                                 "",
-                                "HỘP THANH TOÁN",
-                                "  F2 Hiện QR   Enter Thanh toán & xuất hóa đơn   Esc Để sau",
+                                "Há»˜P THANH TOÃN",
+                                "  F2 Hiá»‡n QR   Enter Thanh toÃ¡n & xuáº¥t hÃ³a Ä‘Æ¡n   Esc Äá»ƒ sau",
                                 "",
-                                "TRỢ GIÚP VÀ HÓA ĐƠN",
-                                "  F1 Hướng dẫn sử dụng   Shift+F1 Phím tắt",
-                                "  Ctrl+P trong Hóa đơn: xuất PDF vào D:\\HoaDonGreenSmart",
+                                "TRá»¢ GIÃšP VÃ€ HÃ“A ÄÆ N",
+                                "  F1 HÆ°á»›ng dáº«n sá»­ dá»¥ng   Shift+F1 PhÃ­m táº¯t",
+                                "  Ctrl+P trong HÃ³a Ä‘Æ¡n: xuáº¥t PDF vÃ o D:\\HoaDonGreenSmart",
                                 "",
-                                "Rê chuột lên nút để xem phím tắt tương ứng."));
+                                "RÃª chuá»™t lÃªn nÃºt Ä‘á»ƒ xem phÃ­m táº¯t tÆ°Æ¡ng á»©ng."));
         t.setEditable(false);
         t.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
         t.setBackground(GiaoDien.SURFACE);
         t.setBorder(BorderFactory.createEmptyBorder(10, 14, 10, 14));
-        JOptionPane.showMessageDialog(this, t, "Phím tắt", JOptionPane.PLAIN_MESSAGE);
+        JOptionPane.showMessageDialog(this, t, "PhÃ­m táº¯t", JOptionPane.PLAIN_MESSAGE);
     }
 
-    // ===== Sao lưu tự động =====
+    // ===== Sao lÆ°u tá»± Ä‘á»™ng =====
     private void batBackup() {
         int n = docSoThietLap("backup.minutes", 0);
         if (n <= 0 || n > 10080 || !"ADMIN".equals(tk.getQuyen())) return;
@@ -454,7 +454,7 @@ public class MainFrame extends JFrame implements ActionListener {
                                 new SaoLuu_DAO().saoLuu(ten, tk);
                             } catch (SQLException ex) {
                                 ex.printStackTrace();
-                                System.err.println("Sao lưu tự động thất bại: " + ex.getMessage());
+                                System.err.println("Sao lÆ°u tá»± Ä‘á»™ng tháº¥t báº¡i: " + ex.getMessage());
                             }
                         });
         backup.start();
@@ -464,12 +464,12 @@ public class MainFrame extends JFrame implements ActionListener {
         if (backup != null) backup.stop();
     }
 
-    // ===== Điều hướng =====
+    // ===== Äiá»u hÆ°á»›ng =====
     private BanHang_GUI pos() {
         if (pos == null) {
             pos = new BanHang_GUI(tk);
-            panels.put("Bán hàng POS", pos);
-            noiDung.add(pos, "Bán hàng POS");
+            panels.put("BÃ¡n hÃ ng POS", pos);
+            noiDung.add(pos, "BÃ¡n hÃ ng POS");
         }
         return pos;
     }
@@ -487,8 +487,8 @@ public class MainFrame extends JFrame implements ActionListener {
 
     public void moMan(String s) {
         try {
-            if (s.equals("Đăng xuất")) {
-                if (xacNhan(this, "Đăng xuất? Giỏ chưa lưu sẽ mất.")) {
+            if (s.equals("ÄÄƒng xuáº¥t")) {
+                if (xacNhan(this, "ÄÄƒng xuáº¥t? Giá» chÆ°a lÆ°u sáº½ máº¥t.")) {
                     dungBackup();
                     if (dongHo != null) dongHo.stop();
                     if (ConnectDB.con != null) ConnectDB.con.close();
@@ -497,66 +497,66 @@ public class MainFrame extends JFrame implements ActionListener {
                 }
                 return;
             }
-            if (s.equals("Đổi mật khẩu")) {
+            if (s.equals("Äá»•i máº­t kháº©u")) {
                 JPasswordField f = new JPasswordField();
                 if (JOptionPane.showConfirmDialog(
-                                this, f, "Mật khẩu mới", JOptionPane.OK_CANCEL_OPTION)
+                                this, f, "Máº­t kháº©u má»›i", JOptionPane.OK_CANCEL_OPTION)
                         == JOptionPane.OK_OPTION) {
                     new TaiKhoan_DAO()
                             .updateMatKhau(tk.getTenDangNhap(), new String(f.getPassword()), tk);
-                    JOptionPane.showMessageDialog(this, "Đã đổi mật khẩu.");
+                    JOptionPane.showMessageDialog(this, "ÄÃ£ Ä‘á»•i máº­t kháº©u.");
                 }
                 return;
             }
             if (!"ADMIN".equals(tk.getQuyen())
                     && java.util.Arrays.asList(
-                                    "Khuyến mãi",
-                                    "Danh mục ca",
-                                    "Nhân viên / tài khoản",
-                                    "Báo cáo",
-                                    "Sao lưu / thiết lập")
-                            .contains(s)) throw new SQLException("Chức năng dành cho quản lý.");
+                                    "Khuyáº¿n mÃ£i",
+                                    "Danh má»¥c ca",
+                                    "NhÃ¢n viÃªn / tÃ i khoáº£n",
+                                    "BÃ¡o cÃ¡o",
+                                    "Sao lÆ°u / thiáº¿t láº­p")
+                            .contains(s)) throw new SQLException("Chá»©c nÄƒng dÃ nh cho quáº£n lÃ½.");
             boolean daMo = panels.containsKey(s);
             if (!daMo) {
                 JPanel p;
                 switch (s) {
-                    case "Trợ giúp":
+                    case "Trá»£ giÃºp":
                         p = new TroGiup_GUI(tk);
                         break;
-                    case "Bán hàng POS":
+                    case "BÃ¡n hÃ ng POS":
                         p = pos();
                         break;
-                    case "Hóa đơn":
+                    case "HÃ³a Ä‘Æ¡n":
                         p = new HoaDon_GUI(tk, pos());
                         break;
-                    case "Sản phẩm":
+                    case "Sáº£n pháº©m":
                         p = new SanPham_GUI(tk);
                         break;
-                    case "Khách hàng":
+                    case "KhÃ¡ch hÃ ng":
                         p = new KhachHang_GUI(tk);
                         break;
-                    case "Khuyến mãi":
+                    case "Khuyáº¿n mÃ£i":
                         p = new ChuongTrinhKhuyenMai_GUI(tk);
                         break;
-                    case "Phiếu nhập hàng":
+                    case "Phiáº¿u nháº­p hÃ ng":
                         p = new PhieuNhapHang_GUI(tk);
                         break;
-                    case "Đổi trả":
+                    case "Äá»•i tráº£":
                         p = new PhieuDoiTra_GUI(tk);
                         break;
-                    case "Ca làm việc":
+                    case "Ca lÃ m viá»‡c":
                         p = new PhanCongCa_GUI(tk);
                         break;
-                    case "Danh mục ca":
+                    case "Danh má»¥c ca":
                         p = new CaLamViec_GUI(tk);
                         break;
-                    case "Nhân viên / tài khoản":
+                    case "NhÃ¢n viÃªn / tÃ i khoáº£n":
                         p = new NhanVien_GUI(tk);
                         break;
-                    case "Báo cáo":
+                    case "BÃ¡o cÃ¡o":
                         p = new BaoCao_GUI(tk);
                         break;
-                    case "Sao lưu / thiết lập":
+                    case "Sao lÆ°u / thiáº¿t láº­p":
                         p = new SaoLuu_GUI(tk);
                         break;
                     default:
@@ -570,56 +570,56 @@ public class MainFrame extends JFrame implements ActionListener {
                 ((BanHang_GUI) panels.get(s)).loadDanhMuc();
             danhDauMenu(
                     s,
-                    "Chào".equals(s)
+                    "ChÃ o".equals(s)
                             ? ("ADMIN".equals(tk.getQuyen())
-                                    ? "Dashboard · Quản lý"
-                                    : "Dashboard · Nhân viên")
+                                    ? "Dashboard Â· Quáº£n lÃ½"
+                                    : "Dashboard Â· NhÃ¢n viÃªn")
                             : s);
-            if ("Chào".equals(s)) lamMoiDashboard();
+            if ("ChÃ o".equals(s)) lamMoiDashboard();
         } catch (java.sql.SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(
-                    this, "Lỗi SQL:\n" + ex.getMessage(), "Lỗi SQL", JOptionPane.ERROR_MESSAGE);
+                    this, "Lá»—i SQL:\n" + ex.getMessage(), "Lá»—i SQL", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             thongBaoLoi(this, ex);
         }
     }
 
-    /** Mở đúng công việc đang được chọn ở dashboard. Không tự duyệt hay ghi giao dịch. */
+    /** Má»Ÿ Ä‘Ãºng cÃ´ng viá»‡c Ä‘ang Ä‘Æ°á»£c chá»n á»Ÿ dashboard. KhÃ´ng tá»± duyá»‡t hay ghi giao dá»‹ch. */
     public void moCongViec(String loai, String ma) throws Exception {
-        if ("Hóa đơn".equals(loai)) {
+        if ("HÃ³a Ä‘Æ¡n".equals(loai)) {
             pos().moHoaDon(ma);
-            moMan("Bán hàng POS");
-        } else if ("Nhập hàng".equals(loai)) {
-            moMan("Phiếu nhập hàng");
-            JPanel p = panels.get("Phiếu nhập hàng");
+            moMan("BÃ¡n hÃ ng POS");
+        } else if ("Nháº­p hÃ ng".equals(loai)) {
+            moMan("Phiáº¿u nháº­p hÃ ng");
+            JPanel p = panels.get("Phiáº¿u nháº­p hÃ ng");
             if (p instanceof PhieuNhapHang_GUI) ((PhieuNhapHang_GUI) p).chonPhieu(ma);
-        } else if ("Đổi trả".equals(loai)) {
-            moMan("Đổi trả");
-            JPanel p = panels.get("Đổi trả");
+        } else if ("Äá»•i tráº£".equals(loai)) {
+            moMan("Äá»•i tráº£");
+            JPanel p = panels.get("Äá»•i tráº£");
             if (p instanceof PhieuDoiTra_GUI) ((PhieuDoiTra_GUI) p).chonPhieu(ma);
-        } else if ("Sản phẩm".equals(loai)) {
-            moMan("Sản phẩm");
-            JPanel p = panels.get("Sản phẩm");
+        } else if ("Sáº£n pháº©m".equals(loai)) {
+            moMan("Sáº£n pháº©m");
+            JPanel p = panels.get("Sáº£n pháº©m");
             if (p instanceof SanPham_GUI) ((SanPham_GUI) p).chonSanPham(ma);
-        } else if ("Mở ca".equals(loai) || "Ca làm việc".equals(loai)) {
-            moMan("Ca làm việc");
-            JPanel p = panels.get("Ca làm việc");
+        } else if ("Má»Ÿ ca".equals(loai) || "Ca lÃ m viá»‡c".equals(loai)) {
+            moMan("Ca lÃ m viá»‡c");
+            JPanel p = panels.get("Ca lÃ m viá»‡c");
             if (p instanceof PhanCongCa_GUI) {
                 PhanCongCa_GUI gui = (PhanCongCa_GUI) p;
                 gui.chonPhanCong(ma);
-                if ("Mở ca".equals(loai)) gui.moCaDaChon();
+                if ("Má»Ÿ ca".equals(loai)) gui.moCaDaChon();
             }
         }
     }
 
     private void thongBaoLoi(Component c, Exception e) {
         JOptionPane.showMessageDialog(
-                c, e.getMessage(), "Không thực hiện được", JOptionPane.ERROR_MESSAGE);
+                c, e.getMessage(), "KhÃ´ng thá»±c hiá»‡n Ä‘Æ°á»£c", JOptionPane.ERROR_MESSAGE);
     }
 
     private boolean xacNhan(Component c, String s) {
-        return JOptionPane.showConfirmDialog(c, s, "Xác nhận", JOptionPane.YES_NO_OPTION)
+        return JOptionPane.showConfirmDialog(c, s, "XÃ¡c nháº­n", JOptionPane.YES_NO_OPTION)
                 == JOptionPane.YES_OPTION;
     }
 

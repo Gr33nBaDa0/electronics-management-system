@@ -6,7 +6,7 @@ import dao.TaiKhoan_DAO;
 
 import entity.TaiKhoan;
 
-import until.GiaoDien;
+import util.GiaoDien;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -75,7 +75,7 @@ public class DangNhap_GUI extends JFrame implements ActionListener {
 
     public DangNhap_GUI() {
         GiaoDien.apDung();
-        setTitle("GreenSmart - Đăng nhập");
+        setTitle("GreenSmart - ÄÄƒng nháº­p");
         setSize(1100, 680);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -83,7 +83,7 @@ public class DangNhap_GUI extends JFrame implements ActionListener {
 
         JPanel mainPanel = new JPanel(new GridLayout(1, 2, 0, 0));
 
-        // Cột trái: logo chiếc lá và tên ứng dụng.
+        // Cá»™t trÃ¡i: logo chiáº¿c lÃ¡ vÃ  tÃªn á»©ng dá»¥ng.
         JPanel leftPanel = new JPanel(new GridBagLayout());
         leftPanel.setBackground(MAU_NEN_TRAI);
         leftPanel.setBorder(new EmptyBorder(35, 30, 35, 30));
@@ -105,14 +105,14 @@ public class DangNhap_GUI extends JFrame implements ActionListener {
         trai.insets = new Insets(2, 0, 12, 0);
         leftPanel.add(lblThuongHieu, trai);
 
-        JLabel lblMoTa = new JLabel("QUẢN LÝ CỬA HÀNG ĐIỆN MÁY", SwingConstants.CENTER);
+        JLabel lblMoTa = new JLabel("QUáº¢N LÃ Cá»¬A HÃ€NG ÄIá»†N MÃY", SwingConstants.CENTER);
         lblMoTa.setFont(FONT_CHU_NHO);
         lblMoTa.setForeground(MAU_CHU_PHU);
         trai.gridy = 2;
         trai.insets = new Insets(0, 0, 0, 0);
         leftPanel.add(lblMoTa, trai);
 
-        // Cột phải: form đăng nhập. GridBagLayout giữ các ô cùng chiều rộng.
+        // Cá»™t pháº£i: form Ä‘Äƒng nháº­p. GridBagLayout giá»¯ cÃ¡c Ã´ cÃ¹ng chiá»u rá»™ng.
         JPanel rightPanel = new JPanel(new GridBagLayout());
         rightPanel.setBackground(MAU_NEN_PHAI);
         rightPanel.setBorder(new EmptyBorder(40, 56, 40, 56));
@@ -122,21 +122,21 @@ public class DangNhap_GUI extends JFrame implements ActionListener {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.LINE_START;
 
-        JLabel lblTitle = new JLabel("Chào mừng trở lại!");
+        JLabel lblTitle = new JLabel("ChÃ o má»«ng trá»Ÿ láº¡i!");
         lblTitle.setFont(FONT_TIEU_DE);
         lblTitle.setForeground(MAU_CHU);
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 7, 0);
         rightPanel.add(lblTitle, gbc);
 
-        JLabel lblSubtitle = new JLabel("Đăng nhập để tiếp tục");
+        JLabel lblSubtitle = new JLabel("ÄÄƒng nháº­p Ä‘á»ƒ tiáº¿p tá»¥c");
         lblSubtitle.setFont(FONT_NOI_DUNG);
         lblSubtitle.setForeground(MAU_CHU_PHU);
         gbc.gridy = 1;
         gbc.insets = new Insets(0, 0, 32, 0);
         rightPanel.add(lblSubtitle, gbc);
 
-        JLabel lblUser = new JLabel("Tài khoản");
+        JLabel lblUser = new JLabel("TÃ i khoáº£n");
         lblUser.setFont(FONT_NHAN);
         lblUser.setForeground(MAU_CHU);
         gbc.gridy = 2;
@@ -157,7 +157,7 @@ public class DangNhap_GUI extends JFrame implements ActionListener {
         gbc.insets = new Insets(0, 0, 23, 0);
         rightPanel.add(txtUsername, gbc);
 
-        JLabel lblPass = new JLabel("Mật khẩu");
+        JLabel lblPass = new JLabel("Máº­t kháº©u");
         lblPass.setFont(FONT_NHAN);
         lblPass.setForeground(MAU_CHU);
         gbc.gridy = 4;
@@ -179,7 +179,7 @@ public class DangNhap_GUI extends JFrame implements ActionListener {
         gbc.insets = new Insets(0, 0, 10, 0);
         rightPanel.add(txtPassword, gbc);
 
-        chkShowPass = new JCheckBox("Hiện mật khẩu");
+        chkShowPass = new JCheckBox("Hiá»‡n máº­t kháº©u");
         chkShowPass.setBackground(MAU_NEN_PHAI);
         chkShowPass.setForeground(MAU_CHU_PHU);
         chkShowPass.setFont(FONT_NOI_DUNG);
@@ -189,7 +189,7 @@ public class DangNhap_GUI extends JFrame implements ActionListener {
         gbc.insets = new Insets(0, 0, 25, 0);
         rightPanel.add(chkShowPass, gbc);
 
-        btnLogin = new JButton("ĐĂNG NHẬP");
+        btnLogin = new JButton("ÄÄ‚NG NHáº¬P");
         btnLogin.setFont(FONT_NUT);
         btnLogin.setBackground(MAU_CHINH);
         btnLogin.setForeground(MAU_CHU_TREN_NUT);
@@ -258,11 +258,11 @@ public class DangNhap_GUI extends JFrame implements ActionListener {
         try {
             ConnectDB.getInstance().connect();
             lblStatus.setForeground(MAU_CHINH);
-            lblStatus.setText("Kết nối SQL thành công.");
+            lblStatus.setText("Káº¿t ná»‘i SQL thÃ nh cÃ´ng.");
         } catch (SQLException e) {
             e.printStackTrace();
             lblStatus.setForeground(MAU_LOI);
-            lblStatus.setText("Chưa kết nối SQL. Bấm Đăng nhập để thử lại.");
+            lblStatus.setText("ChÆ°a káº¿t ná»‘i SQL. Báº¥m ÄÄƒng nháº­p Ä‘á»ƒ thá»­ láº¡i.");
         }
     }
 
@@ -285,8 +285,8 @@ public class DangNhap_GUI extends JFrame implements ActionListener {
         if (user.isEmpty() || pass.isEmpty()) {
             JOptionPane.showMessageDialog(
                     this,
-                    "Vui lòng nhập tài khoản và mật khẩu!",
-                    "Thông báo",
+                    "Vui lÃ²ng nháº­p tÃ i khoáº£n vÃ  máº­t kháº©u!",
+                    "ThÃ´ng bÃ¡o",
                     JOptionPane.WARNING_MESSAGE);
             if (user.isEmpty()) txtUsername.requestFocusInWindow();
             else txtPassword.requestFocusInWindow();
@@ -303,18 +303,18 @@ public class DangNhap_GUI extends JFrame implements ActionListener {
             if (tk != null) {
                 JOptionPane.showMessageDialog(
                         this,
-                        "Đăng nhập thành công!",
-                        "Thông báo",
+                        "ÄÄƒng nháº­p thÃ nh cÃ´ng!",
+                        "ThÃ´ng bÃ¡o",
                         JOptionPane.INFORMATION_MESSAGE);
                 new MainFrame(tk).setVisible(true);
                 dispose();
             } else {
                 lblStatus.setForeground(MAU_LOI);
-                lblStatus.setText("Tài khoản hoặc mật khẩu không chính xác.");
+                lblStatus.setText("TÃ i khoáº£n hoáº·c máº­t kháº©u khÃ´ng chÃ­nh xÃ¡c.");
                 JOptionPane.showMessageDialog(
                         this,
-                        "Tài khoản hoặc mật khẩu không chính xác!",
-                        "Lỗi đăng nhập",
+                        "TÃ i khoáº£n hoáº·c máº­t kháº©u khÃ´ng chÃ­nh xÃ¡c!",
+                        "Lá»—i Ä‘Äƒng nháº­p",
                         JOptionPane.ERROR_MESSAGE);
                 txtPassword.setText("");
                 txtPassword.requestFocusInWindow();
@@ -322,11 +322,11 @@ public class DangNhap_GUI extends JFrame implements ActionListener {
         } catch (SQLException e) {
             e.printStackTrace();
             lblStatus.setForeground(MAU_LOI);
-            lblStatus.setText("Không thể kết nối hoặc truy vấn SQL.");
+            lblStatus.setText("KhÃ´ng thá»ƒ káº¿t ná»‘i hoáº·c truy váº¥n SQL.");
             JOptionPane.showMessageDialog(
                     this,
-                    "Lỗi kết nối hoặc truy vấn SQL:\n" + e.getMessage(),
-                    "Lỗi database",
+                    "Lá»—i káº¿t ná»‘i hoáº·c truy váº¥n SQL:\n" + e.getMessage(),
+                    "Lá»—i database",
                     JOptionPane.ERROR_MESSAGE);
         } finally {
             btnLogin.setEnabled(true);
