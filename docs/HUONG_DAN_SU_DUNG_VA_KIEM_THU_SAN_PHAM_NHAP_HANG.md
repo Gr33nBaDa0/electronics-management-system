@@ -160,3 +160,86 @@ try {
 
 ---
 *Tài liệu kỹ thuật được lập bởi sinh viên Võ Văn Tuấn - MSSV: 24694721.*
+
+
+---
+
+## 7. ĐẶC TẢ CẤU TRÚC DỮ LIỆU & RÀNG BUỘC TOÀN VẸN (DATABASE SCHEMA)
+
+### 7.1. Bảng SanPham (Danh mục hàng hóa)
+- `MaSanPham VARCHAR(6) PRIMARY KEY`: Mã sản phẩm chuẩn hóa `SPxxxx`.
+- `TenSanPham NVARCHAR(100) NOT NULL`: Tên hiển thị đầy đủ của thiết bị.
+- `LoaiHang NVARCHAR(50) NOT NULL`: Phân loại nhóm thiết bị (Tivi, Tủ lạnh, Máy giặt, Gia dụng, Điện lạnh...).
+- `ThuongHieu NVARCHAR(50) NOT NULL`: Nhãn hàng sản xuất (Sony, LG, Samsung, Panasonic, Sharp, Toshiba...).
+- `DonGiaBan FLOAT NOT NULL CHECK (DonGiaBan >= 0)`: Giá bán lẻ niêm yết đến khách hàng.
+- `GiaNhap FLOAT NOT NULL CHECK (GiaNhap >= 0)`: Giá vốn nhập vào gần nhất để theo dõi biên lợi nhuận.
+- `ThongSoKiThuat NVARCHAR(500)`: Tóm tắt thông số kỹ thuật (công suất, kích thước, công nghệ Inverter...).
+- `XuatXu NVARCHAR(50) NOT NULL`: Nước sản xuất (Việt Nam, Thái Lan, Malaysia, Nhật Bản, Trung Quốc...).
+- `TrangThai NVARCHAR(30) NOT NULL DEFAULT N'Đang bán'`: Tình trạng ('Đang bán' hoặc 'Ngừng bán').
+- `ThoiHanBaoHanh INT NOT NULL DEFAULT 12 CHECK (ThoiHanBaoHanh >= 0)`: Thời gian bảo hành tính theo tháng.
+- `SoLuongTon INT NOT NULL DEFAULT 0 CHECK (SoLuongTon >= 0)`: Tồn kho thực tế sẵn sàng xuất bán.
+- `HinhAnh NVARCHAR(255)`: Đường dẫn tương đối lưu trữ ảnh đại diện `resource/hinhanh/SPxxxx.png`.
+
+### 7.2. Bảng PhieuNhapHang (Chứng từ nhập kho)
+- `MaPhieuNhap VARCHAR(20) PRIMARY KEY`: Mã chứng từ nhập hàng.
+- `NgayLap DATETIME2(0) NOT NULL DEFAULT SYSDATETIME()`: Thời điểm nhân viên lập phiếu.
+- `SoChungTu NVARCHAR(50)`: Mã số hóa đơn / phiếu giao hàng từ nhà cung cấp kèm theo kiện hàng.
+- `NhaCungCap NVARCHAR(100) NOT NULL`: Tên đối tác / nhà phân phối cung cấp hàng hóa.
+- `NguoiGiao NVARCHAR(100)`: Họ tên nhân viên giao nhận / tài xế của bên vận chuyển.
+- `MaNhanVienLap VARCHAR(10) NOT NULL FOREIGN KEY REFERENCES NhanVien(MaNhanVien)`: Nhân viên chịu trách nhiệm kiểm đếm ban đầu.
+- `MaQuanLyDuyet VARCHAR(10) FOREIGN KEY REFERENCES NhanVien(MaNhanVien)`: Quản lý thẩm định và ký duyệt thực nhận.
+- `TrangThai NVARCHAR(30) NOT NULL DEFAULT N'Chờ duyệt'`: Ba trạng thái chuẩn ('Chờ duyệt', 'Đã nhập', 'Từ chối').
+- `NgayDuyet DATETIME2(0)`: Thời điểm quản lý phê duyệt hoặc từ chối phiếu.
+- `LyDoTuChoi NVARCHAR(255)`: Ghi chú bắt buộc khi từ chối nhận hàng để đối soát với nhà cung cấp.
+
+### 7.3. Bảng ChiTietPhieuNhapHang (Dòng hàng nhập kho)
+- `MaPhieuNhap VARCHAR(20) NOT NULL FOREIGN KEY REFERENCES PhieuNhapHang(MaPhieuNhap)`: Khóa ngoại liên kết đầu phiếu.
+- `MaSanPham VARCHAR(6) NOT NULL FOREIGN KEY REFERENCES SanPham(MaSanPham)`: Khóa ngoại trỏ đến danh mục hàng hóa.
+- `SoLuong INT NOT NULL CHECK (SoLuong > 0)`: Số lượng kiện hàng thực nhận.
+- `DonGiaNhap FLOAT NOT NULL CHECK (DonGiaNhap >= 0)`: Giá nhập thực tế trên từng đơn vị sản phẩm.
+- `ThanhTien AS CONVERT(FLOAT(53), ROUND(SoLuong * DonGiaNhap, 2))`: Cột tính toán tự động giá trị thành tiền.
+- `PRIMARY KEY (MaPhieuNhap, MaSanPham)`: Ràng buộc khóa chính phức hợp chống trùng sản phẩm trên cùng một phiếu.
+
+---
+
+## 8. HƯỚNG DẪN CÀI ĐẶT & PHỤC HỒI CƠ SỞ DỮ LIỆU THỰC HÀNH
+
+### 8.1. Các bước chạy script CSDL GreenSmart
+1. Mở phần mềm **Microsoft SQL Server Management Studio (SSMS)**.
+2. Kết nối tới SQL Server Instance cục bộ (Ví dụ: `localhost` hoặc `.\SQLEXPRESS`).
+3. Mở file `database/GreenSmart_sql.sql` trong thư mục dự án.
+4. Bấm **Execute (F5)** để khởi tạo toàn bộ 13 bảng, ràng buộc toàn vẹn và nạp dữ liệu mẫu ban đầu.
+5. Kiểm tra kết quả: Bảng `SanPham` có đủ 17 bản ghi và bảng `PhieuNhapHang` có đủ các phiếu mẫu.
+
+### 8.2. Cấu hình kết nối JDBC trong mã nguồn
+- Tệp cấu hình: `config.properties`
+- Cấu hình chuẩn kết nối TLS/SSL tương thích JDK 17+:
+  ```properties
+  db.url=jdbc:sqlserver://localhost:1433;databaseName=GreenSmart;encrypt=true;trustServerCertificate=true;
+  db.user=sa
+  db.password=sapassword
+  backup.file=C:\\DuAnPTUD\\GreenSmart_Backup.bak
+  ```
+
+---
+
+## 9. DANH MỤC 20 TEST CASES NÂNG CAO CHO BUỔI BẢO VỆ
+
+| ID | Nhóm chức năng | Tình huống kiểm thử | Dữ liệu kiểm thử | Kết quả kỳ vọng |
+|:---:|---|---|---|---|
+| TC13 | Tìm kiếm SP | Tìm kiếm theo tên không phân biệt hoa thường | Nhập "tivi sony" | Hiển thị đúng Smart TV Sony |
+| TC14 | Tìm kiếm SP | Tìm kiếm theo thông số kỹ thuật | Nhập "Inverter" | Hiển thị toàn bộ tủ lạnh/máy giặt Inverter |
+| TC15 | Lọc giá SP | Nhập giá từ > giá đến | Giá từ 10tr, Giá đến 5tr | Báo lỗi: "Giá từ không được lớn hơn giá đến" |
+| TC16 | Sửa SP | Cập nhật giá bán lẻ của SP0001 | Sửa từ 14.990.000 thành 15.500.000 | Cập nhật thành công vào CSDL |
+| TC17 | Sửa SP | Đổi trạng thái từ "Đang bán" sang "Ngừng bán" | Chọn trạng thái "Ngừng bán" | Sản phẩm không còn xuất hiện trên màn POS |
+| TC18 | Xóa SP | Xóa sản phẩm chưa có giao dịch | Tạo SP mới SP0018, bấm Xóa | Xóa thành công khỏi CSDL |
+| TC19 | Nhập hàng | Nhập số lượng âm hoặc bằng 0 | Gõ SL = 0 | Spinner chặn lại (giá trị tối thiểu là 1) |
+| TC20 | Nhập hàng | Đơn giá nhập chứa chữ cái | Gõ "nam trieu" | Báo lỗi định dạng số không hợp lệ |
+| TC21 | Nhập hàng | Bỏ bớt dòng hàng trước khi lưu | Bấm chọn dòng ấm siêu tốc -> bấm "Bỏ dòng" | Dòng hàng bị xóa khỏi bảng chi tiết |
+| TC22 | Nhập hàng | Tính tổng tiền tự động | Thêm 2 SP: 10 cái x 1tr + 5 cái x 2tr | Tổng tiền hiển thị chính xác 20.000.000đ |
+| TC23 | Phê duyệt | Quản lý kiểm tra tồn kho tăng | Ghi nhớ tồn SP0005 là 30, duyệt nhập 20 | Tồn kho SP0005 nhảy lên chính xác 50 |
+| TC24 | Phân quyền | Nhân viên đăng nhập mở form Nhập hàng | Tài khoản nhân viên | Chỉ được lập phiếu chờ, không có nút duyệt |
+| TC25 | Kiểm soát | Kiểm tra rollback khi lỗi kết nối giữa chừng | Ngắt mạng khi đang duyệt chi tiết | Toàn bộ transaction bị hủy, kho giữ nguyên |
+
+---
+*Tài liệu kỹ thuật chính thức phục vụ nghiệm thu môn học PTUD - GreenSmart.*
