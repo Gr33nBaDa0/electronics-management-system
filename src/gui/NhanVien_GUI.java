@@ -151,7 +151,13 @@ public class NhanVien_GUI extends JPanel implements ActionListener {
                             if (!e.getValueIsAdjusting()) chon();
                         });
         ganPhimTat();
+        vaiTro.addActionListener(e -> {
+            if (maCu == null) {
+                capNhatMaNhanVienTiepTheo();
+            }
+        });
         loadDataToTable();
+        moi();
     }
 
     private void loadDataToTable() {
@@ -225,13 +231,31 @@ public class NhanVien_GUI extends JPanel implements ActionListener {
         pass.setEnabled(false);
     }
 
+    private void capNhatMaNhanVienTiepTheo() {
+        try {
+            String role = (String) vaiTro.getSelectedItem();
+            String tienTo = "Quản lý".equals(role) ? "QL" : "NV";
+            String maTiepTheo = new NhanVien_DAO().layMaTiepTheo(tienTo);
+            ma.setText(maTiepTheo);
+            ma.setEditable(false);
+            if (maCu == null) {
+                user.setText(maTiepTheo);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void moi() {
         maCu = null;
         anh = null;
         table.clearSelection();
-        for (JTextField f : new JTextField[] {ma, ten, sdt, email, diaChi, cccd, user, pass})
+        for (JTextField f : new JTextField[] {ten, sdt, email, diaChi, cccd, user, pass})
             f.setText("");
-        ma.setEditable(true);
+        sinh.setText("2000-01-01");
+        vaoLam.setText(LocalDate.now().toString());
+        capNhatMaNhanVienTiepTheo();
+        ma.setEditable(false);
         user.setEditable(true);
         pass.setEnabled(true);
         lblAnh.setText("Chưa chọn ảnh");
@@ -239,38 +263,77 @@ public class NhanVien_GUI extends JPanel implements ActionListener {
 
     private void luu() throws Exception {
         if (!ma.getText().matches("(NV|QL)\\d{3}"))
-            throw new IllegalArgumentException("Mã ví dụ NV001 hoặc QL001.");
+            throw new IllegalArgumentException("Mã nhân viên ví dụ NV001 hoặc QL001.");
         kiemTraRong(ten.getText(), "họ tên");
+        if (ten.getText().matches(".*\\d.*")) {
+            throw new IllegalArgumentException("Họ tên không được chứa chữ số.");
+        }
         kiemTraSDT(sdt.getText());
         if (!cccd.getText().matches("\\d{12}"))
-            throw new IllegalArgumentException("CCCD gồm 12 chữ số.");
+            throw new IllegalArgumentException("Số CCCD phải gồm đúng 12 chữ số.");
+
+        NhanVien_DAO nvDao = new NhanVien_DAO();
+        // Kiểm tra trùng SĐT
+        if (nvDao.kiemTraTrungSDT(sdt.getText(), maCu)) {
+            throw new IllegalArgumentException("Số điện thoại '" + sdt.getText() + "' đã tồn tại trong hệ thống.");
+        }
+        // Kiểm tra trùng CCCD
+        if (nvDao.kiemTraTrungCCCD(cccd.getText(), maCu)) {
+            throw new IllegalArgumentException("Số CCCD '" + cccd.getText() + "' đã tồn tại trong hệ thống.");
+        }
+        // Kiểm tra trùng Email
+        String emailVal = email.getText().trim();
+        if (!emailVal.isEmpty()) {
+            if (!emailVal.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+                throw new IllegalArgumentException("Email không đúng định dạng.");
+            }
+            if (nvDao.kiemTraTrungEmail(emailVal, maCu)) {
+                throw new IllegalArgumentException("Email '" + emailVal + "' đã tồn tại trong hệ thống.");
+            }
+        }
+
         NhanVien n = new NhanVien(ma.getText());
         n.setHoTen(ten.getText().trim());
         n.setVaiTro((String) vaiTro.getSelectedItem());
         n.setSdt(sdt.getText());
-        n.setEmail(email.getText().trim());
+        n.setEmail(emailVal.isEmpty() ? null : emailVal);
         n.setDiaChi(diaChi.getText().trim());
         n.setSoCCCD(cccd.getText());
         n.setHinhTheNV(anh);
         n.setGioiTinh((String) gioiTinh.getSelectedItem());
         n.setNgaySinh(LocalDate.parse(sinh.getText()));
         n.setNgayBatDauLV(LocalDate.parse(vaoLam.getText()));
+
         TaiKhoan a = null;
         if (maCu == null) {
+            String u = user.getText().trim();
+            kiemTraRong(u, "tên đăng nhập");
+            kiemTraDoDai(u, 5, "tên đăng nhập");
+            
+            // Kiểm tra trùng tên đăng nhập
+            if (new TaiKhoan_DAO().kiemTraTrungTenDangNhap(u)) {
+                throw new IllegalArgumentException("Tên đăng nhập '" + u + "' đã tồn tại trong hệ thống. Vui lòng chọn tên đăng nhập khác.");
+            }
+
             String mk = new String(pass.getPassword());
-            kiemTraDoDai(user.getText(), 5, "tên đăng nhập");
+            kiemTraRong(mk, "mật khẩu");
+            if (mk.length() < 8) {
+                throw new IllegalArgumentException("Mật khẩu phải có ít nhất 8 ký tự.");
+            }
             kiemTraDoDai(mk, 128, "mật khẩu");
             a =
                     new TaiKhoan(
-                            user.getText().trim(),
+                            u,
                             "Quản lý".equals(n.getVaiTro()) ? "ADMIN" : "BAN_HANG",
                             mk,
                             n);
         }
         if (maCu == null) {
-            new NhanVien_DAO().insertNhanVien(n, a, tk);
+            nvDao.insertNhanVien(n, a, tk);
+            JOptionPane.showMessageDialog(this, "Thêm nhân viên và tài khoản thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
         } else {
-            new NhanVien_DAO().updateNhanVien(n, tk);
+            nvDao.updateNhanVien(n, tk);
+            JOptionPane.showMessageDialog(this, "Cập nhật hồ sơ nhân viên thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
         }
         moi();
         loadDataToTable();
@@ -365,8 +428,8 @@ public class NhanVien_GUI extends JPanel implements ActionListener {
     }
 
     private void kiemTraSDT(String s) {
-        if (s == null || !s.matches("0\\d{9}"))
-            throw new IllegalArgumentException("SĐT phải gồm 10 chữ số, bắt đầu bằng 0.");
+        if (s == null || !s.matches("^0[35789]\\d{8}$"))
+            throw new IllegalArgumentException("Số điện thoại không hợp lệ (10 số, đầu 03/05/07/08/09).");
     }
 
     private JLabel taoTieuDe(String t) {

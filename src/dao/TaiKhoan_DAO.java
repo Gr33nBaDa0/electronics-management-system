@@ -133,6 +133,65 @@ public class TaiKhoan_DAO {
     }
 
 
+    public boolean kiemTraTrungTenDangNhap(String tenDangNhap) throws SQLException {
+        Connection con = ConnectDB.getConnection();
+        return kiemTraTrungTenDangNhap(con, tenDangNhap);
+    }
+
+    public boolean kiemTraTrungTenDangNhap(Connection con, String tenDangNhap) throws SQLException {
+        if (tenDangNhap == null || tenDangNhap.trim().isEmpty()) return false;
+        String sql = "SELECT COUNT(*) FROM dbo.TaiKhoan WHERE TenDangNhap = ?";
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, tenDangNhap.trim());
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean kiemTraThongTinKhoiPhuc(String tenDangNhap, String sdt, String soCCCD) throws SQLException {
+        Connection con = ConnectDB.getConnection();
+        String sql = "SELECT COUNT(*) FROM dbo.TaiKhoan tk "
+                + "JOIN dbo.NhanVien nv ON tk.MaNhanVien = nv.MaNhanVien "
+                + "WHERE tk.TenDangNhap = ? AND nv.SDT = ? AND nv.SoCCCD = ?";
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, tenDangNhap.trim());
+            stmt.setString(2, sdt.trim());
+            stmt.setString(3, soCCCD.trim());
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean datLaiMatKhauQuen(String tenDangNhap, String sdt, String soCCCD, String matKhauMoi) throws SQLException {
+        if (tenDangNhap == null || tenDangNhap.trim().isEmpty()) {
+            throw new SQLException("Vui lòng nhập tên đăng nhập.");
+        }
+        if (sdt == null || sdt.trim().isEmpty()) {
+            throw new SQLException("Vui lòng nhập số điện thoại.");
+        }
+        if (soCCCD == null || soCCCD.trim().isEmpty()) {
+            throw new SQLException("Vui lòng nhập số CCCD.");
+        }
+        if (!kiemTraThongTinKhoiPhuc(tenDangNhap, sdt, soCCCD)) {
+            throw new SQLException("Thông tin xác minh không chính xác (Tên đăng nhập, SĐT hoặc CCCD không khớp).");
+        }
+        if (matKhauMoi == null || matKhauMoi.length() < 8) {
+            throw new SQLException("Mật khẩu mới phải có ít nhất 8 ký tự.");
+        }
+        if (matKhauMoi.length() > 128) {
+            throw new SQLException("Mật khẩu mới tối đa 128 ký tự.");
+        }
+        return updateMatKhau(tenDangNhap, matKhauMoi);
+    }
+
     // Các màn hình mới dùng lại cách truy vấn ở các phương thức phía trên.
     public void kiemTraQuyen(TaiKhoan taiKhoan, boolean canQuanLy) throws SQLException {
         if (taiKhoan == null || taiKhoan.getNhanVien() == null) {

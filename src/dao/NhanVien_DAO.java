@@ -15,6 +15,102 @@ import java.util.List;
 
 public class NhanVien_DAO {
 
+    /** Mã hiển thị trên form; không giữ chỗ trước khi người dùng Lưu. */
+    public String layMaTiepTheo(String tienTo) throws SQLException {
+        Connection con = ConnectDB.getConnection();
+        return taoMaTiepTheo(con, tienTo, false);
+    }
+
+    /** Khi thêm, gọi trong transaction và khóa phạm vi mã trên SQL Server. */
+    public String taoMaTiepTheo(Connection con, String tienTo, boolean khoa) throws SQLException {
+        if (con == null || con.isClosed()) throw new SQLException("Chưa kết nối SQL.");
+        String prefix = (tienTo != null && tienTo.equalsIgnoreCase("QL")) ? "QL" : "NV";
+        String sql =
+                "SELECT MaNhanVien FROM dbo.NhanVien"
+                        + (khoa ? " WITH (UPDLOCK,HOLDLOCK)" : "")
+                        + " WHERE MaNhanVien LIKE ? ORDER BY MaNhanVien DESC";
+        int lonNhat = 0;
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, prefix + "%");
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String ma = rs.getString("MaNhanVien");
+                    if (ma != null && ma.matches("(?i)" + prefix + "[0-9]{3}")) {
+                        try {
+                            int num = Integer.parseInt(ma.substring(2));
+                            lonNhat = Math.max(lonNhat, num);
+                        } catch (NumberFormatException ignored) {}
+                    }
+                }
+            }
+        }
+        if (lonNhat >= 999) throw new SQLException("Đã hết dải mã nhân viên " + prefix + " (tối đa " + prefix + "999).");
+        return String.format(java.util.Locale.ROOT, "%s%03d", prefix, lonNhat + 1);
+    }
+
+    public boolean kiemTraTrungSDT(String sdt, String maHienTai) throws SQLException {
+        Connection con = ConnectDB.getConnection();
+        return kiemTraTrungSDT(con, sdt, maHienTai);
+    }
+
+    public boolean kiemTraTrungSDT(Connection con, String sdt, String maHienTai) throws SQLException {
+        if (sdt == null || sdt.trim().isEmpty()) return false;
+        String sql = "SELECT COUNT(*) FROM dbo.NhanVien WHERE SDT = ?" 
+                + (maHienTai != null && !maHienTai.trim().isEmpty() ? " AND MaNhanVien <> ?" : "");
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, sdt.trim());
+            if (maHienTai != null && !maHienTai.trim().isEmpty()) {
+                stmt.setString(2, maHienTai.trim());
+            }
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getInt(1) > 0;
+            }
+        }
+        return false;
+    }
+
+    public boolean kiemTraTrungCCCD(String cccd, String maHienTai) throws SQLException {
+        Connection con = ConnectDB.getConnection();
+        return kiemTraTrungCCCD(con, cccd, maHienTai);
+    }
+
+    public boolean kiemTraTrungCCCD(Connection con, String cccd, String maHienTai) throws SQLException {
+        if (cccd == null || cccd.trim().isEmpty()) return false;
+        String sql = "SELECT COUNT(*) FROM dbo.NhanVien WHERE SoCCCD = ?" 
+                + (maHienTai != null && !maHienTai.trim().isEmpty() ? " AND MaNhanVien <> ?" : "");
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, cccd.trim());
+            if (maHienTai != null && !maHienTai.trim().isEmpty()) {
+                stmt.setString(2, maHienTai.trim());
+            }
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getInt(1) > 0;
+            }
+        }
+        return false;
+    }
+
+    public boolean kiemTraTrungEmail(String email, String maHienTai) throws SQLException {
+        Connection con = ConnectDB.getConnection();
+        return kiemTraTrungEmail(con, email, maHienTai);
+    }
+
+    public boolean kiemTraTrungEmail(Connection con, String email, String maHienTai) throws SQLException {
+        if (email == null || email.trim().isEmpty()) return false;
+        String sql = "SELECT COUNT(*) FROM dbo.NhanVien WHERE Email = ?" 
+                + (maHienTai != null && !maHienTai.trim().isEmpty() ? " AND MaNhanVien <> ?" : "");
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, email.trim());
+            if (maHienTai != null && !maHienTai.trim().isEmpty()) {
+                stmt.setString(2, maHienTai.trim());
+            }
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getInt(1) > 0;
+            }
+        }
+        return false;
+    }
+
     public List<NhanVien> getAllNhanVien() throws SQLException {
         List<NhanVien> ds = new ArrayList<>();
         String sql = "SELECT * FROM dbo.NhanVien ORDER BY MaNhanVien";
@@ -93,6 +189,19 @@ public class NhanVien_DAO {
             }
             if (x.getNgayBatDauLV() == null || x.getNgayBatDauLV().isAfter(LocalDate.now())) {
                 throw new SQLException("Ngày bắt đầu làm việc không hợp lệ.");
+            }
+            if (kiemTraTrungSDT(con, x.getSdt(), null)) {
+                throw new SQLException("Số điện thoại '" + x.getSdt() + "' đã tồn tại cho nhân viên khác.");
+            }
+            if (kiemTraTrungCCCD(con, x.getSoCCCD(), null)) {
+                throw new SQLException("Số CCCD '" + x.getSoCCCD() + "' đã tồn tại trong hệ thống.");
+            }
+            if (x.getEmail() != null && !x.getEmail().trim().isEmpty() 
+                    && kiemTraTrungEmail(con, x.getEmail(), null)) {
+                throw new SQLException("Email '" + x.getEmail() + "' đã tồn tại cho nhân viên khác.");
+            }
+            if (taiKhoan != null && new TaiKhoan_DAO().kiemTraTrungTenDangNhap(con, taiKhoan.getTenDangNhap())) {
+                throw new SQLException("Tên đăng nhập '" + taiKhoan.getTenDangNhap() + "' đã tồn tại trong hệ thống.");
             }
             String quyen = "Quản lý".equals(x.getVaiTro()) ? "ADMIN" : "BAN_HANG";
             String sql =
@@ -184,6 +293,16 @@ public class NhanVien_DAO {
             }
             if (x.getNgayBatDauLV() == null || x.getNgayBatDauLV().isAfter(LocalDate.now())) {
                 throw new SQLException("Ngày bắt đầu làm việc không hợp lệ.");
+            }
+            if (kiemTraTrungSDT(con, x.getSdt(), x.getMaNhanVien())) {
+                throw new SQLException("Số điện thoại '" + x.getSdt() + "' đã tồn tại cho nhân viên khác.");
+            }
+            if (kiemTraTrungCCCD(con, x.getSoCCCD(), x.getMaNhanVien())) {
+                throw new SQLException("Số CCCD '" + x.getSoCCCD() + "' đã tồn tại trong hệ thống.");
+            }
+            if (x.getEmail() != null && !x.getEmail().trim().isEmpty() 
+                    && kiemTraTrungEmail(con, x.getEmail(), x.getMaNhanVien())) {
+                throw new SQLException("Email '" + x.getEmail() + "' đã tồn tại cho nhân viên khác.");
             }
             String quyen = "Quản lý".equals(x.getVaiTro()) ? "ADMIN" : "BAN_HANG";
             if (x.getMaNhanVien().equals(nguoiDung.getNhanVien().getMaNhanVien())) {

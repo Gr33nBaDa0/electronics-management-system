@@ -29,6 +29,8 @@ import java.sql.SQLException;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -70,6 +72,7 @@ public class DangNhap_GUI extends JFrame implements ActionListener {
     private JPasswordField txtPassword;
     private JCheckBox chkShowPass;
     private JButton btnLogin;
+    private JButton btnQuenMatKhau;
     private JLabel lblStatus;
     private char kyTuAnMatKhau;
 
@@ -179,15 +182,43 @@ public class DangNhap_GUI extends JFrame implements ActionListener {
         gbc.insets = new Insets(0, 0, 10, 0);
         rightPanel.add(txtPassword, gbc);
 
+        JPanel pnlTienIch = new JPanel(new java.awt.BorderLayout());
+        pnlTienIch.setBackground(MAU_NEN_PHAI);
+
         chkShowPass = new JCheckBox("Hiện mật khẩu");
         chkShowPass.setBackground(MAU_NEN_PHAI);
         chkShowPass.setForeground(MAU_CHU_PHU);
         chkShowPass.setFont(FONT_NOI_DUNG);
         chkShowPass.setFocusPainted(false);
         chkShowPass.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        pnlTienIch.add(chkShowPass, java.awt.BorderLayout.WEST);
+
+        btnQuenMatKhau = new JButton("Quên mật khẩu?");
+        btnQuenMatKhau.setFont(FONT_NOI_DUNG);
+        btnQuenMatKhau.setForeground(MAU_CHINH);
+        btnQuenMatKhau.setBackground(MAU_NEN_PHAI);
+        btnQuenMatKhau.setBorderPainted(false);
+        btnQuenMatKhau.setContentAreaFilled(false);
+        btnQuenMatKhau.setFocusPainted(false);
+        btnQuenMatKhau.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnQuenMatKhau.setBorder(new EmptyBorder(0, 0, 0, 0));
+        btnQuenMatKhau.addMouseListener(
+                new MouseAdapter() {
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        btnQuenMatKhau.setForeground(MAU_NUT_HOVER);
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        btnQuenMatKhau.setForeground(MAU_CHINH);
+                    }
+                });
+        pnlTienIch.add(btnQuenMatKhau, java.awt.BorderLayout.EAST);
+
         gbc.gridy = 6;
         gbc.insets = new Insets(0, 0, 25, 0);
-        rightPanel.add(chkShowPass, gbc);
+        rightPanel.add(pnlTienIch, gbc);
 
         btnLogin = new JButton("ĐĂNG NHẬP");
         btnLogin.setFont(FONT_NUT);
@@ -216,6 +247,7 @@ public class DangNhap_GUI extends JFrame implements ActionListener {
         setContentPane(mainPanel);
 
         chkShowPass.addActionListener(this);
+        btnQuenMatKhau.addActionListener(this);
         btnLogin.addActionListener(this);
         txtUsername.addActionListener(this);
         txtPassword.addActionListener(this);
@@ -271,6 +303,8 @@ public class DangNhap_GUI extends JFrame implements ActionListener {
         Object o = e.getSource();
         if (o.equals(chkShowPass)) {
             txtPassword.setEchoChar(chkShowPass.isSelected() ? (char) 0 : kyTuAnMatKhau);
+        } else if (o.equals(btnQuenMatKhau)) {
+            hienThiDialogQuenMatKhau();
         } else if (o.equals(btnLogin) || o.equals(txtPassword)) {
             xulyDangNhap();
         } else if (o.equals(txtUsername)) {
@@ -331,6 +365,190 @@ public class DangNhap_GUI extends JFrame implements ActionListener {
         } finally {
             btnLogin.setEnabled(true);
         }
+    }
+
+    private void hienThiDialogQuenMatKhau() {
+        JDialog dialog = new JDialog(this, "Khôi phục mật khẩu - GreenSmart", true);
+        dialog.setSize(520, 600);
+        dialog.setLocationRelativeTo(this);
+        dialog.setResizable(false);
+
+        JPanel pnlChinh = new JPanel(new java.awt.BorderLayout(0, 16));
+        pnlChinh.setBackground(MAU_NEN_PHAI);
+        pnlChinh.setBorder(new EmptyBorder(24, 32, 24, 32));
+
+        // Header
+        JPanel pnlHeader = new JPanel(new GridLayout(2, 1, 0, 4));
+        pnlHeader.setOpaque(false);
+        JLabel lblTieuDeDlg = new JLabel("KHÔI PHỤC MẬT KHẨU", SwingConstants.CENTER);
+        lblTieuDeDlg.setFont(GiaoDien.phong(Font.BOLD, 22));
+        lblTieuDeDlg.setForeground(MAU_CHINH);
+        JLabel lblMoTaDlg = new JLabel("Nhập thông tin xác thực để đặt lại mật khẩu mới", SwingConstants.CENTER);
+        lblMoTaDlg.setFont(FONT_CHU_NHO);
+        lblMoTaDlg.setForeground(MAU_CHU_PHU);
+        pnlHeader.add(lblTieuDeDlg);
+        pnlHeader.add(lblMoTaDlg);
+        pnlChinh.add(pnlHeader, java.awt.BorderLayout.NORTH);
+
+        // Form
+        JPanel pnlForm = new JPanel(new GridBagLayout());
+        pnlForm.setOpaque(false);
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 1.0;
+        c.gridx = 0;
+
+        JTextField txtDlgUser = new JTextField(txtUsername.getText().trim());
+        txtDlgUser.setFont(FONT_O_NHAP);
+        txtDlgUser.setPreferredSize(new Dimension(0, 42));
+        txtDlgUser.setBorder(taoVienNhap(MAU_VIEN));
+
+        JTextField txtDlgSdt = new JTextField();
+        txtDlgSdt.setFont(FONT_O_NHAP);
+        txtDlgSdt.setPreferredSize(new Dimension(0, 42));
+        txtDlgSdt.setBorder(taoVienNhap(MAU_VIEN));
+
+        JTextField txtDlgCCCD = new JTextField();
+        txtDlgCCCD.setFont(FONT_O_NHAP);
+        txtDlgCCCD.setPreferredSize(new Dimension(0, 42));
+        txtDlgCCCD.setBorder(taoVienNhap(MAU_VIEN));
+
+        JPasswordField txtDlgPassMoi = new JPasswordField();
+        txtDlgPassMoi.setFont(FONT_O_NHAP);
+        txtDlgPassMoi.setPreferredSize(new Dimension(0, 42));
+        txtDlgPassMoi.setBorder(taoVienNhap(MAU_VIEN));
+
+        JPasswordField txtDlgPassXacNhan = new JPasswordField();
+        txtDlgPassXacNhan.setFont(FONT_O_NHAP);
+        txtDlgPassXacNhan.setPreferredSize(new Dimension(0, 42));
+        txtDlgPassXacNhan.setBorder(taoVienNhap(MAU_VIEN));
+
+        JCheckBox chkDlgHienPass = new JCheckBox("Hiện mật khẩu");
+        chkDlgHienPass.setFont(FONT_CHU_NHO);
+        chkDlgHienPass.setForeground(MAU_CHU_PHU);
+        chkDlgHienPass.setOpaque(false);
+        chkDlgHienPass.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        char echoChar = txtDlgPassMoi.getEchoChar();
+        chkDlgHienPass.addActionListener(ev -> {
+            char ec = chkDlgHienPass.isSelected() ? (char) 0 : echoChar;
+            txtDlgPassMoi.setEchoChar(ec);
+            txtDlgPassXacNhan.setEchoChar(ec);
+        });
+
+        int row = 0;
+        themHangForm(pnlForm, c, row++, "Tên đăng nhập:", txtDlgUser);
+        themHangForm(pnlForm, c, row++, "Số điện thoại:", txtDlgSdt);
+        themHangForm(pnlForm, c, row++, "Số CCCD:", txtDlgCCCD);
+        themHangForm(pnlForm, c, row++, "Mật khẩu mới (tối thiểu 8 ký tự):", txtDlgPassMoi);
+        themHangForm(pnlForm, c, row++, "Xác nhận mật khẩu mới:", txtDlgPassXacNhan);
+
+        c.gridy = row * 2;
+        c.insets = new Insets(6, 0, 8, 0);
+        pnlForm.add(chkDlgHienPass, c);
+
+        pnlChinh.add(pnlForm, java.awt.BorderLayout.CENTER);
+
+        // Buttons
+        JPanel pnlNut = new JPanel(new GridLayout(1, 2, 12, 0));
+        pnlNut.setOpaque(false);
+        pnlNut.setPreferredSize(new Dimension(0, 48));
+
+        JButton btnXacNhanDlg = new JButton("ĐẶT LẠI MẬT KHẨU");
+        btnXacNhanDlg.setFont(FONT_NUT);
+        btnXacNhanDlg.setBackground(MAU_CHINH);
+        btnXacNhanDlg.setForeground(MAU_CHU_TREN_NUT);
+        btnXacNhanDlg.setOpaque(true);
+        btnXacNhanDlg.setFocusPainted(false);
+        btnXacNhanDlg.setBorderPainted(false);
+        btnXacNhanDlg.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        JButton btnHuyDlg = new JButton("HỦY BỎ");
+        btnHuyDlg.setFont(FONT_NUT);
+        btnHuyDlg.setBackground(Color.WHITE);
+        btnHuyDlg.setForeground(MAU_CHU);
+        btnHuyDlg.setBorder(BorderFactory.createLineBorder(MAU_VIEN, 1));
+        btnHuyDlg.setFocusPainted(false);
+        btnHuyDlg.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        btnHuyDlg.addActionListener(ev -> dialog.dispose());
+
+        btnXacNhanDlg.addActionListener(ev -> {
+            String u = txtDlgUser.getText().trim();
+            String s = txtDlgSdt.getText().trim();
+            String cccdVal = txtDlgCCCD.getText().trim();
+            String pMoi = new String(txtDlgPassMoi.getPassword());
+            String pXacNhan = new String(txtDlgPassXacNhan.getPassword());
+
+            if (u.isEmpty()) {
+                JOptionPane.showMessageDialog(dialog, "Vui lòng nhập tên đăng nhập!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                txtDlgUser.requestFocusInWindow();
+                return;
+            }
+            if (s.isEmpty() || !s.matches("^0[35789]\\d{8}$")) {
+                JOptionPane.showMessageDialog(dialog, "Số điện thoại không hợp lệ (10 số, đầu 03/05/07/08/09)!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                txtDlgSdt.requestFocusInWindow();
+                return;
+            }
+            if (cccdVal.isEmpty() || !cccdVal.matches("^\\d{12}$")) {
+                JOptionPane.showMessageDialog(dialog, "Số CCCD phải gồm đúng 12 chữ số!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                txtDlgCCCD.requestFocusInWindow();
+                return;
+            }
+            if (pMoi.isEmpty()) {
+                JOptionPane.showMessageDialog(dialog, "Vui lòng nhập mật khẩu mới!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                txtDlgPassMoi.requestFocusInWindow();
+                return;
+            }
+            if (pMoi.length() < 8) {
+                JOptionPane.showMessageDialog(dialog, "Mật khẩu mới phải có ít nhất 8 ký tự!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                txtDlgPassMoi.requestFocusInWindow();
+                return;
+            }
+            if (!pMoi.equals(pXacNhan)) {
+                JOptionPane.showMessageDialog(dialog, "Xác nhận mật khẩu mới không khớp!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                txtDlgPassXacNhan.requestFocusInWindow();
+                return;
+            }
+
+            try {
+                if (ConnectDB.con == null || ConnectDB.con.isClosed()) {
+                    ConnectDB.getInstance().connect();
+                }
+                TaiKhoan_DAO dao = new TaiKhoan_DAO();
+                boolean ok = dao.datLaiMatKhauQuen(u, s, cccdVal, pMoi);
+                if (ok) {
+                    JOptionPane.showMessageDialog(dialog, "Đặt lại mật khẩu thành công! Vui lòng đăng nhập với mật khẩu mới.", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                    txtUsername.setText(u);
+                    txtPassword.setText("");
+                    txtPassword.requestFocusInWindow();
+                    dialog.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(dialog, "Không thể cập nhật mật khẩu. Vui lòng thử lại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(dialog, ex.getMessage(), "Lỗi xác thực", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        pnlNut.add(btnXacNhanDlg);
+        pnlNut.add(btnHuyDlg);
+        pnlChinh.add(pnlNut, java.awt.BorderLayout.SOUTH);
+
+        dialog.setContentPane(pnlChinh);
+        dialog.setVisible(true);
+    }
+
+    private void themHangForm(JPanel pnl, GridBagConstraints c, int row, String nhan, JComponent comp) {
+        JLabel lbl = new JLabel(nhan);
+        lbl.setFont(FONT_NHAN);
+        lbl.setForeground(MAU_CHU);
+        c.gridy = row * 2;
+        c.insets = new Insets(row == 0 ? 0 : 8, 0, 4, 0);
+        pnl.add(lbl, c);
+
+        c.gridy = row * 2 + 1;
+        c.insets = new Insets(0, 0, 4, 0);
+        pnl.add(comp, c);
     }
 
     private Border taoVienNhap(Color mauVien) {
