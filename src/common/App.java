@@ -1,22 +1,27 @@
 package common;
 
-import gui.LoginFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import gui.DangNhap_GUI;
+import java.security.Security;
 
 public class App {
-    public static void main(String[] args) {
-        // Set giao diện cho đẹp (Look and Feel)
+    static {
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
+            String disabledAlgorithms = Security.getProperty("jdk.tls.disabledAlgorithms");
+            if (disabledAlgorithms != null) {
+                disabledAlgorithms = disabledAlgorithms
+                        .replace("TLSv1.1,", "")
+                        .replace("TLSv1,", "")
+                        .replace(", TLSv1.1", "")
+                        .replace(", TLSv1", "")
+                        .replace("TLSv1.1", "")
+                        .replace("TLSv1", "");
+                Security.setProperty("jdk.tls.disabledAlgorithms", disabledAlgorithms);
+            }
+        } catch (Exception ignored) {
         }
+    }
 
-        // Chạy LoginFrame trên luồng sự kiện (EDT - Event Dispatch Thread)
-        SwingUtilities.invokeLater(() -> {
-            LoginFrame loginFrame = new LoginFrame();
-            loginFrame.setVisible(true);
-        });
+    public static void main(String[] args) {
+            new DangNhap_GUI().setVisible(true);
     }
 }

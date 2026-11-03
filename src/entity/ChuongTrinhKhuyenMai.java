@@ -1,74 +1,134 @@
 package entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class ChuongTrinhKhuyenMai {
     private String maKhuyenMai;
     private String tenChuongTrinh;
-    private double giaTriGiam;
+    private BigDecimal giaTriGiam;
     private LocalDate ngayBatDau;
     private LocalDate ngayKetThuc;
     private String trangThai;
 
-    public ChuongTrinhKhuyenMai() {}
-
-    public String getMaKhuyenMai() { return maKhuyenMai; }
+    public ChuongTrinhKhuyenMai() {
+        this.trangThai = "Đang áp dụng";
+    }
+    public ChuongTrinhKhuyenMai(String maKhuyenMai) {
+    	this.maKhuyenMai = maKhuyenMai;
+    }
+    public ChuongTrinhKhuyenMai(String maKhuyenMai, String tenChuongTrinh, BigDecimal giaTriGiam, LocalDate ngayBatDau,
+			LocalDate ngayKetThuc, String trangThai) {
+		this.maKhuyenMai = maKhuyenMai;
+		this.tenChuongTrinh = tenChuongTrinh;
+		this.giaTriGiam = giaTriGiam;
+		this.ngayBatDau = ngayBatDau;
+		this.ngayKetThuc = ngayKetThuc;
+		this.trangThai = trangThai;
+	}
+    
+	public String getMaKhuyenMai() {
+        return maKhuyenMai;
+    }
     public void setMaKhuyenMai(String maKhuyenMai) {
-        // KM + yyyy + 3 chữ số (VD: KM2026001)
-        if (maKhuyenMai == null || !maKhuyenMai.matches("^KM\\d{7}$")) {
-            throw new IllegalArgumentException("Mã khuyến mãi không hợp lệ (VD: KM2026001)");
+        if (maKhuyenMai == null || !maKhuyenMai.trim().matches("^KM\\d{7}$")) {
+            throw new IllegalArgumentException("Mã khuyến mãi không hợp lệ (Dạng KM + năm yyyy + 3 chữ số, ví dụ KM2026001)");
         }
-        this.maKhuyenMai = maKhuyenMai;
+        this.maKhuyenMai = maKhuyenMai.trim();
     }
 
-    public String getTenChuongTrinh() { return tenChuongTrinh; }
+    public String getTenChuongTrinh() {
+        return tenChuongTrinh;
+    }
     public void setTenChuongTrinh(String tenChuongTrinh) {
         if (tenChuongTrinh == null || tenChuongTrinh.trim().isEmpty()) {
             throw new IllegalArgumentException("Tên chương trình không được rỗng");
         }
-        this.tenChuongTrinh = tenChuongTrinh;
+        this.tenChuongTrinh = tenChuongTrinh.trim();
+    }
+    public BigDecimal getGiaTriGiam() {
+        return giaTriGiam != null ? giaTriGiam : BigDecimal.ZERO;
     }
 
-    public double getGiaTriGiam() { return giaTriGiam; }
-    public void setGiaTriGiam(double giaTriGiam) {
-        if (giaTriGiam <= 0 || giaTriGiam > 50) {
-            throw new IllegalArgumentException("Giá trị giảm phải > 0 và <= 50 (%)");
+    public void setGiaTriGiam(BigDecimal giaTriGiam) {
+        if (giaTriGiam == null || giaTriGiam.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Giá trị giảm phải lớn hơn 0");
         }
         this.giaTriGiam = giaTriGiam;
     }
+    public void setGiaTriGiam(double val) {
+        setGiaTriGiam(BigDecimal.valueOf(val));
+    }
 
-    public LocalDate getNgayBatDau() { return ngayBatDau; }
+    public LocalDate getNgayBatDau() {
+        return ngayBatDau;
+    }
     public void setNgayBatDau(LocalDate ngayBatDau) {
-        if (ngayBatDau == null) throw new IllegalArgumentException("Ngày bắt đầu không được rỗng");
+        if (ngayBatDau == null) {
+            throw new IllegalArgumentException("Ngày bắt đầu không được để trống");
+        }
         this.ngayBatDau = ngayBatDau;
     }
 
-    public LocalDate getNgayKetThuc() { return ngayKetThuc; }
+    public LocalDate getNgayKetThuc() {
+        return ngayKetThuc;
+    }
     public void setNgayKetThuc(LocalDate ngayKetThuc) {
-        if (ngayKetThuc == null) throw new IllegalArgumentException("Ngày kết thúc không được rỗng");
+        if (ngayKetThuc == null) {
+            throw new IllegalArgumentException("Ngày kết thúc không được để trống");
+        }
         if (ngayBatDau != null && ngayKetThuc.isBefore(ngayBatDau)) {
-            throw new IllegalArgumentException("Ngày kết thúc phải >= ngày bắt đầu");
+            throw new IllegalArgumentException("Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu");
         }
         this.ngayKetThuc = ngayKetThuc;
     }
 
-    public String getTrangThai() { return trangThai; }
+    public String getTrangThai() {
+        return trangThai;
+    }
     public void setTrangThai(String trangThai) {
-        if (!"Đang áp dụng".equals(trangThai) && !"Tạm ngừng".equals(trangThai) && !"Hết hạn".equals(trangThai)) {
-            throw new IllegalArgumentException("Trạng thái không hợp lệ");
+        if (trangThai == null || (!trangThai.equalsIgnoreCase("Đang áp dụng")
+                && !trangThai.equalsIgnoreCase("Tạm ngưng")
+                && !trangThai.equalsIgnoreCase("Hết hạn"))) {
+            throw new IllegalArgumentException("Trạng thái không hợp lệ (Đang áp dụng, Tạm ngưng hoặc Hết hạn)");
         }
         this.trangThai = trangThai;
     }
 
-    /** Kiểm tra còn hiệu lực không */
     public boolean kiemTraHieuLuc() {
-        if (!"Đang áp dụng".equals(this.trangThai)) return false;
-        LocalDate now = LocalDate.now();
-        return !now.isBefore(this.ngayBatDau) && !now.isAfter(this.ngayKetThuc);
+        if (!"Đang áp dụng".equalsIgnoreCase(this.trangThai)) {
+            return false;
+        }
+        LocalDate homNay = LocalDate.now();
+        if (ngayBatDau != null && homNay.isBefore(ngayBatDau)) {
+            return false;
+        }
+        if (ngayKetThuc != null && homNay.isAfter(ngayKetThuc)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ChuongTrinhKhuyenMai other = (ChuongTrinhKhuyenMai) obj;
+		return Objects.equals(maKhuyenMai, other.maKhuyenMai);
+	}
+	@Override
+	public int hashCode() {
+		return Objects.hash(maKhuyenMai);
+	}
+
+    @Override
     public String toString() {
-        return tenChuongTrinh + " (" + giaTriGiam + "%)";
+        return "ChuongTrinhKhuyenMai [maKM=" + maKhuyenMai + ", ten=" + tenChuongTrinh + ", giam=" + giaTriGiam
+                + ", tuNgay=" + ngayBatDau + ", denNgay=" + ngayKetThuc + ", trangThai=" + trangThai + "]";
     }
 }
