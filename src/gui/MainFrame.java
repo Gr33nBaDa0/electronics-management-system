@@ -63,24 +63,24 @@ public class MainFrame extends JFrame implements ActionListener {
 
     // Nhóm menu: {nhãn, gợi ý phím, KeyStroke, chỉ quản lý (true/false)}
     private static final String[][] NHOM_BAN_HANG = {
-        {"Bán hàng POS", "Ctrl+1", "ctrl 1", "0"},
-        {"Hóa đơn", "Ctrl+2", "ctrl 2", "0"},
-        {"Đổi trả", "Ctrl+3", "ctrl 3", "0"},
-        {"Khách hàng", "Ctrl+4", "ctrl 4", "0"}
+        {"Bán hàng POS", "", "ctrl 1", "0"},
+        {"Hóa đơn", "", "ctrl 2", "0"},
+        {"Đổi trả", "", "ctrl 3", "0"},
+        {"Khách hàng", "", "ctrl 4", "0"}
     };
     private static final String[][] NHOM_KHO = {
-        {"Sản phẩm", "Ctrl+5", "ctrl 5", "0"},
-        {"Phiếu nhập hàng", "Ctrl+6", "ctrl 6", "0"},
-        {"Khuyến mãi", "Ctrl+7", "ctrl 7", "1"}
+        {"Sản phẩm", "", "ctrl 5", "0"},
+        {"Phiếu nhập hàng", "", "ctrl 6", "0"},
+        {"Khuyến mãi", "", "ctrl 7", "1"}
     };
     private static final String[][] NHOM_VAN_HANH = {
-        {"Ca làm việc", "Ctrl+8", "ctrl 8", "0"},
-        {"Danh mục ca", "Ctrl+9", "ctrl 9", "1"}
+        {"Ca làm việc", "", "ctrl 8", "0"},
+        {"Danh mục ca", "", "ctrl 9", "1"}
     };
     private static final String[][] NHOM_QUAN_TRI = {
-        {"Nhân viên / tài khoản", "Ctrl+0", "ctrl 0", "1"},
-        {"Báo cáo", "Ctrl+B", "ctrl B", "1"},
-        {"Sao lưu / thiết lập", "Ctrl+G", "ctrl G", "1"}
+        {"Nhân viên / tài khoản", "", "ctrl 0", "1"},
+        {"Báo cáo", "", "ctrl B", "1"},
+        {"Sao lưu / thiết lập", "", "ctrl G", "1"}
     };
 
     public MainFrame(TaiKhoan tk) {
@@ -170,7 +170,7 @@ public class MainFrame extends JFrame implements ActionListener {
         thuongHieu.setMaximumSize(new Dimension(Integer.MAX_VALUE, 48));
         dau.add(thuongHieu);
         dau.add(Box.createVerticalStrut(14));
-        GiaoDien.NutMenu trangChu = new GiaoDien.NutMenu("Dashboard", "Alt+Home");
+        GiaoDien.NutMenu trangChu = new GiaoDien.NutMenu("Dashboard", "");
         trangChu.setActionCommand("Chào");
         trangChu.addActionListener(this);
         trangChu.datHoatDong(true);
