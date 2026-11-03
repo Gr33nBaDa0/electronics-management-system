@@ -38,6 +38,10 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.table.DefaultTableModel;
 
+/**
+ * Giao diện Quản lý Nhập hàng - Hệ thống GreenSmart
+ * @author Võ Văn Tuấn - MSSV: 24694721 (Nhóm 12)
+ */
 public class PhieuNhapHang_GUI extends JPanel implements ActionListener {
     // MÃ u dÃ¹ng chung Ä‘Æ°á»£c khai bÃ¡o á»Ÿ Ä‘áº§u lá»›p.
     private static final Color PRIMARY = GiaoDien.PRIMARY,

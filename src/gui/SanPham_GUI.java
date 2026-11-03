@@ -40,6 +40,10 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
+/**
+ * Giao diện Quản lý Sản phẩm - Hệ thống GreenSmart
+ * @author Võ Văn Tuấn - MSSV: 24694721 (Nhóm 12)
+ */
 public class SanPham_GUI extends JPanel implements ActionListener {
     // MÃ u dÃ¹ng chung Ä‘Æ°á»£c khai bÃ¡o á»Ÿ Ä‘áº§u lá»›p.
     private static final Color PRIMARY = GiaoDien.PRIMARY,
