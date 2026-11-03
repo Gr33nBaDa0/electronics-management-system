@@ -11,10 +11,8 @@ import entity.PhanCongCa;
 import entity.PhieuDoiTra;
 import entity.TaiKhoan;
 
-import util.InHoaDon;
+import until.InHoaDon;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -120,7 +118,7 @@ public class PhieuDoiTra_DAO {
                 }
             }
             List<ChiTietHoaDon> goc = new ChiTietHoaDon_DAO().getTheoHoaDon(con, hd);
-            Map<String, BigDecimal> phanBo =
+            Map<String, Double> phanBo =
                     InHoaDon.phanBo(goc, h.getDiemSuDung(), h.getThueSuatVAT());
             Set<String> seen = new HashSet<>();
             for (ChiTietDoiTra d : ds) {
@@ -139,18 +137,17 @@ public class PhieuDoiTra_DAO {
                         "SELECT COALESCE(SUM(d.SoLuongTra),0) FROM dbo.ChiTietDoiTra d JOIN"
                                 + " dbo.PhieuDoiTra p ON p.MaPhieuDoiTra=d.MaPhieuDoiTra WHERE"
                                 + " d.MaHoaDon=? AND d.MaSanPham=? AND p.TrangThai<>N'Từ chối'";
-                BigDecimal ketQua12 = BigDecimal.ZERO;
+                int ketQua12 = 0;
                 try (PreparedStatement stmt6 = con.prepareStatement(sql5)) {
                     stmt6.setString(1, hd);
                     stmt6.setString(2, sp);
                     try (ResultSet rs = stmt6.executeQuery()) {
                         if (rs.next()) {
-                            ketQua12 = rs.getBigDecimal(1);
-                            if (ketQua12 == null) ketQua12 = BigDecimal.ZERO;
+                            ketQua12 = rs.getInt(1);
                         }
                     }
                 }
-                int da = ketQua12.intValue();
+                int da = ketQua12;
                 if (da + d.getSoLuongTra() > g.getSoLuong()) {
                     throw new SQLException(
                             "Số trả vượt số còn lại (đã tính phiếu chờ / đã duyệt): " + sp);
@@ -159,7 +156,7 @@ public class PhieuDoiTra_DAO {
                         && !("Lỗi".equals(d.getTinhTrangHang()))) {
                     throw new SQLException("Chọn tình trạng Nguyên vẹn hoặc Lỗi.");
                 }
-                BigDecimal tien = InHoaDon.luyKe(phanBo.get(sp), d.getSoLuongTra(), g.getSoLuong());
+                double tien = InHoaDon.luyKe(phanBo.get(sp), d.getSoLuongTra(), g.getSoLuong());
                 String sql6 =
                         "INSERT INTO"
                             + " dbo.ChiTietDoiTra(MaPhieuDoiTra,MaHoaDon,MaSanPham,SoLuongTra,TinhTrangHang,TienHoan)"
@@ -170,7 +167,7 @@ public class PhieuDoiTra_DAO {
                     stmt7.setString(3, sp);
                     stmt7.setInt(4, d.getSoLuongTra());
                     stmt7.setString(5, d.getTinhTrangHang());
-                    stmt7.setBigDecimal(6, tien);
+                    stmt7.setDouble(6, tien);
                     stmt7.executeUpdate();
                 }
             }
@@ -268,46 +265,44 @@ public class PhieuDoiTra_DAO {
     public int soConTra(String hd, String sp) throws SQLException {
         Connection con = ConnectDB.getConnection();
         String sql = "SELECT SoLuong FROM dbo.ChiTietHoaDon WHERE MaHoaDon=? AND MaSanPham=?";
-        BigDecimal ketQua3 = BigDecimal.ZERO;
+        int ketQua3 = 0;
         try (PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setString(1, hd);
             stmt.setString(2, sp);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    ketQua3 = rs.getBigDecimal(1);
-                    if (ketQua3 == null) ketQua3 = BigDecimal.ZERO;
+                    ketQua3 = rs.getInt(1);
                 }
             }
         }
-        int mua = ketQua3.intValue();
+        int mua = ketQua3;
         String sql2 =
                 "SELECT COALESCE(SUM(d.SoLuongTra),0) FROM dbo.ChiTietDoiTra d JOIN dbo.PhieuDoiTra"
                     + " p ON p.MaPhieuDoiTra=d.MaPhieuDoiTra WHERE d.MaHoaDon=? AND d.MaSanPham=?"
                     + " AND p.TrangThai<>N'Từ chối'";
-        BigDecimal ketQua7 = BigDecimal.ZERO;
+        int ketQua7 = 0;
         try (PreparedStatement stmt3 = con.prepareStatement(sql2)) {
             stmt3.setString(1, hd);
             stmt3.setString(2, sp);
             try (ResultSet rs2 = stmt3.executeQuery()) {
                 if (rs2.next()) {
-                    ketQua7 = rs2.getBigDecimal(1);
-                    if (ketQua7 == null) ketQua7 = BigDecimal.ZERO;
+                    ketQua7 = rs2.getInt(1);
                 }
             }
         }
-        int da = ketQua7.intValue();
+        int da = ketQua7;
         return mua - da;
     }
 
-    public BigDecimal duTinh(String id, TaiKhoan tk) throws SQLException {
-        return hoanTat(id, tk, false, null);
+    public double duTinh(String id, TaiKhoan tk) throws SQLException {
+        return hoanTat(id, tk, false, 0.0);
     }
 
-    public BigDecimal hoanTat(String id, BigDecimal daXacNhan, TaiKhoan tk) throws SQLException {
+    public double hoanTat(String id, double daXacNhan, TaiKhoan tk) throws SQLException {
         return hoanTat(id, tk, true, daXacNhan);
     }
 
-    private BigDecimal hoanTat(String id, TaiKhoan tk, boolean ghi, BigDecimal daXacNhan)
+    private double hoanTat(String id, TaiKhoan tk, boolean ghi, double daXacNhan)
             throws SQLException {
         Connection con = ConnectDB.getConnection();
         boolean tuDongCommitCu = con.getAutoCommit();
@@ -349,27 +344,26 @@ public class PhieuDoiTra_DAO {
             }
             String ca = new PhanCongCa_DAO().layMaCaDangMo(con, tk);
             List<ChiTietHoaDon> goc = new ChiTietHoaDon_DAO().getTheoHoaDon(con, hd);
-            Map<String, BigDecimal> phanBo =
+            Map<String, Double> phanBo =
                     InHoaDon.phanBo(goc, h.getDiemSuDung(), h.getThueSuatVAT());
-            BigDecimal total = InHoaDon.phaiTra(goc, h.getDiemSuDung(), h.getThueSuatVAT());
-            if (total.signum() <= 0) {
+            double total = InHoaDon.phaiTra(goc, h.getDiemSuDung(), h.getThueSuatVAT());
+            if (total <= 0) {
                 throw new SQLException("Hóa đơn không có giá trị để hoàn.");
             }
             String sql3 =
                     "SELECT COALESCE(SUM(d.TienHoan),0) FROM dbo.ChiTietDoiTra d JOIN"
                             + " dbo.PhieuDoiTra p ON p.MaPhieuDoiTra=d.MaPhieuDoiTra WHERE"
                             + " p.MaHoaDonGoc=? AND p.TrangThai=N'Hoàn tất'";
-            BigDecimal ketQua11 = BigDecimal.ZERO;
+            double ketQua11 = 0.0;
             try (PreparedStatement stmt4 = con.prepareStatement(sql3)) {
                 stmt4.setString(1, hd);
                 try (ResultSet rs3 = stmt4.executeQuery()) {
                     if (rs3.next()) {
-                        ketQua11 = rs3.getBigDecimal(1);
-                        if (ketQua11 == null) ketQua11 = BigDecimal.ZERO;
+                        ketQua11 = rs3.getDouble(1);
                     }
                 }
             }
-            BigDecimal truoc = ketQua11, hoan = BigDecimal.ZERO;
+            double truoc = ketQua11, hoan = 0.0;
             List<ChiTietDoiTra> ds = new ChiTietDoiTra_DAO().getTheoPhieu(con, id);
             if (ds.isEmpty()) {
                 throw new SQLException("Phiếu chưa có dòng trả.");
@@ -390,46 +384,43 @@ public class PhieuDoiTra_DAO {
                                 + " p.MaPhieuDoiTra=d.MaPhieuDoiTra WHERE d.MaHoaDon=? AND"
                                 + " d.MaSanPham=? AND p.TrangThai=N'Hoàn tất'";
                 String sql4 = "SELECT COALESCE(SUM(d.SoLuongTra),0)" + from;
-                BigDecimal ketQua15 = BigDecimal.ZERO;
+                int ketQua15 = 0;
                 try (PreparedStatement stmt5 = con.prepareStatement(sql4)) {
                     stmt5.setString(1, hd);
                     stmt5.setString(2, sp);
                     try (ResultSet rs5 = stmt5.executeQuery()) {
                         if (rs5.next()) {
-                            ketQua15 = rs5.getBigDecimal(1);
-                            if (ketQua15 == null) ketQua15 = BigDecimal.ZERO;
+                            ketQua15 = rs5.getInt(1);
                         }
                     }
                 }
-                int da = ketQua15.intValue();
+                int da = ketQua15;
                 String sql6 = "SELECT COALESCE(SUM(d.TienHoan),0)" + from;
-                BigDecimal ketQua19 = BigDecimal.ZERO;
+                double ketQua19 = 0.0;
                 try (PreparedStatement stmt7 = con.prepareStatement(sql6)) {
                     stmt7.setString(1, hd);
                     stmt7.setString(2, sp);
                     try (ResultSet rs6 = stmt7.executeQuery()) {
                         if (rs6.next()) {
-                            ketQua19 = rs6.getBigDecimal(1);
-                            if (ketQua19 == null) ketQua19 = BigDecimal.ZERO;
+                            ketQua19 = rs6.getDouble(1);
                         }
                     }
                 }
-                BigDecimal tienDa = ketQua19;
+                double tienDa = ketQua19;
                 if (da + d.getSoLuongTra() > g.getSoLuong()) {
                     throw new SQLException("Đã trả vượt số lượng mua.");
                 }
-                BigDecimal tien =
-                        InHoaDon.luyKe(phanBo.get(sp), da + d.getSoLuongTra(), g.getSoLuong())
-                                .subtract(tienDa);
-                if (tien.signum() < 0) {
+                double tien =
+                        InHoaDon.tron(InHoaDon.luyKe(phanBo.get(sp), da + d.getSoLuongTra(), g.getSoLuong()) - tienDa);
+                if (tien < 0) {
                     throw new SQLException("Số tiền hoàn gốc không nhất quán.");
                 }
-                hoan = hoan.add(tien);
+                hoan = InHoaDon.tron(hoan + tien);
                 String sql7 =
                         "UPDATE dbo.ChiTietDoiTra SET TienHoan=? WHERE MaPhieuDoiTra=? AND"
                                 + " MaSanPham=?";
                 try (PreparedStatement stmt8 = con.prepareStatement(sql7)) {
-                    stmt8.setBigDecimal(1, tien);
+                    stmt8.setDouble(1, tien);
                     stmt8.setString(2, id);
                     stmt8.setString(3, sp);
                     stmt8.executeUpdate();
@@ -438,7 +429,7 @@ public class PhieuDoiTra_DAO {
                     SanPham_DAO.doiTon(con, sp, d.getSoLuongTra());
                 }
             }
-            if (truoc.add(hoan).compareTo(total) > 0) {
+            if (InHoaDon.soSanhTien(truoc + hoan, total) > 0) {
                 throw new SQLException("Tổng hoàn vượt tiền thực trả.");
             }
             int diemHoan = 0, diemThu = 0;
@@ -446,49 +437,41 @@ public class PhieuDoiTra_DAO {
                 String sql8 =
                         "SELECT COALESCE(SUM(DiemHoanLai),0) FROM dbo.PhieuDoiTra WHERE"
                                 + " MaHoaDonGoc=? AND TrangThai=N'Hoàn tất'";
-                BigDecimal ketQua26 = BigDecimal.ZERO;
+                int ketQua26 = 0;
                 try (PreparedStatement stmt9 = con.prepareStatement(sql8)) {
                     stmt9.setString(1, hd);
                     try (ResultSet rs7 = stmt9.executeQuery()) {
                         if (rs7.next()) {
-                            ketQua26 = rs7.getBigDecimal(1);
-                            if (ketQua26 == null) ketQua26 = BigDecimal.ZERO;
+                            ketQua26 = rs7.getInt(1);
                         }
                     }
                 }
-                int daHoan = ketQua26.intValue();
+                int daHoan = ketQua26;
                 String sql10 =
                         "SELECT COALESCE(SUM(DiemThuHoi),0) FROM dbo.PhieuDoiTra WHERE"
                                 + " MaHoaDonGoc=? AND TrangThai=N'Hoàn tất'";
-                BigDecimal ketQua30 = BigDecimal.ZERO;
+                int ketQua30 = 0;
                 try (PreparedStatement stmt11 = con.prepareStatement(sql10)) {
                     stmt11.setString(1, hd);
                     try (ResultSet rs9 = stmt11.executeQuery()) {
                         if (rs9.next()) {
-                            ketQua30 = rs9.getBigDecimal(1);
-                            if (ketQua30 == null) ketQua30 = BigDecimal.ZERO;
+                            ketQua30 = rs9.getInt(1);
                         }
                     }
                 }
-                int daThu = ketQua30.intValue();
+                int daThu = ketQua30;
                 diemHoan =
-                        BigDecimal.valueOf(h.getDiemSuDung())
-                                        .multiply(truoc.add(hoan))
-                                        .divide(total, 0, RoundingMode.DOWN)
-                                        .intValueExact()
+                        (int) Math.floor(Math.nextUp(h.getDiemSuDung() * (InHoaDon.tron(truoc + hoan) / total)))
                                 - daHoan;
                 diemThu =
-                        BigDecimal.valueOf(InHoaDon.diemCong(total))
-                                        .multiply(truoc.add(hoan))
-                                        .divide(total, 0, RoundingMode.DOWN)
-                                        .intValueExact()
+                        (int) Math.floor(Math.nextUp(InHoaDon.diemCong(total) * (InHoaDon.tron(truoc + hoan) / total)))
                                 - daThu;
                 if (diemHoan < 0 || diemThu < 0) {
                     throw new SQLException("Điểm hoàn trước đây không nhất quán.");
                 }
                 KhachHang_DAO.doiDiem(con, h.getKhachHang().getMaKhachHang(), diemHoan - diemThu);
             }
-            if (ghi && (daXacNhan == null || hoan.compareTo(daXacNhan) != 0)) {
+            if (ghi && (!Double.isFinite(daXacNhan) || InHoaDon.soSanhTien(hoan, daXacNhan) != 0)) {
                 throw new SQLException("Số tiền hoàn đã thay đổi. Kiểm tra và xác nhận lại.");
             }
             String sql11 =

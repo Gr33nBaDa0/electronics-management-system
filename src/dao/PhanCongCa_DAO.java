@@ -7,7 +7,6 @@ import entity.NhanVien;
 import entity.PhanCongCa;
 import entity.TaiKhoan;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -36,8 +35,8 @@ public class PhanCongCa_DAO {
                     x.setNgay(r.getDate("Ngay").toLocalDate());
                     x.setGhiChu(r.getString("GhiChu"));
                     x.setCaLamViec(new CaLamViec(r.getString("MaCa")));
-                    x.setTienQuyDauCa(r.getBigDecimal("TienQuyDauCa"));
-                    x.setTienMatThucDem(r.getBigDecimal("TienMatThucDem"));
+                    x.setTienQuyDauCa(r.getDouble("TienQuyDauCa"));
+                    x.setTienMatThucDem(r.getDouble("TienMatThucDem"));
                     x.setTrangThai(r.getString("TrangThai"));
                     Timestamp thoiGian2 = r.getTimestamp("GioMoCa");
                     x.setGioMoCa(thoiGian2 == null ? null : thoiGian2.toLocalDateTime());
@@ -103,19 +102,18 @@ public class PhanCongCa_DAO {
                     "SELECT COUNT(*) FROM dbo.PhanCongCa p JOIN dbo.CaLamViec a ON a.MaCa=p.MaCa"
                         + " JOIN dbo.CaLamViec b ON b.MaCa=? WHERE p.MaNhanVien=? AND p.Ngay=? AND"
                         + " a.GioBatDau<b.GioKetThuc AND a.GioKetThuc>b.GioBatDau";
-            BigDecimal ketQua7 = BigDecimal.ZERO;
+            int ketQua7 = 0;
             try (PreparedStatement stmt3 = con.prepareStatement(sql)) {
                 stmt3.setString(1, ca);
                 stmt3.setString(2, nv);
                 stmt3.setDate(3, java.sql.Date.valueOf(ngay));
                 try (ResultSet rs2 = stmt3.executeQuery()) {
                     if (rs2.next()) {
-                        ketQua7 = rs2.getBigDecimal(1);
-                        if (ketQua7 == null) ketQua7 = BigDecimal.ZERO;
+                        ketQua7 = rs2.getInt(1);
                     }
                 }
             }
-            if (ketQua7.signum() != 0) {
+            if (ketQua7 != 0) {
                 throw new SQLException("Ca đã trùng hoặc chồng giờ với phân công hiện có.");
             }
             String sql4 =
@@ -166,7 +164,7 @@ public class PhanCongCa_DAO {
         }
     }
 
-    public void moCa(String id, BigDecimal quy, TaiKhoan tk) throws SQLException {
+    public void moCa(String id, double quy, TaiKhoan tk) throws SQLException {
         Connection con = ConnectDB.getConnection();
         boolean tuDongCommitCu = con.getAutoCommit();
         int mucCoLapCu = con.getTransactionIsolation();
@@ -174,7 +172,7 @@ public class PhanCongCa_DAO {
         con.setAutoCommit(false);
         try {
             new TaiKhoan_DAO().kiemTraQuyen(tk, false);
-            if (quy.signum() < 0) {
+            if (!Double.isFinite(quy) || quy < 0) {
                 throw new SQLException("Quỹ đầu ca không được âm.");
             }
             String nv = tk.getNhanVien().getMaNhanVien();
@@ -193,17 +191,16 @@ public class PhanCongCa_DAO {
             String sql2 =
                     "SELECT COUNT(*) FROM dbo.PhanCongCa WHERE MaNhanVien=? AND TrangThai=N'Đang"
                             + " mở'";
-            BigDecimal ketQua7 = BigDecimal.ZERO;
+            int ketQua7 = 0;
             try (PreparedStatement stmt3 = con.prepareStatement(sql2)) {
                 stmt3.setString(1, nv);
                 try (ResultSet rs2 = stmt3.executeQuery()) {
                     if (rs2.next()) {
-                        ketQua7 = rs2.getBigDecimal(1);
-                        if (ketQua7 == null) ketQua7 = BigDecimal.ZERO;
+                        ketQua7 = rs2.getInt(1);
                     }
                 }
             }
-            if (ketQua7.signum() != 0) {
+            if (ketQua7 != 0) {
                 throw new SQLException("Bạn còn ca đang mở. Đóng ca cũ trước.");
             }
             String sql3 =
@@ -213,7 +210,7 @@ public class PhanCongCa_DAO {
                             + " TrangThai=N'Chưa mở'";
             int ketQua11;
             try (PreparedStatement stmt4 = con.prepareStatement(sql3)) {
-                stmt4.setBigDecimal(1, quy);
+                stmt4.setDouble(1, quy);
                 stmt4.setString(2, id);
                 stmt4.setString(3, nv);
                 ketQua11 = stmt4.executeUpdate();
@@ -231,7 +228,7 @@ public class PhanCongCa_DAO {
         }
     }
 
-    public BigDecimal tienLyThuyet(String pc, TaiKhoan tk) throws SQLException {
+    public double tienLyThuyet(String pc, TaiKhoan tk) throws SQLException {
         Connection con = ConnectDB.getConnection();
         new TaiKhoan_DAO().kiemTraQuyen(tk, false);
         String sql = "SELECT MaNhanVien FROM dbo.PhanCongCa WHERE MaPhanCong=?";
@@ -251,19 +248,18 @@ public class PhanCongCa_DAO {
         return tienLyThuyet(con, pc);
     }
 
-    static BigDecimal tienLyThuyet(Connection con, String pc) throws SQLException {
+    static double tienLyThuyet(Connection con, String pc) throws SQLException {
         String sql2 = "SELECT TienQuyDauCa FROM dbo.PhanCongCa WHERE MaPhanCong=?";
-        BigDecimal ketQua3 = BigDecimal.ZERO;
+        double ketQua3 = 0.0;
         try (PreparedStatement stmt = con.prepareStatement(sql2)) {
             stmt.setString(1, pc);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    ketQua3 = rs.getBigDecimal(1);
-                    if (ketQua3 == null) ketQua3 = BigDecimal.ZERO;
+                    ketQua3 = rs.getDouble(1);
                 }
             }
         }
-        BigDecimal quy = ketQua3;
+        double quy = ketQua3;
         String sql =
                 "SELECT COALESCE(SUM(v.Tien),0) FROM (SELECT"
                     + " h.MaHoaDon,ROUND((SUM(d.SoLuong*d.DonGia-d.GiamGia)-h.DiemSuDung*1000)*(1+h.ThueSuatVAT),2)"
@@ -271,37 +267,35 @@ public class PhanCongCa_DAO {
                     + " WHERE h.MaPhanCong=? AND h.TrangThaiThanhToan=N'Đã thanh toán' AND"
                     + " h.HinhThucThanhToan=N'Tiền mặt' GROUP BY"
                     + " h.MaHoaDon,h.DiemSuDung,h.ThueSuatVAT) v";
-        BigDecimal ketQua7 = BigDecimal.ZERO;
+        double ketQua7 = 0.0;
         try (PreparedStatement stmt3 = con.prepareStatement(sql)) {
             stmt3.setString(1, pc);
             try (ResultSet rs2 = stmt3.executeQuery()) {
                 if (rs2.next()) {
-                    ketQua7 = rs2.getBigDecimal(1);
-                    if (ketQua7 == null) ketQua7 = BigDecimal.ZERO;
+                    ketQua7 = rs2.getDouble(1);
                 }
             }
         }
-        BigDecimal thu = ketQua7;
+        double thu = ketQua7;
         String sql4 =
                 "SELECT COALESCE(SUM(d.TienHoan),0) FROM dbo.PhieuDoiTra p JOIN dbo.ChiTietDoiTra d"
                         + " ON d.MaPhieuDoiTra=p.MaPhieuDoiTra JOIN dbo.HoaDon h ON"
                         + " h.MaHoaDon=p.MaHoaDonGoc WHERE p.MaPhanCongHoanTien=? AND"
                         + " p.TrangThai=N'Hoàn tất' AND h.HinhThucThanhToan=N'Tiền mặt'";
-        BigDecimal ketQua11 = BigDecimal.ZERO;
+        double ketQua11 = 0.0;
         try (PreparedStatement stmt4 = con.prepareStatement(sql4)) {
             stmt4.setString(1, pc);
             try (ResultSet rs3 = stmt4.executeQuery()) {
                 if (rs3.next()) {
-                    ketQua11 = rs3.getBigDecimal(1);
-                    if (ketQua11 == null) ketQua11 = BigDecimal.ZERO;
+                    ketQua11 = rs3.getDouble(1);
                 }
             }
         }
-        BigDecimal hoan = ketQua11;
-        return quy.add(thu).subtract(hoan);
+        double hoan = ketQua11;
+        return until.InHoaDon.tron(quy + thu - hoan);
     }
 
-    public void dongCa(String id, BigDecimal dem, String lyDo, TaiKhoan tk) throws SQLException {
+    public void dongCa(String id, double dem, String lyDo, TaiKhoan tk) throws SQLException {
         Connection con = ConnectDB.getConnection();
         boolean tuDongCommitCu = con.getAutoCommit();
         int mucCoLapCu = con.getTransactionIsolation();
@@ -325,11 +319,11 @@ public class PhanCongCa_DAO {
             if (!(tk.getNhanVien().getMaNhanVien().equals(nv))) {
                 throw new SQLException("Chỉ đóng ca đang mở của mình.");
             }
-            if (dem.signum() < 0) {
+            if (!Double.isFinite(dem) || dem < 0) {
                 throw new SQLException("Tiền thực đếm không được âm.");
             }
-            BigDecimal lt = tienLyThuyet(con, id);
-            if (dem.compareTo(lt) != 0 && (lyDo == null || lyDo.trim().isEmpty())) {
+            double lt = tienLyThuyet(con, id);
+            if (until.InHoaDon.soSanhTien(dem, lt) != 0 && (lyDo == null || lyDo.trim().isEmpty())) {
                 throw new SQLException("Có chênh lệch, cần nhập giải trình.");
             }
             String sql2 =
@@ -337,7 +331,7 @@ public class PhanCongCa_DAO {
                         + " TienMatThucDem=?,GhiChu=?,GioDongCa=SYSDATETIME(),TrangThai=N'Đã đóng'"
                         + " WHERE MaPhanCong=?";
             try (PreparedStatement stmt3 = con.prepareStatement(sql2)) {
-                stmt3.setBigDecimal(1, dem);
+                stmt3.setDouble(1, dem);
                 stmt3.setString(2, lyDo);
                 stmt3.setString(3, id);
                 stmt3.executeUpdate();

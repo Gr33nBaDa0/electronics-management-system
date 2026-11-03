@@ -20,7 +20,12 @@ public class PhieuNhapHang_DAO {
     public List<PhieuNhapHang> getAllPhieuNhapHang() throws SQLException {
         List<PhieuNhapHang> ds = new ArrayList<>();
         Connection con = ConnectDB.getConnection();
-        String sql = "SELECT * FROM dbo.PhieuNhapHang ORDER BY NgayLap DESC";
+        String sql =
+                "SELECT p.*, nvLap.HoTen AS TenNguoiLap, nvDuyet.HoTen AS TenNguoiDuyet "
+                        + "FROM dbo.PhieuNhapHang p "
+                        + "LEFT JOIN dbo.NhanVien nvLap ON nvLap.MaNhanVien = p.MaNhanVienLap "
+                        + "LEFT JOIN dbo.NhanVien nvDuyet ON nvDuyet.MaNhanVien = p.MaQuanLyDuyet "
+                        + "ORDER BY p.NgayLap DESC";
         try (PreparedStatement s = con.prepareStatement(sql);
                 ResultSet r = s.executeQuery()) {
             while (r.next()) {
@@ -30,9 +35,20 @@ public class PhieuNhapHang_DAO {
                 p.setSoChungTu(r.getString("SoChungTu"));
                 p.setNhaCungCap(r.getString("NhaCungCap"));
                 p.setNguoiGiao(r.getString("NguoiGiao"));
-                p.setNhanVienLap(new NhanVien(r.getString("MaNhanVienLap")));
+
+                NhanVien nvLap = new NhanVien(r.getString("MaNhanVienLap"));
+                nvLap.setHoTen(r.getString("TenNguoiLap"));
+                p.setNhanVienLap(nvLap);
+
                 String q = r.getString("MaQuanLyDuyet");
-                p.setQuanLyDuyet(q == null ? null : new NhanVien(q));
+                if (q != null) {
+                    NhanVien nvDuyet = new NhanVien(q);
+                    nvDuyet.setHoTen(r.getString("TenNguoiDuyet"));
+                    p.setQuanLyDuyet(nvDuyet);
+                } else {
+                    p.setQuanLyDuyet(null);
+                }
+
                 p.setTrangThai(r.getString("TrangThai"));
                 Timestamp thoiGian3 = r.getTimestamp("NgayDuyet");
                 p.setNgayDuyet(thoiGian3 == null ? null : thoiGian3.toLocalDateTime());

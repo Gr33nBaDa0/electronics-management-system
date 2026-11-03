@@ -1,4 +1,6 @@
-﻿package gui;
+package gui;
+
+import until.InHoaDon;
 
 import connectDB.ConnectDB;
 
@@ -6,7 +8,7 @@ import dao.BaoCao_DAO;
 
 import entity.TaiKhoan;
 
-import util.GiaoDien;
+import until.GiaoDien;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -14,7 +16,6 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.sql.SQLException;
@@ -109,19 +110,19 @@ public class BaoCao_GUI extends JPanel implements ActionListener {
 
             BaoCao_DAO d = new BaoCao_DAO();
             LocalDate a = LocalDate.parse(tu.getText()), b = LocalDate.parse(den.getText());
-            BigDecimal thu = BigDecimal.ZERO, hoan = BigDecimal.ZERO;
+            double thu = 0.0, hoan = 0.0;
             List<Object[]> list = d.doanhThu(a, b, tk);
             for (Object[] r : list) {
-                thu = thu.add((BigDecimal) r[3]);
-                hoan = hoan.add((BigDecimal) r[4]);
+                thu = InHoaDon.tron(thu + ((Number) r[3]).doubleValue());
+                hoan = InHoaDon.tron(hoan + ((Number) r[4]).doubleValue());
                 model.addRow(
                         new Object[] {
                             r[0],
                             r[1],
                             r[2],
-                            formatGia((BigDecimal) r[3]),
-                            formatGia((BigDecimal) r[4]),
-                            formatGia((BigDecimal) r[5])
+                            formatGia(((Number) r[3]).doubleValue()),
+                            formatGia(((Number) r[4]).doubleValue()),
+                            formatGia(((Number) r[5]).doubleValue())
                         });
             }
             modelSP.setRowCount(0);
@@ -135,7 +136,7 @@ public class BaoCao_GUI extends JPanel implements ActionListener {
                             + " · Hoàn: "
                             + formatGia(hoan)
                             + " · Sau hoàn: "
-                            + formatGia(thu.subtract(hoan))
+                            + formatGia(InHoaDon.tron(thu - hoan))
                             + " VND");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -178,12 +179,12 @@ public class BaoCao_GUI extends JPanel implements ActionListener {
         }
     }
 
-    private String formatGia(java.math.BigDecimal gia) {
+    private String formatGia(double gia) {
         java.text.DecimalFormat df =
                 new java.text.DecimalFormat(
                         "#,##0.##",
                         java.text.DecimalFormatSymbols.getInstance(java.util.Locale.US));
-        return gia == null ? "" : df.format(gia);
+        return df.format(gia);
     }
 
     private JTable taoBang(DefaultTableModel m) {

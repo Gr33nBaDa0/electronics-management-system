@@ -7,7 +7,7 @@ import dao.TaiKhoan_DAO;
 
 import entity.TaiKhoan;
 
-import util.GiaoDien;
+import until.GiaoDien;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -198,6 +198,12 @@ public class MainFrame extends JFrame implements ActionListener {
         cuoi.setLayout(new BoxLayout(cuoi, BoxLayout.Y_AXIS));
         cuoi.setBackground(MAU_NAVI);
         cuoi.setBorder(BorderFactory.createEmptyBorder(8, 12, 12, 12));
+        GiaoDien.NutMenu troGiup = new GiaoDien.NutMenu("Trợ giúp", "F1");
+        troGiup.setActionCommand("Trợ giúp");
+        troGiup.addActionListener(this);
+        menu.put("Trợ giúp", troGiup);
+        cuoi.add(troGiup);
+        cuoi.add(Box.createVerticalStrut(6));
         cuoi.add(taoTheNguoiDung());
         cuoi.add(Box.createVerticalStrut(6));
         JPanel hangCuoi = new JPanel(new java.awt.GridLayout(1, 2, 6, 0));
@@ -317,7 +323,7 @@ public class MainFrame extends JFrame implements ActionListener {
                         BorderFactory.createMatteBorder(1, 0, 0, 0, GiaoDien.BORDER),
                         BorderFactory.createEmptyBorder(5, 20, 5, 20)));
         lblKetNoi.setFont(GiaoDien.phong(Font.PLAIN, 12));
-        JLabel goiY = new JLabel("F1: danh sách phím tắt");
+        JLabel goiY = new JLabel("F1: Trợ giúp · Shift+F1: phím tắt");
         goiY.setFont(GiaoDien.phong(Font.PLAIN, 12));
         goiY.setForeground(GiaoDien.MUTED);
         p.add(lblKetNoi, BorderLayout.WEST);
@@ -372,7 +378,8 @@ public class MainFrame extends JFrame implements ActionListener {
             }
         GiaoDien.phimTat(getRootPane(), "ctrl L", () -> moMan("Đăng xuất"));
         GiaoDien.phimTat(getRootPane(), "ctrl shift P", () -> moMan("Đổi mật khẩu"));
-        GiaoDien.phimTat(getRootPane(), "F1", this::hienPhimTat);
+        GiaoDien.phimTat(getRootPane(), "F1", () -> moMan("Trợ giúp"));
+        GiaoDien.phimTat(getRootPane(), "shift F1", this::hienPhimTat);
         // Phím "Trang chủ": Alt+Home
         GiaoDien.phimTat(
                 getRootPane(),
@@ -407,7 +414,11 @@ public class MainFrame extends JFrame implements ActionListener {
                                 "  Ctrl+N Đơn mới",
                                 "",
                                 "HỘP THANH TOÁN",
-                                "  F2 Hiện QR   Enter Xác nhận thanh toán   Esc Để sau",
+                                "  F2 Hiện QR   Enter Thanh toán & xuất hóa đơn   Esc Để sau",
+                                "",
+                                "TRỢ GIÚP VÀ HÓA ĐƠN",
+                                "  F1 Hướng dẫn sử dụng   Shift+F1 Phím tắt",
+                                "  Ctrl+P trong Hóa đơn: xuất PDF vào D:\\HoaDonGreenSmart",
                                 "",
                                 "Rê chuột lên nút để xem phím tắt tương ứng."));
         t.setEditable(false);
@@ -505,9 +516,13 @@ public class MainFrame extends JFrame implements ActionListener {
                                     "Báo cáo",
                                     "Sao lưu / thiết lập")
                             .contains(s)) throw new SQLException("Chức năng dành cho quản lý.");
-            if (!panels.containsKey(s)) {
+            boolean daMo = panels.containsKey(s);
+            if (!daMo) {
                 JPanel p;
                 switch (s) {
+                    case "Trợ giúp":
+                        p = new TroGiup_GUI(tk);
+                        break;
                     case "Bán hàng POS":
                         p = pos();
                         break;
@@ -551,6 +566,8 @@ public class MainFrame extends JFrame implements ActionListener {
                 noiDung.add(p, s);
             }
             ((CardLayout) noiDung.getLayout()).show(noiDung, s);
+            if (daMo && panels.get(s) instanceof BanHang_GUI)
+                ((BanHang_GUI) panels.get(s)).loadDanhMuc();
             danhDauMenu(
                     s,
                     "Chào".equals(s)

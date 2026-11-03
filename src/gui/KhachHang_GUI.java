@@ -1,4 +1,4 @@
-﻿package gui;
+package gui;
 
 import connectDB.ConnectDB;
 
@@ -7,7 +7,7 @@ import dao.KhachHang_DAO;
 import entity.KhachHang;
 import entity.TaiKhoan;
 
-import util.GiaoDien;
+import until.GiaoDien;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

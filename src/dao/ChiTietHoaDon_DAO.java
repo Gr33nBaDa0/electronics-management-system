@@ -37,8 +37,8 @@ public class ChiTietHoaDon_DAO {
                     sanPham.setTenSanPham(rs.getString("TenSanPham"));
                     sanPham.setLoaiHang(rs.getString("LoaiHang"));
                     sanPham.setThuongHieu(rs.getString("ThuongHieu"));
-                    sanPham.setDonGiaBan(rs.getBigDecimal("DonGiaBan"));
-                    sanPham.setGiaNhap(rs.getBigDecimal("GiaNhap"));
+                    sanPham.setDonGiaBan(rs.getDouble("DonGiaBan"));
+                    sanPham.setGiaNhap(rs.getDouble("GiaNhap"));
                     sanPham.setThongSoKiThuat(rs.getString("ThongSoKiThuat"));
                     sanPham.setXuatXu(rs.getString("XuatXu"));
                     sanPham.setTrangThai(rs.getString("TrangThai"));
@@ -48,8 +48,8 @@ public class ChiTietHoaDon_DAO {
                     d.setSoLuong(rs.getInt("SoLuong"));
                     String km = rs.getString("MaKhuyenMai");
                     d.setChuongTrinhKhuyenMai(km == null ? null : new ChuongTrinhKhuyenMai(km));
-                    d.setDonGia(rs.getBigDecimal("DonGia"));
-                    d.setGiamGia(rs.getBigDecimal("GiamGia"));
+                    d.setDonGia(rs.getDouble("DonGia"));
+                    d.setGiamGia(rs.getDouble("GiamGia"));
                     ds.add(d);
                 }
             }
@@ -72,8 +72,8 @@ public class ChiTietHoaDon_DAO {
                         d.getChuongTrinhKhuyenMai() == null
                                 ? null
                                 : d.getChuongTrinhKhuyenMai().getMaKhuyenMai());
-                stmt.setBigDecimal(5, d.getDonGia());
-                stmt.setBigDecimal(6, d.getGiamGia());
+                stmt.setDouble(5, d.getDonGia());
+                stmt.setDouble(6, d.getGiamGia());
                 stmt.executeUpdate();
             }
         }

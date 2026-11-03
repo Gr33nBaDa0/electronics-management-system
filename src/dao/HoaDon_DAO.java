@@ -11,9 +11,8 @@ import entity.PhanCongCa;
 import entity.SanPham;
 import entity.TaiKhoan;
 
-import util.InHoaDon;
+import until.InHoaDon;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -30,7 +29,8 @@ import java.util.Set;
 public class HoaDon_DAO {
 
     private final ChiTietHoaDon_DAO ct = new ChiTietHoaDon_DAO();
-	public HoaDon tim(String ma) throws SQLException {
+
+    public HoaDon tim(String ma) throws SQLException {
         Connection con = ConnectDB.getConnection();
         return tim(con, ma, false);
     }
@@ -52,7 +52,7 @@ public class HoaDon_DAO {
                     hoaDon.setNgayLap(thoiGian4 == null ? null : thoiGian4.toLocalDateTime());
                     hoaDon.setHinhThucThanhToan(r.getString("HinhThucThanhToan"));
                     hoaDon.setTrangThaiThanhToan(r.getString("TrangThaiThanhToan"));
-                    hoaDon.setThueSuatVAT(r.getBigDecimal("ThueSuatVAT"));
+                    hoaDon.setThueSuatVAT(r.getDouble("ThueSuatVAT"));
                     hoaDon.setPhanCongCa(new PhanCongCa(r.getString("MaPhanCong")));
                     hoaDon.setDiemSuDung(r.getInt("DiemSuDung"));
                     return hoaDon;
@@ -96,7 +96,7 @@ public class HoaDon_DAO {
                     hoaDon.setNgayLap(thoiGian4 == null ? null : thoiGian4.toLocalDateTime());
                     hoaDon.setHinhThucThanhToan(r.getString("HinhThucThanhToan"));
                     hoaDon.setTrangThaiThanhToan(r.getString("TrangThaiThanhToan"));
-                    hoaDon.setThueSuatVAT(r.getBigDecimal("ThueSuatVAT"));
+                    hoaDon.setThueSuatVAT(r.getDouble("ThueSuatVAT"));
                     hoaDon.setPhanCongCa(new PhanCongCa(r.getString("MaPhanCong")));
                     hoaDon.setDiemSuDung(r.getInt("DiemSuDung"));
                     ds.add(hoaDon);
@@ -134,9 +134,8 @@ public class HoaDon_DAO {
         if (h.getDiemSuDung() > InHoaDon.diemToiDa(InHoaDon.sauKhuyenMai(ds), soDu)) {
             throw new SQLException("Điểm vượt số dư hoặc mức giảm 50% trước VAT.");
         }
-        if (h.getThueSuatVAT() == null
-                || h.getThueSuatVAT().signum() < 0
-                || h.getThueSuatVAT().compareTo(BigDecimal.ONE) >= 0) {
+        if (!Double.isFinite(h.getThueSuatVAT())
+                || h.getThueSuatVAT() < 0 || h.getThueSuatVAT() >= 1) {
             throw new SQLException("Thuế suất VAT không hợp lệ.");
         }
     }
@@ -155,11 +154,12 @@ public class HoaDon_DAO {
             }
             String sql =
                     "SELECT MaSanPham FROM dbo.SanPham WITH (UPDLOCK,HOLDLOCK) WHERE MaSanPham=?";
+            String ketQua3 = null;
             try (PreparedStatement stmt = con.prepareStatement(sql)) {
                 stmt.setString(1, ma);
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
-                        rs.getString(1);
+                        ketQua3 = rs.getString(1);
                     }
                 }
             }
@@ -173,11 +173,11 @@ public class HoaDon_DAO {
             if (luu) {
                 d.setDonGia(sp.getDonGiaBan());
             } else {
-                if (d.getDonGia().compareTo(sp.getDonGiaBan()) != 0) {
+                if (InHoaDon.soSanhTien(d.getDonGia(), sp.getDonGiaBan()) != 0) {
                     throw new SQLException("Giá đã đổi. Mở lại đơn, lưu lại trước khi thanh toán.");
                 }
             }
-            BigDecimal giam = BigDecimal.ZERO;
+            double giam = 0.0;
             if (d.getChuongTrinhKhuyenMai() != null) {
                 ChuongTrinhKhuyenMai km =
                         ChuongTrinhKhuyenMai_DAO.tim(
@@ -187,15 +187,12 @@ public class HoaDon_DAO {
                 }
                 giam =
                         InHoaDon.tron(
-                                d.getDonGia()
-                                        .multiply(BigDecimal.valueOf(d.getSoLuong()))
-                                        .multiply(km.getGiaTriGiam())
-                                        .divide(new BigDecimal("100")));
+                                d.getDonGia() * d.getSoLuong() * km.getGiaTriGiam() / 100.0);
             }
             if (luu) {
                 d.setGiamGia(giam);
             } else {
-                if (d.getGiamGia().compareTo(giam) != 0) {
+                if (InHoaDon.soSanhTien(d.getGiamGia(), giam) != 0) {
                     throw new SQLException("Mức giảm đã đổi. Lưu lại đơn trước khi thanh toán.");
                 }
             }
@@ -254,7 +251,7 @@ public class HoaDon_DAO {
                     stmt4.setString(
                             2, h.getKhachHang() == null ? null : h.getKhachHang().getMaKhachHang());
                     stmt4.setString(3, tk.getNhanVien().getMaNhanVien());
-                    stmt4.setBigDecimal(4, h.getThueSuatVAT());
+                    stmt4.setDouble(4, h.getThueSuatVAT());
                     stmt4.setString(5, pc);
                     stmt4.setInt(6, h.getDiemSuDung());
                     stmt4.executeUpdate();
@@ -275,7 +272,7 @@ public class HoaDon_DAO {
                 try (PreparedStatement stmt5 = con.prepareStatement(sql4)) {
                     stmt5.setString(
                             1, h.getKhachHang() == null ? null : h.getKhachHang().getMaKhachHang());
-                    stmt5.setBigDecimal(2, h.getThueSuatVAT());
+                    stmt5.setDouble(2, h.getThueSuatVAT());
                     stmt5.setString(3, pc);
                     stmt5.setInt(4, h.getDiemSuDung());
                     stmt5.setString(5, h.getMaHoaDon());
@@ -299,8 +296,8 @@ public class HoaDon_DAO {
         }
     }
 
-    public BigDecimal thanhToan(
-            String ma, String hinhThuc, BigDecimal tienNhan, boolean xacNhanQR, TaiKhoan tk)
+    public double thanhToan(
+            String ma, String hinhThuc, double tienNhan, boolean xacNhanQR, TaiKhoan tk)
             throws SQLException {
         Connection con = ConnectDB.getConnection();
         boolean tuDongCommitCu = con.getAutoCommit();
@@ -324,22 +321,21 @@ public class HoaDon_DAO {
             List<ChiTietHoaDon> ds = ct.getTheoHoaDon(con, ma);
             kiemTraDong(con, ds, false);
             kiemTraKhach(con, h, ds);
-            BigDecimal total = InHoaDon.phaiTra(ds, h.getDiemSuDung(), h.getThueSuatVAT());
+            double total = InHoaDon.phaiTra(ds, h.getDiemSuDung(), h.getThueSuatVAT());
             if (!("Tiền mặt".equals(hinhThuc)) && !("Chuyển khoản QR".equals(hinhThuc))) {
                 throw new SQLException("Hình thức không hợp lệ.");
             }
             if ("Tiền mặt".equals(hinhThuc)) {
-                if (tienNhan == null || tienNhan.compareTo(total) < 0) {
+                if (!Double.isFinite(tienNhan) || InHoaDon.soSanhTien(tienNhan, total) < 0) {
                     throw new SQLException("Tiền khách đưa chưa đủ.");
                 }
             } else {
                 if (!(xacNhanQR)) {
                     throw new SQLException("Chưa xác nhận tiền chuyển khoản đã vào.");
                 }
-                util.InHoaDon.kiemTraCauHinhQR();
-                if (total.signum() <= 0
-                        || total.stripTrailingZeros().scale() > 0
-                        || total.toBigInteger().toString().length() > 13) {
+                until.InHoaDon.kiemTraCauHinhQR();
+                if (!Double.isFinite(total) || total <= 0
+                        || total != Math.rint(total) || total > 9999999999999.0) {
                     throw new SQLException("QR cần số tiền nguyên VND dương, tối đa 13 chữ số.");
                 }
             }
@@ -365,7 +361,7 @@ public class HoaDon_DAO {
                 throw new SQLException("Trạng thái đơn đã thay đổi.");
             }
             con.commit();
-            return "Tiền mặt".equals(hinhThuc) ? tienNhan.subtract(total) : BigDecimal.ZERO;
+            return "Tiền mặt".equals(hinhThuc) ? InHoaDon.tron(tienNhan - total) : 0.0;
         } catch (SQLException | RuntimeException e) {
             con.rollback();
             throw e;

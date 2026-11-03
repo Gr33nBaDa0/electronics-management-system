@@ -5,7 +5,6 @@ import connectDB.ConnectDB;
 import entity.CaLamViec;
 import entity.TaiKhoan;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -125,17 +124,16 @@ public class CaLamViec_DAO {
                 throw new SQLException("Giờ kết thúc phải sau giờ bắt đầu trong cùng ngày.");
             }
             String sql2 = "SELECT COUNT(*) FROM dbo.PhanCongCa WHERE MaCa=?";
-            BigDecimal ketQua6 = BigDecimal.ZERO;
+            int ketQua6 = 0;
             try (PreparedStatement stmt3 = con.prepareStatement(sql2)) {
                 stmt3.setString(1, x.getMaCa());
                 try (ResultSet rs = stmt3.executeQuery()) {
                     if (rs.next()) {
-                        ketQua6 = rs.getBigDecimal(1);
-                        if (ketQua6 == null) ketQua6 = BigDecimal.ZERO;
+                        ketQua6 = rs.getInt(1);
                     }
                 }
             }
-            if (ketQua6.signum() != 0) {
+            if (ketQua6 != 0) {
                 throw new SQLException("Ca đã có phân công: giữ lịch sử, tạo ca mới nếu đổi giờ.");
             }
             String sql3 = "UPDATE dbo.CaLamViec SET TenCa=?,GioBatDau=?,GioKetThuc=? WHERE MaCa=?";

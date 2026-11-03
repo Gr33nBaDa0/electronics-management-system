@@ -1,4 +1,4 @@
-﻿package gui;
+package gui;
 
 import connectDB.ConnectDB;
 
@@ -6,7 +6,7 @@ import dao.TaiKhoan_DAO;
 
 import entity.TaiKhoan;
 
-import util.GiaoDien;
+import until.GiaoDien;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -42,7 +42,6 @@ import javax.swing.border.EmptyBorder;
 public class DangNhap_GUI extends JFrame implements ActionListener {
     private static final long serialVersionUID = 1L;
 
-    // Màu và font của màn hình được khai báo tập trung ở đầu lớp.
     private static final Color MAU_CHINH = GiaoDien.PRIMARY;
     private static final Color MAU_NUT_HOVER = GiaoDien.PRIMARY_DARK;
     private static final Color MAU_NEN_TRAI = GiaoDien.PRIMARY_SOFT;

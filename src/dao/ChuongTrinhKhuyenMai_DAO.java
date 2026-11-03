@@ -5,7 +5,6 @@ import connectDB.ConnectDB;
 import entity.ChuongTrinhKhuyenMai;
 import entity.TaiKhoan;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,7 +25,7 @@ public class ChuongTrinhKhuyenMai_DAO {
                 ChuongTrinhKhuyenMai khuyenMai = new ChuongTrinhKhuyenMai();
                 khuyenMai.setMaKhuyenMai(rs.getString("MaKhuyenMai"));
                 khuyenMai.setTenChuongTrinh(rs.getString("TenChuongTrinh"));
-                khuyenMai.setGiaTriGiam(rs.getBigDecimal("GiaTriGiam"));
+                khuyenMai.setGiaTriGiam(rs.getDouble("GiaTriGiam"));
                 khuyenMai.setNgayBatDau(
                         rs.getDate("NgayBatDau") == null
                                 ? null
@@ -51,7 +50,7 @@ public class ChuongTrinhKhuyenMai_DAO {
                     ChuongTrinhKhuyenMai khuyenMai = new ChuongTrinhKhuyenMai();
                     khuyenMai.setMaKhuyenMai(rs.getString("MaKhuyenMai"));
                     khuyenMai.setTenChuongTrinh(rs.getString("TenChuongTrinh"));
-                    khuyenMai.setGiaTriGiam(rs.getBigDecimal("GiaTriGiam"));
+                    khuyenMai.setGiaTriGiam(rs.getDouble("GiaTriGiam"));
                     khuyenMai.setNgayBatDau(
                             rs.getDate("NgayBatDau") == null
                                     ? null
@@ -79,8 +78,8 @@ public class ChuongTrinhKhuyenMai_DAO {
         try {
             new TaiKhoan_DAO().kiemTraQuyen(tk, true);
             if (x.getNgayKetThuc().isBefore(x.getNgayBatDau())
-                    || x.getGiaTriGiam().signum() < 0
-                    || x.getGiaTriGiam().compareTo(new BigDecimal("50")) > 0) {
+                    || !Double.isFinite(x.getGiaTriGiam()) || x.getGiaTriGiam() < 0
+                    || x.getGiaTriGiam() > 50.0) {
                 throw new SQLException("Ngày hoặc % giảm không hợp lệ (0 đến 50%).");
             }
             String sql =
@@ -90,7 +89,7 @@ public class ChuongTrinhKhuyenMai_DAO {
             try (PreparedStatement stmt = con.prepareStatement(sql)) {
                 stmt.setString(1, x.getMaKhuyenMai());
                 stmt.setString(2, x.getTenChuongTrinh());
-                stmt.setBigDecimal(3, x.getGiaTriGiam());
+                stmt.setDouble(3, x.getGiaTriGiam());
                 stmt.setDate(4, java.sql.Date.valueOf(x.getNgayBatDau()));
                 stmt.setDate(5, java.sql.Date.valueOf(x.getNgayKetThuc()));
                 stmt.setString(6, x.getTrangThai());
@@ -141,8 +140,8 @@ public class ChuongTrinhKhuyenMai_DAO {
                 && "Đang áp dụng".equals(x.getTrangThai())
                 && !(ngay.isBefore(x.getNgayBatDau()))
                 && !(ngay.isAfter(x.getNgayKetThuc()))
-                && x.getGiaTriGiam().compareTo(BigDecimal.ZERO) >= 0
-                && x.getGiaTriGiam().compareTo(new BigDecimal("50")) <= 0;
+                && Double.isFinite(x.getGiaTriGiam()) && x.getGiaTriGiam() >= 0
+                && x.getGiaTriGiam() <= 50.0;
     }
 
     public boolean updateChuongTrinhKhuyenMai(ChuongTrinhKhuyenMai x, TaiKhoan tk)
@@ -155,8 +154,8 @@ public class ChuongTrinhKhuyenMai_DAO {
         try {
             new TaiKhoan_DAO().kiemTraQuyen(tk, true);
             if (x.getNgayKetThuc().isBefore(x.getNgayBatDau())
-                    || x.getGiaTriGiam().signum() < 0
-                    || x.getGiaTriGiam().compareTo(new BigDecimal("50")) > 0) {
+                    || !Double.isFinite(x.getGiaTriGiam()) || x.getGiaTriGiam() < 0
+                    || x.getGiaTriGiam() > 50.0) {
                 throw new SQLException("Ngày hoặc % giảm không hợp lệ (0 đến 50%).");
             }
             String sql2 =
@@ -166,7 +165,7 @@ public class ChuongTrinhKhuyenMai_DAO {
             int ketQua6;
             try (PreparedStatement stmt3 = con.prepareStatement(sql2)) {
                 stmt3.setString(1, x.getTenChuongTrinh());
-                stmt3.setBigDecimal(2, x.getGiaTriGiam());
+                stmt3.setDouble(2, x.getGiaTriGiam());
                 stmt3.setDate(3, java.sql.Date.valueOf(x.getNgayBatDau()));
                 stmt3.setDate(4, java.sql.Date.valueOf(x.getNgayKetThuc()));
                 stmt3.setString(5, x.getTrangThai());

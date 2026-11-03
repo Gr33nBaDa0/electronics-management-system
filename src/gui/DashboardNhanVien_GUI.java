@@ -1,4 +1,4 @@
-﻿package gui;
+package gui;
 
 import connectDB.ConnectDB;
 
@@ -6,12 +6,11 @@ import dao.Dashboard_DAO;
 
 import entity.TaiKhoan;
 
-import util.GiaoDien;
-import util.InHoaDon;
+import until.GiaoDien;
+import until.InHoaDon;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.math.BigDecimal;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -106,7 +105,7 @@ public class DashboardNhanVien_GUI extends JPanel implements ActionListener {
             List<Object[]> viec = dao.congViecCuaToi(tk),
                     ca = dao.lichCuaToi(tk),
                     sp = dao.sanPhamCanXem(tk);
-            thu.setText(InHoaDon.tien((BigDecimal) a[0]) + " đ");
+            thu.setText(InHoaDon.tien(((Number) a[0]).doubleValue()) + " đ");
             don.setText(a[2].toString());
             cho.setText(a[3].toString());
             tra.setText(a[6].toString());
@@ -117,7 +116,7 @@ public class DashboardNhanVien_GUI extends JPanel implements ActionListener {
             modelSP.setRowCount(0);
             for (Object[] r : viec)
                 model.addRow(
-                        new Object[] {r[0], r[1], r[3], InHoaDon.tien((BigDecimal) r[4]) + " đ"});
+                        new Object[] {r[0], r[1], r[3], InHoaDon.tien(((Number) r[4]).doubleValue()) + " đ"});
             for (Object[] r : ca)
                 modelCa.addRow(
                         new Object[] {
@@ -157,7 +156,7 @@ public class DashboardNhanVien_GUI extends JPanel implements ActionListener {
                                 + ((LocalTime) mo[4]).format(GIO));
                 lblGoiY.setText(
                         "Quỹ đầu ca: "
-                                + InHoaDon.tien((BigDecimal) mo[6])
+                                + InHoaDon.tien(((Number) mo[6]).doubleValue())
                                 + " đ. Có thể bắt đầu bán hàng.");
                 btnBatDau.setText("Bán hàng");
             } else if (choMo != null) {

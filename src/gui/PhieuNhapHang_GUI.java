@@ -1,4 +1,4 @@
-﻿package gui;
+package gui;
 
 import connectDB.ConnectDB;
 
@@ -11,8 +11,8 @@ import entity.PhieuNhapHang;
 import entity.SanPham;
 import entity.TaiKhoan;
 
-import util.GiaoDien;
-import util.InHoaDon;
+import until.GiaoDien;
+import until.InHoaDon;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -157,13 +157,16 @@ public class PhieuNhapHang_GUI extends JPanel implements ActionListener {
             hienThi.clear();
             String t = txtTim.getText().toLowerCase(java.util.Locale.ROOT);
             for (PhieuNhapHang p : list) {
+                String nguoiLap = p.getNhanVienLap() == null ? "" : (p.getNhanVienLap().getHoTen() != null && !p.getNhanVienLap().getHoTen().isBlank() ? p.getNhanVienLap().getHoTen() + " (" + p.getNhanVienLap().getMaNhanVien() + ")" : p.getNhanVienLap().getMaNhanVien());
+                String nguoiDuyet = p.getQuanLyDuyet() == null ? "" : (p.getQuanLyDuyet().getHoTen() != null && !p.getQuanLyDuyet().getHoTen().isBlank() ? p.getQuanLyDuyet().getHoTen() + " (" + p.getQuanLyDuyet().getMaNhanVien() + ")" : p.getQuanLyDuyet().getMaNhanVien());
+                String ngayHienThi = p.getNgayLap() == null ? "" : p.getNgayLap().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
                 if (!(p.getMaPhieuNhap()
                                 + " "
                                 + p.getNhaCungCap()
                                 + " "
-                                + p.getNhanVienLap().getMaNhanVien()
+                                + nguoiLap
                                 + " "
-                                + p.getNgayLap())
+                                + ngayHienThi)
                         .toLowerCase(java.util.Locale.ROOT)
                         .contains(t)) continue;
                 if (loc.getSelectedIndex() > 0 && !p.getTrangThai().equals(loc.getSelectedItem()))
@@ -172,11 +175,11 @@ public class PhieuNhapHang_GUI extends JPanel implements ActionListener {
                 model.addRow(
                         new Object[] {
                             p.getMaPhieuNhap(),
-                            p.getNgayLap(),
+                            ngayHienThi,
                             p.getNhaCungCap(),
-                            p.getNhanVienLap().getMaNhanVien(),
+                            nguoiLap,
                             p.getTrangThai(),
-                            p.getQuanLyDuyet(),
+                            nguoiDuyet,
                             p.getLyDoTuChoi()
                         });
             }
@@ -215,7 +218,7 @@ public class PhieuNhapHang_GUI extends JPanel implements ActionListener {
 
     private void hienDong() {
         modelCT.setRowCount(0);
-        java.math.BigDecimal total = java.math.BigDecimal.ZERO;
+        double total = 0.0;
         for (ChiTietPhieuNhapHang d : dong) {
             modelCT.addRow(
                     new Object[] {
@@ -225,7 +228,7 @@ public class PhieuNhapHang_GUI extends JPanel implements ActionListener {
                         formatGia(d.getDonGiaNhap()),
                         formatGia(d.getThanhTien())
                     });
-            total = total.add(d.getThanhTien());
+            total = InHoaDon.tron(total + d.getThanhTien());
         }
         lblTong.setText("Tổng nhập: " + formatGia(total));
     }
@@ -367,12 +370,12 @@ public class PhieuNhapHang_GUI extends JPanel implements ActionListener {
         }
     }
 
-    private String formatGia(java.math.BigDecimal gia) {
+    private String formatGia(double gia) {
         java.text.DecimalFormat df =
                 new java.text.DecimalFormat(
                         "#,##0.##",
                         java.text.DecimalFormatSymbols.getInstance(java.util.Locale.US));
-        return gia == null ? "" : df.format(gia);
+        return df.format(gia);
     }
 
     private JTable taoBang(DefaultTableModel m) {

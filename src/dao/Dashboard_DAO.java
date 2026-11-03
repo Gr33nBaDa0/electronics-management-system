@@ -4,7 +4,6 @@ import connectDB.ConnectDB;
 
 import entity.TaiKhoan;
 
-import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ public class Dashboard_DAO {
         new TaiKhoan_DAO().kiemTraQuyen(tk, false);
         boolean tatCa = "ADMIN".equals(tk.getQuyen()) && !caNhan;
         String nv = tk.getNhanVien().getMaNhanVien();
-        Object[] kq = {BigDecimal.ZERO, BigDecimal.ZERO, 0, 0, 0, 0, 0, 0};
+        Object[] kq = {0.0, 0.0, 0, 0, 0, 0, 0, 0};
         String sql =
                 "SELECT COUNT(*),COALESCE(SUM(x.Tien),0) FROM (SELECT"
                     + " h.MaHoaDon,ROUND((SUM(d.SoLuong*d.DonGia-d.GiamGia)-h.DiemSuDung*1000)*(1+h.ThueSuatVAT),2)"
@@ -37,7 +36,7 @@ public class Dashboard_DAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     kq[2] = rs.getInt(1);
-                    kq[0] = rs.getBigDecimal(2);
+                    kq[0] = rs.getDouble(2);
                 }
             }
         }
@@ -51,7 +50,7 @@ public class Dashboard_DAO {
             stmt.setInt(2, tatCa ? 1 : 0);
             stmt.setString(3, nv);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) kq[1] = rs.getBigDecimal(1);
+                if (rs.next()) kq[1] = rs.getDouble(1);
             }
         }
         kq[3] =
@@ -127,7 +126,7 @@ public class Dashboard_DAO {
                             rs.getString(2),
                             rs.getString(3),
                             rs.getTimestamp(4).toLocalDateTime(),
-                            rs.getBigDecimal(5)
+                            rs.getDouble(5)
                         });
         }
         return ds;
@@ -160,7 +159,7 @@ public class Dashboard_DAO {
                                 rs.getString(2),
                                 rs.getTimestamp(3).toLocalDateTime(),
                                 rs.getString(4),
-                                rs.getBigDecimal(5)
+                                rs.getDouble(5)
                             });
             }
         }
@@ -214,7 +213,7 @@ public class Dashboard_DAO {
                                 rs.getTime(4).toLocalTime(),
                                 rs.getTime(5).toLocalTime(),
                                 rs.getString(6),
-                                rs.getBigDecimal(7)
+                                rs.getDouble(7)
                             });
             }
         }

@@ -34,8 +34,8 @@ public class ChiTietPhieuNhapHang_DAO {
                     sanPham.setTenSanPham(r.getString("TenSanPham"));
                     sanPham.setLoaiHang(r.getString("LoaiHang"));
                     sanPham.setThuongHieu(r.getString("ThuongHieu"));
-                    sanPham.setDonGiaBan(r.getBigDecimal("DonGiaBan"));
-                    sanPham.setGiaNhap(r.getBigDecimal("GiaNhap"));
+                    sanPham.setDonGiaBan(r.getDouble("DonGiaBan"));
+                    sanPham.setGiaNhap(r.getDouble("GiaNhap"));
                     sanPham.setThongSoKiThuat(r.getString("ThongSoKiThuat"));
                     sanPham.setXuatXu(r.getString("XuatXu"));
                     sanPham.setTrangThai(r.getString("TrangThai"));
@@ -43,7 +43,7 @@ public class ChiTietPhieuNhapHang_DAO {
                     sanPham.setSoLuongTon(r.getInt("SoLuongTon"));
                     d.setSanPham(sanPham);
                     d.setSoLuong(r.getInt("SoLuong"));
-                    d.setDonGiaNhap(r.getBigDecimal("DonGiaNhap"));
+                    d.setDonGiaNhap(r.getDouble("DonGiaNhap"));
                     ds.add(d);
                 }
             }
@@ -55,7 +55,7 @@ public class ChiTietPhieuNhapHang_DAO {
         Set<String> seen = new HashSet<>();
         for (ChiTietPhieuNhapHang d : ds) {
             if (d.getSoLuong() <= 0
-                    || d.getDonGiaNhap().signum() < 0
+                    || !Double.isFinite(d.getDonGiaNhap()) || d.getDonGiaNhap() < 0
                     || !(seen.add(d.getSanPham().getMaSanPham()))) {
                 throw new SQLException("Dòng nhập không hợp lệ hoặc trùng sản phẩm.");
             }
@@ -66,7 +66,7 @@ public class ChiTietPhieuNhapHang_DAO {
                 stmt.setString(1, ma);
                 stmt.setString(2, d.getSanPham().getMaSanPham());
                 stmt.setInt(3, d.getSoLuong());
-                stmt.setBigDecimal(4, d.getDonGiaNhap());
+                stmt.setDouble(4, d.getDonGiaNhap());
                 stmt.executeUpdate();
             }
         }

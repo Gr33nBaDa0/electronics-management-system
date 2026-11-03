@@ -1,4 +1,4 @@
-﻿package gui;
+package gui;
 
 import connectDB.ConnectDB;
 
@@ -13,7 +13,7 @@ import entity.HoaDon;
 import entity.PhieuDoiTra;
 import entity.TaiKhoan;
 
-import util.GiaoDien;
+import until.GiaoDien;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -22,7 +22,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -255,7 +254,7 @@ public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
                         d.getChiTietHoaDon().getSanPham().getMaSanPham(),
                         d.getSoLuongTra(),
                         d.getTinhTrangHang(),
-                        d.getTienHoan() == null ? "Tính khi lưu" : formatGia(d.getTienHoan())
+                        d.getPhieuDoiTra() == null ? "Tính khi lưu" : formatGia(d.getTienHoan())
                     });
         capNhatForm();
     }
@@ -318,7 +317,7 @@ public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
                 d.setChiTietHoaDon(g);
                 d.setSoLuongTra(n);
                 d.setTinhTrangHang((String) tinhTrang.getSelectedItem());
-                d.setTienHoan(null);
+                d.setTienHoan(0.0);
                 dong.add(d);
                 hd.setEditable(false);
                 hienDong();
@@ -363,7 +362,7 @@ public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
                 String reason = JOptionPane.showInputDialog(this, "Lý do từ chối:");
                 if (reason != null) dao.duyet(p.getMaPhieuDoiTra(), false, reason, tk);
             } else if (o.equals(btnHoan)) {
-                BigDecimal tien = dao.duTinh(p.getMaPhieuDoiTra(), tk);
+                double tien = dao.duTinh(p.getMaPhieuDoiTra(), tk);
                 HoaDon h = new HoaDon_DAO().tim(p.getHoaDonGoc().getMaHoaDon());
                 if (xacNhan(
                         this,
@@ -451,12 +450,12 @@ public class PhieuDoiTra_GUI extends JPanel implements ActionListener {
         }
     }
 
-    private String formatGia(java.math.BigDecimal gia) {
+    private String formatGia(double gia) {
         java.text.DecimalFormat df =
                 new java.text.DecimalFormat(
                         "#,##0.##",
                         java.text.DecimalFormatSymbols.getInstance(java.util.Locale.US));
-        return gia == null ? "" : df.format(gia);
+        return df.format(gia);
     }
 
     private JTable taoBang(DefaultTableModel m) {

@@ -5,7 +5,6 @@ import connectDB.ConnectDB;
 import entity.SanPham;
 import entity.TaiKhoan;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -53,8 +52,8 @@ public class SanPham_DAO {
                 sanPham.setTenSanPham(rs.getString("TenSanPham"));
                 sanPham.setLoaiHang(rs.getString("LoaiHang"));
                 sanPham.setThuongHieu(rs.getString("ThuongHieu"));
-                sanPham.setDonGiaBan(rs.getBigDecimal("DonGiaBan"));
-                sanPham.setGiaNhap(rs.getBigDecimal("GiaNhap"));
+                sanPham.setDonGiaBan(rs.getDouble("DonGiaBan"));
+                sanPham.setGiaNhap(rs.getDouble("GiaNhap"));
                 sanPham.setThongSoKiThuat(rs.getString("ThongSoKiThuat"));
                 sanPham.setXuatXu(rs.getString("XuatXu"));
                 sanPham.setTrangThai(rs.getString("TrangThai"));
@@ -78,8 +77,8 @@ public class SanPham_DAO {
                     sanPham.setTenSanPham(rs.getString("TenSanPham"));
                     sanPham.setLoaiHang(rs.getString("LoaiHang"));
                     sanPham.setThuongHieu(rs.getString("ThuongHieu"));
-                    sanPham.setDonGiaBan(rs.getBigDecimal("DonGiaBan"));
-                    sanPham.setGiaNhap(rs.getBigDecimal("GiaNhap"));
+                    sanPham.setDonGiaBan(rs.getDouble("DonGiaBan"));
+                    sanPham.setGiaNhap(rs.getDouble("GiaNhap"));
                     sanPham.setThongSoKiThuat(rs.getString("ThongSoKiThuat"));
                     sanPham.setXuatXu(rs.getString("XuatXu"));
                     sanPham.setTrangThai(rs.getString("TrangThai"));
@@ -103,8 +102,8 @@ public class SanPham_DAO {
         try {
             new TaiKhoan_DAO().kiemTraQuyen(tk, true);
             String maMoi = taoMaTiepTheo(con, true);
-            if (x.getDonGiaBan().signum() < 0
-                    || x.getGiaNhap().signum() < 0
+            if (!Double.isFinite(x.getDonGiaBan()) || x.getDonGiaBan() < 0
+                    || !Double.isFinite(x.getGiaNhap()) || x.getGiaNhap() < 0
                     || x.getThoiHanBaoHanh() < 0) {
                 throw new SQLException("Giá / bảo hành không được âm.");
             }
@@ -117,8 +116,8 @@ public class SanPham_DAO {
                 stmt.setString(2, x.getTenSanPham());
                 stmt.setString(3, x.getLoaiHang());
                 stmt.setString(4, x.getThuongHieu());
-                stmt.setBigDecimal(5, x.getDonGiaBan());
-                stmt.setBigDecimal(6, x.getGiaNhap());
+                stmt.setDouble(5, x.getDonGiaBan());
+                stmt.setDouble(6, x.getGiaNhap());
                 stmt.setString(7, x.getThongSoKiThuat());
                 stmt.setString(8, x.getXuatXu());
                 stmt.setString(9, x.getTrangThai());
@@ -149,17 +148,16 @@ public class SanPham_DAO {
             new TaiKhoan_DAO().kiemTraQuyen(tk, true);
             String sql =
                     "SELECT SoLuongTon FROM dbo.SanPham WITH (UPDLOCK,HOLDLOCK) WHERE MaSanPham=?";
-            BigDecimal ketQua3 = BigDecimal.ZERO;
+            int ketQua3 = 0;
             try (PreparedStatement stmt = con.prepareStatement(sql)) {
                 stmt.setString(1, ma);
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
-                        ketQua3 = rs.getBigDecimal(1);
-                        if (ketQua3 == null) ketQua3 = BigDecimal.ZERO;
+                        ketQua3 = rs.getInt(1);
                     }
                 }
             }
-            if (ketQua3.signum() != 0) {
+            if (ketQua3 != 0) {
                 throw new SQLException("Chỉ xóa sản phẩm tồn 0, chưa có lịch sử.");
             }
             String sql2 = "DELETE FROM dbo.SanPham WHERE MaSanPham=?";
@@ -207,8 +205,8 @@ public class SanPham_DAO {
         con.setAutoCommit(false);
         try {
             new TaiKhoan_DAO().kiemTraQuyen(tk, true);
-            if (x.getDonGiaBan().signum() < 0
-                    || x.getGiaNhap().signum() < 0
+            if (!Double.isFinite(x.getDonGiaBan()) || x.getDonGiaBan() < 0
+                    || !Double.isFinite(x.getGiaNhap()) || x.getGiaNhap() < 0
                     || x.getThoiHanBaoHanh() < 0) {
                 throw new SQLException("Giá / bảo hành không được âm.");
             }
@@ -221,8 +219,8 @@ public class SanPham_DAO {
                 stmt3.setString(1, x.getTenSanPham());
                 stmt3.setString(2, x.getLoaiHang());
                 stmt3.setString(3, x.getThuongHieu());
-                stmt3.setBigDecimal(4, x.getDonGiaBan());
-                stmt3.setBigDecimal(5, x.getGiaNhap());
+                stmt3.setDouble(4, x.getDonGiaBan());
+                stmt3.setDouble(5, x.getGiaNhap());
                 stmt3.setString(6, x.getThongSoKiThuat());
                 stmt3.setString(7, x.getXuatXu());
                 stmt3.setString(8, x.getTrangThai());

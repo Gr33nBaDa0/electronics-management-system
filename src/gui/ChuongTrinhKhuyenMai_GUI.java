@@ -1,4 +1,4 @@
-﻿package gui;
+package gui;
 
 import connectDB.ConnectDB;
 
@@ -7,8 +7,8 @@ import dao.ChuongTrinhKhuyenMai_DAO;
 import entity.ChuongTrinhKhuyenMai;
 import entity.TaiKhoan;
 
-import util.GiaoDien;
-import util.InHoaDon;
+import until.GiaoDien;
+import until.InHoaDon;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -251,12 +251,12 @@ public class ChuongTrinhKhuyenMai_GUI extends JPanel implements ActionListener {
         }
     }
 
-    private String formatGia(java.math.BigDecimal gia) {
+    private String formatGia(double gia) {
         java.text.DecimalFormat df =
                 new java.text.DecimalFormat(
                         "#,##0.##",
                         java.text.DecimalFormatSymbols.getInstance(java.util.Locale.US));
-        return gia == null ? "" : df.format(gia);
+        return df.format(gia);
     }
 
     private JTable taoBang(DefaultTableModel m) {

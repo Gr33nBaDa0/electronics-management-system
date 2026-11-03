@@ -1,4 +1,4 @@
-﻿package gui;
+package gui;
 
 import connectDB.ConnectDB;
 
@@ -11,8 +11,8 @@ import entity.NhanVien;
 import entity.PhanCongCa;
 import entity.TaiKhoan;
 
-import util.GiaoDien;
-import util.InHoaDon;
+import until.GiaoDien;
+import until.InHoaDon;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -22,7 +22,6 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -197,7 +196,7 @@ public class PhanCongCa_GUI extends JPanel implements ActionListener {
                             a.getNgay(),
                             a.getCaLamViec().getMaCa(),
                             formatGia(a.getTienQuyDauCa()),
-                            formatGia(a.getTienMatThucDem()),
+                            a.getGioDongCa() == null ? "" : formatGia(a.getTienMatThucDem()),
                             a.getTrangThai(),
                             a.getGioMoCa(),
                             a.getGioDongCa(),
@@ -255,20 +254,20 @@ public class PhanCongCa_GUI extends JPanel implements ActionListener {
                                 this, "Tiền quỹ đầu ca (số không phân cách):", "1000000");
                 if (tien != null) dao.moCa(a.getMaPhanCong(), InHoaDon.soTien(tien), tk);
             } else if (o.equals(btnDong)) {
-                BigDecimal lt = dao.tienLyThuyet(a.getMaPhanCong(), tk);
+                double lt = dao.tienLyThuyet(a.getMaPhanCong(), tk);
                 String dem =
                         JOptionPane.showInputDialog(
                                 this,
                                 "Quỹ lý thuyết: " + formatGia(lt) + " VND. Nhập tiền thực đếm:");
                 if (dem == null) return;
-                BigDecimal thuc = InHoaDon.soTien(dem);
+                double thuc = InHoaDon.soTien(dem);
                 String lyDo = ghiChu.getText();
-                if (thuc.compareTo(lt) != 0) {
+                if (InHoaDon.soSanhTien(thuc, lt) != 0) {
                     lyDo =
                             JOptionPane.showInputDialog(
                                     this,
                                     "Chênh lệch "
-                                            + formatGia(thuc.subtract(lt))
+                                            + formatGia(InHoaDon.tron(thuc - lt))
                                             + ". Nhập giải trình:");
                     if (lyDo == null) return;
                 }
@@ -403,12 +402,12 @@ public class PhanCongCa_GUI extends JPanel implements ActionListener {
         if (table.getSelectedRow() >= 0) btnMo.doClick();
     }
 
-    private String formatGia(java.math.BigDecimal gia) {
+    private String formatGia(double gia) {
         java.text.DecimalFormat df =
                 new java.text.DecimalFormat(
                         "#,##0.##",
                         java.text.DecimalFormatSymbols.getInstance(java.util.Locale.US));
-        return gia == null ? "" : df.format(gia);
+        return df.format(gia);
     }
 
     private JTable taoBang(DefaultTableModel m) {

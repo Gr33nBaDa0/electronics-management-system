@@ -1,11 +1,11 @@
-﻿package gui;
+package gui;
 
 import dao.SaoLuu_DAO;
 import dao.TaiKhoan_DAO;
 
 import entity.TaiKhoan;
 
-import util.GiaoDien;
+import until.GiaoDien;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

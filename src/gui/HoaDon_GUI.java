@@ -1,4 +1,4 @@
-﻿package gui;
+package gui;
 
 import connectDB.ConnectDB;
 
@@ -9,8 +9,8 @@ import entity.ChiTietHoaDon;
 import entity.HoaDon;
 import entity.TaiKhoan;
 
-import util.*;
-import util.GiaoDien;
+import until.*;
+import until.GiaoDien;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -53,7 +53,8 @@ public class HoaDon_GUI extends JPanel implements ActionListener {
             tt = new JComboBox<>(new String[] {"", "Chưa thanh toán", "Đã thanh toán", "Đã hủy"}),
             ht = new JComboBox<>(new String[] {"", "Tiền mặt", "Chuyển khoản QR"});
     private final JButton btnTim = taoNut("Tìm / lọc"),
-            btnXem = taoNut("Xem / in"),
+            btnXem = taoNut("Xem chi tiết"),
+            btnIn = taoNut("In hóa đơn"),
             btnMo = taoNut("Mở đơn tại POS"),
             btnHuy = taoNut("Hủy đơn"),
             btnBo = taoNut("Bỏ lọc"),
@@ -124,10 +125,10 @@ public class HoaDon_GUI extends JPanel implements ActionListener {
                 GiaoDien.the(
                         "Danh sách hóa đơn",
                         GiaoDien.cuon(table),
-                        taoDong(btnXem, btnMo, btnHuy, btnBH)),
+                        taoDong(btnXem, btnIn, btnMo, btnHuy, btnBH)),
                 BorderLayout.CENTER);
         GiaoDien.trangTri(this);
-        for (JButton b : new JButton[] {btnTim, btnBo, btnXem, btnMo, btnHuy, btnBH})
+        for (JButton b : new JButton[] {btnTim, btnBo, btnXem, btnIn, btnMo, btnHuy, btnBH})
             b.addActionListener(this);
         btnMo.setEnabled(pos != null);
         ganPhimTat();
@@ -194,8 +195,18 @@ public class HoaDon_GUI extends JPanel implements ActionListener {
             }
             int i = table.getSelectedRow();
             if (i < 0) throw new IllegalArgumentException("Chọn hóa đơn.");
+            i = table.convertRowIndexToModel(i);
             HoaDon h = new HoaDon_DAO().tim(ds.get(i).getMaHoaDon());
-            if (o.equals(btnBH)) {
+            if (o.equals(btnIn)) {
+                java.io.File file = InHoaDon.xuatFilePDF(h.getMaHoaDon());
+                try {
+                    if (!InHoaDon.moFilePDF(file))
+                        JOptionPane.showMessageDialog(this, "Đã xuất hóa đơn: " + file.getAbsolutePath());
+                } catch (Exception | LinkageError loiMo) {
+                    JOptionPane.showMessageDialog(this, "Đã xuất hóa đơn: " + file.getAbsolutePath()
+                            + "\nChưa mở được PDF tự động. Bạn có thể mở file đã lưu trong ổ D.");
+                }
+            } else if (o.equals(btnBH)) {
                 if (!"Đã thanh toán".equals(h.getTrangThaiThanhToan()))
                     throw new IllegalArgumentException("Chỉ tra hóa đơn đã thanh toán.");
                 List<ChiTietHoaDon> ds = new ChiTietHoaDon_DAO().getTheoHoaDon(h.getMaHoaDon());
@@ -237,21 +248,8 @@ public class HoaDon_GUI extends JPanel implements ActionListener {
                 List<ChiTietHoaDon> dong = new ChiTietHoaDon_DAO().getTheoHoaDon(h.getMaHoaDon());
                 JTextArea text = new JTextArea(InHoaDon.noiDung(h, dong), 25, 65);
                 text.setEditable(false);
-                JPanel p = new JPanel(new BorderLayout());
-                p.add(new JScrollPane(text), BorderLayout.CENTER);
-                JButton in = taoNut("In hóa đơn");
-                in.setEnabled("Đã thanh toán".equals(h.getTrangThaiThanhToan()));
-                in.addActionListener(
-                        a -> {
-                            try {
-                                text.print();
-                            } catch (Exception ex) {
-                                thongBaoLoi(this, ex);
-                            }
-                        });
-                p.add(in, BorderLayout.SOUTH);
                 JOptionPane.showMessageDialog(
-                        this, p, "Chi tiết hóa đơn", JOptionPane.PLAIN_MESSAGE);
+                        this, new JScrollPane(text), "Chi tiết hóa đơn", JOptionPane.PLAIN_MESSAGE);
             }
         } catch (java.sql.SQLException ex) {
             ex.printStackTrace();
@@ -299,7 +297,7 @@ public class HoaDon_GUI extends JPanel implements ActionListener {
 
     private void ganPhimTat() {
         GiaoDien.phimTatChuan(this, null, null, btnHuy, btnTim, txtTim);
-        GiaoDien.phimTat(this, "ctrl P", btnXem);
+        GiaoDien.phimTat(this, "ctrl P", btnIn);
         GiaoDien.phimTat(this, "ctrl O", btnMo);
     }
 }

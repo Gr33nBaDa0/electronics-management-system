@@ -37,7 +37,7 @@ public class ChiTietDoiTra_DAO {
                     d.setChiTietHoaDon(g);
                     d.setSoLuongTra(r.getInt("SoLuongTra"));
                     d.setTinhTrangHang(r.getString("TinhTrangHang"));
-                    d.setTienHoan(r.getBigDecimal("TienHoan"));
+                    d.setTienHoan(r.getDouble("TienHoan"));
                     ds.add(d);
                 }
             }

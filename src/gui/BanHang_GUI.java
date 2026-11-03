@@ -1,4 +1,4 @@
-﻿package gui;
+package gui;
 
 import connectDB.ConnectDB;
 
@@ -6,13 +6,12 @@ import dao.*;
 
 import entity.*;
 
-import util.GiaoDien;
-import util.InHoaDon;
+import until.GiaoDien;
+import until.InHoaDon;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -26,20 +25,20 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 
 public class BanHang_GUI extends JPanel implements ActionListener {
-    // Màu khai báo ở đầu lớp. VAT, điểm và khuyến mãi giữ quy định hiện tại.
-    private static final Color PRIMARY = GiaoDien.PRIMARY,
+    private static final long serialVersionUID = 1L;
+	private static final Color PRIMARY = GiaoDien.PRIMARY,
             TEXT = GiaoDien.TEXT,
             MUTED = GiaoDien.MUTED,
             BORDER = GiaoDien.BORDER,
             SURFACE = GiaoDien.SURFACE;
-    private static final BigDecimal VAT = new BigDecimal("0.10");
+    private static final double VAT = 0.10;
     private static final int CAO_THE_SP = 242;
     private final TaiKhoan tk;
     private final List<ChiTietHoaDon> gio = new ArrayList<>();
     private List<SanPham> sanPham = new ArrayList<>(), hienThi = new ArrayList<>();
     private final List<ChuongTrinhKhuyenMai> khuyenMai = new ArrayList<>();
     private String maHoaDon, loaiDangChon;
-    private BigDecimal thueSuat = VAT;
+    private double thueSuat = VAT;
     private boolean dangNap;
     private final JTextField
             txtTim =
@@ -230,7 +229,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
         capNhatGio();
     }
 
-    private void loadDanhMuc() {
+    public void loadDanhMuc() {
         KhachHang cu = (KhachHang) cboKhach.getSelectedItem();
         dangNap = true;
         try {
@@ -391,7 +390,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
         d.setSanPham(sp);
         d.setSoLuong(1);
         d.setDonGia(sp.getDonGiaBan());
-        d.setGiamGia(BigDecimal.ZERO);
+        d.setGiamGia(0.0);
         gio.add(d);
         capNhatGio();
     }
@@ -411,15 +410,12 @@ public class BanHang_GUI extends JPanel implements ActionListener {
         capNhatGio();
     }
 
-    private BigDecimal giam(ChiTietHoaDon d) {
+    private double giam(ChiTietHoaDon d) {
         ChuongTrinhKhuyenMai k = d.getChuongTrinhKhuyenMai();
         return k == null
-                ? BigDecimal.ZERO
+                ? 0.0
                 : InHoaDon.tron(
-                        d.getDonGia()
-                                .multiply(BigDecimal.valueOf(d.getSoLuong()))
-                                .multiply(k.getGiaTriGiam())
-                                .divide(new BigDecimal("100")));
+                        d.getDonGia() * d.getSoLuong() * k.getGiaTriGiam() / 100.0);
     }
 
     private void capNhatGio() {
@@ -507,7 +503,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
                         hang(
                                 km,
                                 nhan(
-                                        d.getGiamGia().signum() > 0
+                                        d.getGiamGia() > 0
                                                 ? "Giảm " + formatGia(d.getGiamGia()) + " đ"
                                                 : "",
                                         11,
@@ -581,17 +577,15 @@ public class BanHang_GUI extends JPanel implements ActionListener {
             lblHang.setText(formatGia(InHoaDon.tongHang(gio)) + " đ");
             lblGiam.setText(
                     "− "
-                            + formatGia(InHoaDon.tongHang(gio).subtract(InHoaDon.sauKhuyenMai(gio)))
+                            + formatGia(InHoaDon.tron(InHoaDon.tongHang(gio) - InHoaDon.sauKhuyenMai(gio)))
                             + " đ");
             lblQuyDoi.setText(
-                    "− " + formatGia(InHoaDon.MOT_DIEM.multiply(BigDecimal.valueOf(diem))) + " đ");
+                    "− " + formatGia(InHoaDon.MOT_DIEM * diem) + " đ");
             lblVAT.setText(formatGia(InHoaDon.vat(gio, diem, thueSuat)) + " đ");
             lblTong.setText(formatGia(InHoaDon.phaiTra(gio, diem, thueSuat)) + " đ");
             lblTenVAT.setText(
                     "VAT ("
-                            + thueSuat.multiply(new BigDecimal("100"))
-                                    .stripTrailingZeros()
-                                    .toPlainString()
+                            + formatGia(thueSuat * 100.0)
                             + "%)");
             lblLoi.setText(" ");
             btnLuu.setEnabled(!gio.isEmpty());
@@ -741,7 +735,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
                 this, e.getMessage(), "Không thực hiện được", JOptionPane.ERROR_MESSAGE);
     }
 
-    private String formatGia(BigDecimal n) {
+    private String formatGia(double n) {
         return InHoaDon.tien(n);
     }
 
@@ -811,7 +805,7 @@ public class BanHang_GUI extends JPanel implements ActionListener {
     /** Có thể đặt ảnh ở resource/sanpham/MaSP.png; thiếu ảnh vẫn có biểu tượng loại hàng. */
     private Icon anhSanPham(SanPham sp) {
         for (String ext : new String[] {"png", "jpg", "jpeg"}) {
-            File f = new File("resource/sanpham/" + sp.getMaSanPham() + "." + ext);
+            File f = new File("resource/hinhanh/" + sp.getMaSanPham() + "." + ext);
             if (f.isFile()) {
                 ImageIcon i = new ImageIcon(f.getAbsolutePath());
                 if (i.getIconWidth() > 0) {

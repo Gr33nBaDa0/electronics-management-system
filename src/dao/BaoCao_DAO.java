@@ -4,7 +4,6 @@ import connectDB.ConnectDB;
 
 import entity.TaiKhoan;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -44,9 +43,9 @@ public class BaoCao_DAO {
                                 r.getDate(1),
                                 r.getString(2),
                                 r.getInt(3),
-                                r.getBigDecimal(4),
-                                BigDecimal.ZERO,
-                                r.getBigDecimal(4)
+                                r.getDouble(4),
+                                0.0,
+                                r.getDouble(4)
                             });
                 }
             }
@@ -74,14 +73,14 @@ public class BaoCao_DAO {
                                     r.getDate(1),
                                     r.getString(2),
                                     0,
-                                    BigDecimal.ZERO,
-                                    BigDecimal.ZERO,
-                                    BigDecimal.ZERO
+                                    0.0,
+                                    0.0,
+                                    0.0
                                 };
                         ds.add(found);
                     }
-                    found[4] = r.getBigDecimal(3);
-                    found[5] = ((BigDecimal) found[3]).subtract((BigDecimal) found[4]);
+                    found[4] = r.getDouble(3);
+                    found[5] = until.InHoaDon.tron(((Number) found[3]).doubleValue() - ((Number) found[4]).doubleValue());
                 }
             }
         }

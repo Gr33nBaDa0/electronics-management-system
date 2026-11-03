@@ -1,4 +1,4 @@
-﻿package gui;
+package gui;
 
 import connectDB.ConnectDB;
 
@@ -8,13 +8,11 @@ import dao.TaiKhoan_DAO;
 
 import entity.TaiKhoan;
 
-import util.GiaoDien;
-import util.InHoaDon;
+import until.GiaoDien;
+import until.InHoaDon;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.nio.file.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -53,7 +51,7 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
     private final JTable table = GiaoDien.bang(model), tableSP = GiaoDien.bang(modelSP);
     private final BieuDoThu bieuDo = new BieuDoThu();
     private List<Object[]> phieu = new ArrayList<>();
-    private BigDecimal thucTe = BigDecimal.ZERO, mucTieu = BigDecimal.ZERO;
+    private double thucTe = 0.0, mucTieu = 0.0;
 
     public DashboardQuanLy_GUI(TaiKhoan tk, MainFrame main) {
         this.tk = tk;
@@ -113,16 +111,16 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
             Dashboard_DAO dao = new Dashboard_DAO();
             Object[] a = dao.tongHopNgay(tk, LocalDate.now(), false);
             List<Object[]> ds = dao.phieuChoDuyet(tk), sp = dao.sanPhamCanXem(tk);
-            Map<LocalDate, BigDecimal> ngay = new LinkedHashMap<>();
-            for (int i = 6; i >= 0; i--) ngay.put(LocalDate.now().minusDays(i), BigDecimal.ZERO);
+            Map<LocalDate, Double> ngay = new LinkedHashMap<>();
+            for (int i = 6; i >= 0; i--) ngay.put(LocalDate.now().minusDays(i), 0.0);
             for (Object[] r :
                     new BaoCao_DAO().doanhThu(LocalDate.now().minusDays(6), LocalDate.now(), tk)) {
                 LocalDate n = ((java.sql.Date) r[0]).toLocalDate();
-                ngay.put(n, ngay.getOrDefault(n, BigDecimal.ZERO).add((BigDecimal) r[5]));
+                ngay.put(n, InHoaDon.tron(ngay.getOrDefault(n, 0.0) + ((Number) r[5]).doubleValue()));
             }
-            thucTe = ((BigDecimal) a[0]).subtract((BigDecimal) a[1]);
+            thucTe = InHoaDon.tron(((Number) a[0]).doubleValue() - ((Number) a[1]).doubleValue());
             thu.setText(InHoaDon.tien(thucTe) + " đ");
-            thu.setForeground(thucTe.signum() < 0 ? ERROR : PRIMARY);
+            thu.setForeground(thucTe < 0 ? ERROR : PRIMARY);
             don.setText(a[2].toString());
             nhap.setText(a[4].toString());
             tra.setText(a[5].toString());
@@ -137,7 +135,7 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
                             r[2],
                             ((LocalDateTime) r[3])
                                     .format(DateTimeFormatter.ofPattern("dd/MM HH:mm")),
-                            InHoaDon.tien((BigDecimal) r[4]) + " đ"
+                            InHoaDon.tien(((Number) r[4]).doubleValue()) + " đ"
                         });
             for (Object[] r : sp) modelSP.addRow(r);
             table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -178,24 +176,24 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
     }
 
     private void hienKeHoach() {
-        if (mucTieu.signum() <= 0) {
+        if (mucTieu <= 0) {
             lblKeHoach.setText("Chưa đặt mục tiêu thu sau hoàn hôm nay");
             tienDo.setValue(0);
             tienDo.setString("Chưa đặt mục tiêu");
             return;
         }
-        BigDecimal pt =
-                thucTe.multiply(new BigDecimal("100")).divide(mucTieu, 1, RoundingMode.HALF_UP);
+        double pt =
+                Math.round(thucTe * 1000.0 / mucTieu) / 10.0;
         lblKeHoach.setText(
                 InHoaDon.tien(thucTe)
                         + " / "
                         + InHoaDon.tien(mucTieu)
                         + " đ · "
-                        + (thucTe.compareTo(mucTieu) >= 0
+                        + (InHoaDon.soSanhTien(thucTe, mucTieu) >= 0
                                 ? "Đã đạt mục tiêu"
-                                : "Còn " + InHoaDon.tien(mucTieu.subtract(thucTe)) + " đ"));
-        tienDo.setValue(pt.max(BigDecimal.ZERO).min(new BigDecimal("100")).intValue());
-        tienDo.setString(pt.toPlainString() + "% mục tiêu");
+                                : "Còn " + InHoaDon.tien(InHoaDon.tron(mucTieu - thucTe)) + " đ"));
+        tienDo.setValue((int) Math.max(0.0, Math.min(100.0, pt)));
+        tienDo.setString(String.format(java.util.Locale.US, "%.1f", pt) + "% mục tiêu");
     }
 
     private Properties docThietLap() throws java.io.IOException {
@@ -209,12 +207,12 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
         return p;
     }
 
-    private BigDecimal docMucTieu() throws java.io.IOException {
+    private double docMucTieu() throws java.io.IOException {
         String s = docThietLap().getProperty("dashboard.target." + LocalDate.now(), "");
         try {
-            return s.isBlank() ? BigDecimal.ZERO : InHoaDon.soTien(s).max(BigDecimal.ZERO);
+            return s.isBlank() ? 0.0 : Math.max(0.0, InHoaDon.soTien(s));
         } catch (NumberFormatException e) {
-            return BigDecimal.ZERO;
+            return 0.0;
         }
     }
 
@@ -224,13 +222,13 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
                 JOptionPane.showInputDialog(
                         this,
                         "Mục tiêu thu sau hoàn hôm nay (VND):",
-                        mucTieu.signum() > 0 ? mucTieu.toPlainString() : "");
+                        mucTieu > 0 ? InHoaDon.tien(mucTieu).replace(",", "") : "");
         if (s == null) return;
-        BigDecimal tien = InHoaDon.soTien(s);
-        if (tien.signum() <= 0 || tien.precision() > 18)
+        double tien = InHoaDon.soTien(s);
+        if (tien <= 0 || !Double.isFinite(tien) || tien >= 1.0E18)
             throw new IllegalArgumentException("Nhập mục tiêu dương, tối đa 18 chữ số.");
         Properties p = docThietLap();
-        p.setProperty("dashboard.target." + LocalDate.now(), tien.toPlainString());
+        p.setProperty("dashboard.target." + LocalDate.now(), InHoaDon.tien(tien).replace(",", ""));
         try (java.io.Writer w = Files.newBufferedWriter(Paths.get("config.properties"))) {
             p.store(w, "GreenSmart settings");
         }
@@ -263,7 +261,7 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
     }
 
     private static final class BieuDoThu extends JPanel {
-        Map<LocalDate, BigDecimal> duLieu = new LinkedHashMap<>();
+        Map<LocalDate, Double> duLieu = new LinkedHashMap<>();
 
         BieuDoThu() {
             setOpaque(false);
@@ -283,9 +281,9 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
                 return;
             }
             double max = 0, min = 0;
-            for (BigDecimal v : duLieu.values()) {
-                max = Math.max(max, v.doubleValue());
-                min = Math.min(min, v.doubleValue());
+            for (double v : duLieu.values()) {
+                max = Math.max(max, v);
+                min = Math.min(min, v);
             }
             if (max == min) {
                 g.setColor(MUTED);
@@ -302,24 +300,21 @@ public class DashboardQuanLy_GUI extends JPanel implements ActionListener {
             g.setColor(GiaoDien.BORDER);
             g.drawLine(10, base, getWidth() - 10, base);
             int i = 0, n = duLieu.size(), bar = Math.max(10, Math.min(36, w / n - 12));
-            for (Map.Entry<LocalDate, BigDecimal> e : duLieu.entrySet()) {
+            for (Map.Entry<LocalDate, Double> e : duLieu.entrySet()) {
                 int x = 10 + i * w / n + (w / n - bar) / 2,
                         y = top + (int) (h * (max - e.getValue().doubleValue()) / (max - min));
-                g.setColor(e.getValue().signum() < 0 ? DashboardQuanLy_GUI.ERROR : PRIMARY);
-                if (e.getValue().signum() != 0)
+                g.setColor(e.getValue() < 0 ? DashboardQuanLy_GUI.ERROR : PRIMARY);
+                if (e.getValue() != 0)
                     g.fillRoundRect(
                             x, Math.min(base, y), bar, Math.max(2, Math.abs(base - y)), 4, 4);
                 String s =
-                        e.getValue()
-                                .divide(new BigDecimal("1000000"), 1, RoundingMode.HALF_UP)
-                                .stripTrailingZeros()
-                                .toPlainString();
+                        InHoaDon.tien(Math.copySign(Math.floor(Math.abs(e.getValue()) / 100000.0 + 0.5) / 10.0, e.getValue()));
                 g.setFont(GiaoDien.phong(Font.PLAIN, 10));
                 g.setColor(MUTED);
                 g.drawString(
                         s,
                         x + (bar - g.getFontMetrics().stringWidth(s)) / 2,
-                        e.getValue().signum() < 0 ? y + 12 : Math.max(12, y - 4));
+                        e.getValue() < 0 ? y + 12 : Math.max(12, y - 4));
                 String ngay = e.getKey().format(DateTimeFormatter.ofPattern("dd/MM"));
                 g.drawString(
                         ngay,
