@@ -15,6 +15,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Lớp xử lý dữ liệu Chi Tiết Phiếu Nhập Hàng (Data Access Object)
+ * Quản lý các dòng hàng, đơn giá nhập và số lượng chi tiết từng sản phẩm.
+ * @author Võ Văn Tuấn - MSSV: 24694721 (Nhóm 12)
+ */
 public class ChiTietPhieuNhapHang_DAO {
 
     public List<ChiTietPhieuNhapHang> getTheoPhieu(String ma) throws SQLException {

@@ -12,6 +12,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Lớp xử lý dữ liệu Sản phẩm (Data Access Object)
+ * Thực hiện các giao dịch thêm, sửa, xóa, truy vấn, tự sinh mã và khóa tồn kho.
+ * @author Võ Văn Tuấn - MSSV: 24694721 (Nhóm 12)
+ */
 public class SanPham_DAO {
 
     /** Mã hiển thị trên form; không giữ chỗ trước khi người dùng Lưu. */
