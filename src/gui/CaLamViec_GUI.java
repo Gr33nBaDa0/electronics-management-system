@@ -7,7 +7,7 @@ import dao.CaLamViec_DAO;
 import entity.CaLamViec;
 import entity.TaiKhoan;
 
-import util.GiaoDien;
+import until.GiaoDien;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -29,7 +29,7 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 public class CaLamViec_GUI extends JPanel implements ActionListener {
-    // MÃ u dÃ¹ng chung Ä‘Æ°á»£c khai bÃ¡o á»Ÿ Ä‘áº§u lá»›p.
+    // Màu dùng chung được khai báo ở đầu lớp.
     private static final Color PRIMARY = GiaoDien.PRIMARY,
             DARK = GiaoDien.DARK,
             BACKGROUND = GiaoDien.BACKGROUND,
@@ -45,11 +45,11 @@ public class CaLamViec_GUI extends JPanel implements ActionListener {
             ten = new JTextField(15),
             batDau = new JTextField("08:00", 8),
             ketThuc = new JTextField("12:00", 8);
-    private final JButton btnMoi = taoNut("Táº¡o má»›i"),
-            btnLuu = taoNut("LÆ°u"),
-            btnXoa = taoNut("XÃ³a ca"),
-            btnTai = taoNut("Táº£i láº¡i");
-    private final DefaultTableModel model = taoModel("MÃ£ ca", "TÃªn ca", "Báº¯t Ä‘áº§u", "Káº¿t thÃºc");
+    private final JButton btnMoi = taoNut("Tạo mới"),
+            btnLuu = taoNut("Lưu"),
+            btnXoa = taoNut("Xóa ca"),
+            btnTai = taoNut("Tải lại");
+    private final DefaultTableModel model = taoModel("Mã ca", "Tên ca", "Bắt đầu", "Kết thúc");
     private final JTable table = taoBang(model);
 
     public CaLamViec_GUI(TaiKhoan tk) {
@@ -59,26 +59,26 @@ public class CaLamViec_GUI extends JPanel implements ActionListener {
         JPanel form =
                 GiaoDien.form(
                         2,
-                        "MÃ£ ca (CA01)",
+                        "Mã ca (CA01)",
                         ma,
-                        "TÃªn ca",
+                        "Tên ca",
                         ten,
-                        "Báº¯t Ä‘áº§u (HH:mm)",
+                        "Bắt đầu (HH:mm)",
                         batDau,
-                        "Káº¿t thÃºc (HH:mm)",
+                        "Kết thúc (HH:mm)",
                         ketThuc);
         JPanel trai =
                 GiaoDien.the(
-                        "ThÃ´ng tin ca",
+                        "Thông tin ca",
                         GiaoDien.cuonForm(form),
                         taoDong(btnMoi, btnLuu, btnXoa, btnTai));
         JPanel phai =
                 GiaoDien.the(
-                        "CÃ¡c ca lÃ m viá»‡c",
+                        "Các ca làm việc",
                         GiaoDien.cuon(table),
                         GiaoDien.ghiChu(
-                                "Ca Ä‘Ã£ cÃ³ phÃ¢n cÃ´ng giá»¯ nguyÃªn giá». Táº¡o ca má»›i khi cáº§n Ä‘á»•i khung"
-                                        + " giá»."));
+                                "Ca đã có phân công giữ nguyên giờ. Tạo ca mới khi cần đổi khung"
+                                        + " giờ."));
         trai.setMinimumSize(new Dimension(340, 180));
         phai.setMinimumSize(new Dimension(400, 180));
         add(
@@ -122,12 +122,12 @@ public class CaLamViec_GUI extends JPanel implements ActionListener {
             e.printStackTrace();
             JOptionPane.showMessageDialog(
                     this,
-                    "Lá»—i táº£i dá»¯ liá»‡u SQL:\n" + e.getMessage(),
-                    "Lá»—i SQL",
+                    "Lỗi tải dữ liệu SQL:\n" + e.getMessage(),
+                    "Lỗi SQL",
                     JOptionPane.ERROR_MESSAGE);
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(
-                    this, e.getMessage(), "ThÃ´ng bÃ¡o", JOptionPane.WARNING_MESSAGE);
+                    this, e.getMessage(), "Thông báo", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -144,8 +144,8 @@ public class CaLamViec_GUI extends JPanel implements ActionListener {
             } else if (o.equals(btnTai)) loadDataToTable();
             else if (o.equals(btnLuu)) {
                 if (!ma.getText().matches("CA\\d{2}"))
-                    throw new IllegalArgumentException("MÃ£ ca vÃ­ dá»¥ CA01.");
-                kiemTraDoDai(ten.getText(), 20, "tÃªn ca");
+                    throw new IllegalArgumentException("Mã ca ví dụ CA01.");
+                kiemTraDoDai(ten.getText(), 20, "tên ca");
                 CaLamViec c =
                         new CaLamViec(
                                 ma.getText(),
@@ -159,8 +159,8 @@ public class CaLamViec_GUI extends JPanel implements ActionListener {
                 }
                 loadDataToTable();
             } else if (o.equals(btnXoa)) {
-                if (them) throw new IllegalArgumentException("Chá»n ca.");
-                if (xacNhan(this, "XÃ³a ca chÆ°a cÃ³ phÃ¢n cÃ´ng?")) {
+                if (them) throw new IllegalArgumentException("Chọn ca.");
+                if (xacNhan(this, "Xóa ca chưa có phân công?")) {
                     new CaLamViec_DAO().deleteCaLamViec(ma.getText(), tk);
                     loadDataToTable();
                 }
@@ -168,7 +168,7 @@ public class CaLamViec_GUI extends JPanel implements ActionListener {
         } catch (java.sql.SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(
-                    this, "Lá»—i SQL:\n" + ex.getMessage(), "Lá»—i SQL", JOptionPane.ERROR_MESSAGE);
+                    this, "Lỗi SQL:\n" + ex.getMessage(), "Lỗi SQL", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             thongBaoLoi(this, ex);
         }
@@ -184,12 +184,12 @@ public class CaLamViec_GUI extends JPanel implements ActionListener {
 
     private void thongBaoLoi(Component c, Exception e) {
         JOptionPane.showMessageDialog(
-                c, e.getMessage(), "KhÃ´ng thá»±c hiá»‡n Ä‘Æ°á»£c", JOptionPane.ERROR_MESSAGE);
+                c, e.getMessage(), "Không thực hiện được", JOptionPane.ERROR_MESSAGE);
     }
 
     private void kiemTraDoDai(String s, int n, String ten) {
         kiemTraRong(s, ten);
-        if (s.length() > n) throw new IllegalArgumentException(ten + " tá»‘i Ä‘a " + n + " kÃ½ tá»±.");
+        if (s.length() > n) throw new IllegalArgumentException(ten + " tối đa " + n + " ký tự.");
     }
 
     private DefaultTableModel taoModel(String... cot) {
@@ -207,7 +207,7 @@ public class CaLamViec_GUI extends JPanel implements ActionListener {
 
     private void kiemTraRong(String s, String ten) {
         if (s == null || s.trim().isEmpty())
-            throw new IllegalArgumentException("Vui lÃ²ng nháº­p " + ten);
+            throw new IllegalArgumentException("Vui lòng nhập " + ten);
     }
 
     private JLabel taoTieuDe(String t) {
@@ -215,7 +215,7 @@ public class CaLamViec_GUI extends JPanel implements ActionListener {
     }
 
     private boolean xacNhan(Component c, String s) {
-        return JOptionPane.showConfirmDialog(c, s, "XÃ¡c nháº­n", JOptionPane.YES_NO_OPTION)
+        return JOptionPane.showConfirmDialog(c, s, "Xác nhận", JOptionPane.YES_NO_OPTION)
                 == JOptionPane.YES_OPTION;
     }
 

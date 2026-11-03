@@ -7,51 +7,35 @@ import dao.SanPham_DAO;
 import entity.SanPham;
 import entity.TaiKhoan;
 
-import util.GiaoDien;
-import util.InHoaDon;
+import until.GiaoDien;
+import until.InHoaDon;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
-/**
- * Giao diện Quản lý Sản phẩm - Hệ thống GreenSmart
- * @author Võ Văn Tuấn - MSSV: 24694721 (Nhóm 12)
- */
 public class SanPham_GUI extends JPanel implements ActionListener {
-    // MÃ u dÃ¹ng chung Ä‘Æ°á»£c khai bÃ¡o á»Ÿ Ä‘áº§u lá»›p.
+    // Màu dùng chung được khai báo ở đầu lớp.
     private static final Color PRIMARY = GiaoDien.PRIMARY,
             DARK = GiaoDien.DARK,
             BACKGROUND = GiaoDien.BACKGROUND,
             SURFACE = GiaoDien.SURFACE,
             TEXT = GiaoDien.TEXT,
-            MUTED = GiaoDien.MUTED,
             BORDER = GiaoDien.BORDER,
             ERROR = GiaoDien.ERROR;
 
@@ -59,15 +43,6 @@ public class SanPham_GUI extends JPanel implements ActionListener {
     private final SanPham_DAO sanPhamDAO = new SanPham_DAO();
     private List<SanPham> danhSach = new ArrayList<>(), hienThi = new ArrayList<>();
     private String maCu;
-
-    // --- Quáº£n lÃ½ hÃ¬nh áº£nh ---
-    private final JLabel lblHinhAnh = new JLabel();
-    private final JButton btnChonAnh = taoNut("Chá»n áº£nh..."),
-            btnXoaAnh = taoNut("Bá» áº£nh");
-    private String duongDanAnhHienTai;
-    private File fileAnhMoi;
-
-    // --- Form nháº­p liá»‡u ---
     private final JTextField maSanPham = new JTextField(14);
     private final JTextField tenSanPham = new JTextField(14);
     private final JTextField loaiHang = new JTextField(14);
@@ -78,126 +53,99 @@ public class SanPham_GUI extends JPanel implements ActionListener {
     private final JTextField xuatXu = new JTextField(14);
     private final JTextField thoiHanBaoHanh = new JTextField(14);
     private final JComboBox<String> trangThai =
-            new JComboBox<>(new String[] {"Äang bÃ¡n", "Ngá»«ng bÃ¡n"});
+            new JComboBox<>(new String[] {"Đang bán", "Ngưng bán"});
     private final JTextField txtTim = new JTextField(20);
     private final JLabel lblSoLuong = new JLabel();
-    private final JButton btnMoi = taoNut("Táº¡o má»›i"),
-            btnLuu = taoNut("LÆ°u"),
-            btnXoa = taoNut("XÃ³a"),
-            btnTim = taoNut("TÃ¬m"),
-            btnTai = taoNut("Táº£i láº¡i / bá» lá»c");
+    private final JButton btnMoi = taoNut("Tạo mới"),
+            btnLuu = taoNut("Lưu"),
+            btnXoa = taoNut("Xóa"),
+            btnTim = taoNut("Tìm"),
+            btnTai = taoNut("Tải lại / bỏ lọc");
     private final JTextField giaTu = new JTextField(8), giaDen = new JTextField(8);
     private final JComboBox<String> locLoai = new JComboBox<>(),
             locHang = new JComboBox<>(),
-            locTT = new JComboBox<>(new String[] {"Táº¥t cáº£", "Äang bÃ¡n", "Ngá»«ng bÃ¡n"});
+            locTT = new JComboBox<>(new String[] {"Tất cả", "Đang bán", "Ngưng bán"});
     private final DefaultTableModel model =
             taoModel(
-                    "MÃ£ SP (SP0001)",
-                    "TÃªn sáº£n pháº©m",
-                    "Loáº¡i hÃ ng",
-                    "ThÆ°Æ¡ng hiá»‡u",
-                    "GiÃ¡ bÃ¡n",
-                    "GiÃ¡ nháº­p",
-                    "ThÃ´ng sá»‘ kÄ© thuáº­t",
-                    "Xuáº¥t xá»©",
-                    "Báº£o hÃ nh (thÃ¡ng)",
-                    "Tráº¡ng thÃ¡i",
-                    "Tá»“n kho");
+                    "Mã SP (SP0001)",
+                    "Tên sản phẩm",
+                    "Loại hàng",
+                    "Thương hiệu",
+                    "Giá bán",
+                    "Giá nhập",
+                    "Thông số kỹ thuật",
+                    "Xuất xứ",
+                    "Bảo hành (tháng)",
+                    "Trạng thái",
+                    "Tồn kho");
     private final JTable table = taoBang(model);
 
     public SanPham_GUI(TaiKhoan tk) {
         this.tk = tk;
         maSanPham.setEditable(false);
-        maSanPham.setToolTipText("MÃ£ tá»± sinh khi táº¡o má»›i");
+        maSanPham.setToolTipText("Mã tự sinh khi tạo mới");
         GiaoDien.boCuc(this);
-
-        // Khung hiá»ƒn thá»‹ áº£nh sáº£n pháº©m xem trÆ°á»›c
-        lblHinhAnh.setPreferredSize(new Dimension(140, 140));
-        lblHinhAnh.setMaximumSize(new Dimension(140, 140));
-        lblHinhAnh.setHorizontalAlignment(SwingConstants.CENTER);
-        lblHinhAnh.setVerticalAlignment(SwingConstants.CENTER);
-        lblHinhAnh.setBorder(BorderFactory.createLineBorder(BORDER, 1, true));
-        lblHinhAnh.setBackground(SURFACE);
-        lblHinhAnh.setOpaque(true);
-        xoaAnh();
-
-        JPanel pnlNutAnh = new JPanel(new GridLayout(2, 1, 0, 8));
-        pnlNutAnh.setOpaque(false);
-        pnlNutAnh.add(btnChonAnh);
-        pnlNutAnh.add(btnXoaAnh);
-
-        JPanel pnlAnh = new JPanel(new FlowLayout(FlowLayout.CENTER, 16, 0));
-        pnlAnh.setOpaque(false);
-        pnlAnh.add(lblHinhAnh);
-        pnlAnh.add(pnlNutAnh);
 
         JPanel form =
                 GiaoDien.form(
                         2,
-                        "MÃ£ sáº£n pháº©m",
+                        "Mã sản phẩm",
                         maSanPham,
-                        "TÃªn sáº£n pháº©m",
+                        "Tên sản phẩm",
                         tenSanPham,
-                        "Loáº¡i hÃ ng",
+                        "Loại hàng",
                         loaiHang,
-                        "ThÆ°Æ¡ng hiá»‡u",
+                        "Thương hiệu",
                         thuongHieu,
-                        "GiÃ¡ bÃ¡n (VND)",
+                        "Giá bán (VND)",
                         donGiaBan,
-                        "GiÃ¡ nháº­p (VND)",
+                        "Giá nhập (VND)",
                         giaNhap,
-                        "ThÃ´ng sá»‘ kÄ© thuáº­t",
+                        "Thông số kỹ thuật",
                         thongSoKiThuat,
-                        "Xuáº¥t xá»©",
+                        "Xuất xứ",
                         xuatXu,
-                        "Báº£o hÃ nh (thÃ¡ng)",
+                        "Bảo hành (tháng)",
                         thoiHanBaoHanh,
-                        "Tráº¡ng thÃ¡i",
+                        "Trạng thái",
                         trangThai);
-
-        JPanel pnlThongTinForm = GiaoDien.doc(pnlAnh, form);
-
         JPanel trai =
                 GiaoDien.the(
-                        "ThÃ´ng tin sáº£n pháº©m",
-                        GiaoDien.cuonForm(pnlThongTinForm),
+                        "Thông tin sản phẩm",
+                        GiaoDien.cuonForm(form),
                         taoDong(btnMoi, btnLuu, btnXoa, btnTai));
         JPanel loc =
                 GiaoDien.form(
                         3,
-                        "MÃ£ / tÃªn / thÃ´ng tin",
+                        "Mã / tên / thông tin",
                         txtTim,
-                        "Loáº¡i hÃ ng",
+                        "Loại hàng",
                         locLoai,
-                        "ThÆ°Æ¡ng hiá»‡u",
+                        "Thương hiệu",
                         locHang,
-                        "Tráº¡ng thÃ¡i",
+                        "Trạng thái",
                         locTT,
-                        "GiÃ¡ tá»«",
+                        "Giá từ",
                         giaTu,
-                        "GiÃ¡ Ä‘áº¿n",
+                        "Giá đến",
                         giaDen);
         JPanel danhSach = new JPanel(new BorderLayout(0, 12));
         danhSach.setOpaque(false);
         danhSach.add(GiaoDien.doc(loc, taoDong(btnTim, lblSoLuong)), BorderLayout.NORTH);
         danhSach.add(GiaoDien.cuon(table), BorderLayout.CENTER);
-        JPanel phai = GiaoDien.the("Danh sÃ¡ch sáº£n pháº©m", danhSach, null);
+        JPanel phai = GiaoDien.the("Danh sách sản phẩm", danhSach, null);
         trai.setMinimumSize(new Dimension(340, 180));
         phai.setMinimumSize(new Dimension(400, 180));
         add(
                 GiaoDien.tach(javax.swing.JSplitPane.HORIZONTAL_SPLIT, trai, phai, .43),
                 BorderLayout.CENTER);
         GiaoDien.trangTri(this);
-
         btnMoi.addActionListener(this);
         btnLuu.addActionListener(this);
         btnXoa.addActionListener(this);
         btnTim.addActionListener(this);
         btnTai.addActionListener(this);
-        btnChonAnh.addActionListener(this);
-        btnXoaAnh.addActionListener(this);
         txtTim.addActionListener(this);
-
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         for (int i = 0; i < table.getColumnCount(); i++)
             table.getColumnModel()
@@ -208,14 +156,10 @@ public class SanPham_GUI extends JPanel implements ActionListener {
                         e -> {
                             if (!e.getValueIsAdjusting()) chonDong();
                         });
-
         boolean quanLy = "ADMIN".equals(tk.getQuyen());
         btnMoi.setEnabled(quanLy);
         btnLuu.setEnabled(quanLy);
         btnXoa.setEnabled(quanLy);
-        btnChonAnh.setEnabled(quanLy);
-        btnXoaAnh.setEnabled(quanLy);
-
         ganPhimTat();
         loadDataToTable();
     }
@@ -236,8 +180,8 @@ public class SanPham_GUI extends JPanel implements ActionListener {
 
             locLoai.removeAllItems();
             locHang.removeAllItems();
-            locLoai.addItem("Táº¥t cáº£");
-            locHang.addItem("Táº¥t cáº£");
+            locLoai.addItem("Tất cả");
+            locHang.addItem("Tất cả");
             java.util.Set<String> loai = new java.util.TreeSet<>();
             java.util.Set<String> hang = new java.util.TreeSet<>();
             for (SanPham sp : list) {
@@ -253,7 +197,7 @@ public class SanPham_GUI extends JPanel implements ActionListener {
             if (!giaTu.getText().isBlank()
                     && !giaDen.getText().isBlank()
                     && InHoaDon.soTien(giaTu.getText()) > InHoaDon.soTien(giaDen.getText()))
-                throw new IllegalArgumentException("GiÃ¡ tá»« khÃ´ng Ä‘Æ°á»£c lá»›n hÆ¡n giÃ¡ Ä‘áº¿n.");
+                throw new IllegalArgumentException("Giá từ không được lớn hơn giá đến.");
             String tim = txtTim.getText().trim().toLowerCase(java.util.Locale.ROOT);
             for (SanPham sp : list) {
                 String noiDung =
@@ -306,19 +250,19 @@ public class SanPham_GUI extends JPanel implements ActionListener {
                             sp.getSoLuongTon()
                         });
             }
-            lblSoLuong.setText("Tá»•ng: " + hienThi.size() + " báº£n ghi");
+            lblSoLuong.setText("Tổng: " + hienThi.size() + " bản ghi");
             if (maCu == null) hienMaTiepTheo();
 
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(
                     this,
-                    "Lá»—i táº£i dá»¯ liá»‡u SQL:\n" + e.getMessage(),
-                    "Lá»—i SQL",
+                    "Lỗi tải dữ liệu SQL:\n" + e.getMessage(),
+                    "Lỗi SQL",
                     JOptionPane.ERROR_MESSAGE);
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(
-                    this, e.getMessage(), "ThÃ´ng bÃ¡o", JOptionPane.WARNING_MESSAGE);
+                    this, e.getMessage(), "Thông báo", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -338,21 +282,16 @@ public class SanPham_GUI extends JPanel implements ActionListener {
         xuatXu.setText(String.valueOf(sp.getXuatXu()));
         thoiHanBaoHanh.setText(String.valueOf(sp.getThoiHanBaoHanh()));
         trangThai.setSelectedItem(sp.getTrangThai());
-
-        // Hiá»ƒn thá»‹ áº£nh cá»§a sáº£n pháº©m Ä‘Æ°á»£c chá»n
-        fileAnhMoi = null;
-        duongDanAnhHienTai = sp.getHinhAnh();
-        taiAnhLenKhung(duongDanAnhHienTai, sp.getMaSanPham());
     }
 
     private void hienMaTiepTheo() {
         maSanPham.setEditable(false);
         try {
             maSanPham.setText(sanPhamDAO.layMaTiepTheo());
-            maSanPham.setToolTipText("MÃ£ tá»± sinh khi táº¡o má»›i");
+            maSanPham.setToolTipText("Mã tự sinh khi tạo mới");
         } catch (SQLException e) {
             maSanPham.setText("");
-            maSanPham.setToolTipText("ChÆ°a láº¥y Ä‘Æ°á»£c mÃ£: " + e.getMessage());
+            maSanPham.setToolTipText("Chưa lấy được mã: " + e.getMessage());
         }
     }
 
@@ -369,148 +308,31 @@ public class SanPham_GUI extends JPanel implements ActionListener {
         xuatXu.setText("");
         thoiHanBaoHanh.setText("");
         trangThai.setSelectedIndex(0);
-
-        // Reset áº£nh
-        fileAnhMoi = null;
-        duongDanAnhHienTai = null;
-        xoaAnh();
-
         hienMaTiepTheo();
         tenSanPham.requestFocusInWindow();
-    }
-
-    private void chonAnh() {
-        JFileChooser chooser = new JFileChooser();
-        chooser.setDialogTitle("Chá»n hÃ¬nh áº£nh sáº£n pháº©m");
-        chooser.setFileFilter(
-                new FileNameExtensionFilter(
-                        "HÃ¬nh áº£nh (*.png, *.jpg, *.jpeg)", "png", "jpg", "jpeg"));
-        int res = chooser.showOpenDialog(this);
-        if (res == JFileChooser.APPROVE_OPTION) {
-            fileAnhMoi = chooser.getSelectedFile();
-            duongDanAnhHienTai = fileAnhMoi.getAbsolutePath();
-            taiAnhLenKhung(duongDanAnhHienTai, maCu != null ? maCu : maSanPham.getText().trim());
-        }
-    }
-
-    private void boAnh() {
-        fileAnhMoi = null;
-        duongDanAnhHienTai = null;
-        xoaAnh();
-    }
-
-    private void xoaAnh() {
-        lblHinhAnh.setIcon(null);
-        lblHinhAnh.setText(
-                "<html><center><span style='color:#627368;'>ChÆ°a cÃ³ áº£nh</span><br>"
-                        + "<small style='color:#9E9E9E;'>(Báº¥m Chá»n áº£nh...)</small></center></html>");
-    }
-
-    /**
-     * Táº£i vÃ  co dÃ£n áº£nh Ä‘áº¡i diá»‡n cho sáº£n pháº©m. CÃ³ cÆ¡ cháº¿ fallback an toÃ n khi file thiáº¿u hoáº·c sai Ä‘Æ°á»ng dáº«n.
-     */
-    private void taiAnhLenKhung(String duongDan, String ma) {
-        File f = null;
-        if (duongDan != null && !duongDan.isBlank()) {
-            f = new File(duongDan);
-            if (!f.isFile()) {
-                f = new File("resource/hinhanh/" + duongDan);
-            }
-            if (!f.isFile()) {
-                f = new File("resource/sanpham/" + duongDan);
-            }
-        }
-        // Thá»­ tÃ¬m theo mÃ£ sáº£n pháº©m náº¿u Ä‘Æ°á»ng dáº«n trong DB khÃ´ng tÃ¬m tháº¥y
-        if ((f == null || !f.isFile()) && ma != null && !ma.isBlank()) {
-            for (String ext : new String[] {"png", "jpg", "jpeg"}) {
-                File thu = new File("resource/hinhanh/" + ma + "." + ext);
-                if (thu.isFile()) {
-                    f = thu;
-                    break;
-                }
-                thu = new File("resource/sanpham/" + ma + "." + ext);
-                if (thu.isFile()) {
-                    f = thu;
-                    break;
-                }
-            }
-        }
-
-        if (f != null && f.isFile()) {
-            try {
-                ImageIcon icon = new ImageIcon(f.getAbsolutePath());
-                Image img = icon.getImage();
-                if (img.getWidth(null) > 0 && img.getHeight(null) > 0) {
-                    int wMax = 130, hMax = 130;
-                    double tyLe =
-                            Math.min(
-                                    (double) wMax / img.getWidth(null),
-                                    (double) hMax / img.getHeight(null));
-                    int newW = Math.max(1, (int) (img.getWidth(null) * tyLe));
-                    int newH = Math.max(1, (int) (img.getHeight(null) * tyLe));
-                    Image scaled = img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
-                    lblHinhAnh.setIcon(new ImageIcon(scaled));
-                    lblHinhAnh.setText("");
-                    return;
-                }
-            } catch (Exception ignored) {
-            }
-        }
-
-        // TrÆ°á»ng há»£p khÃ´ng cÃ³ áº£nh hoáº·c Ä‘Æ°á»ng dáº«n sai
-        lblHinhAnh.setIcon(null);
-        lblHinhAnh.setText(
-                "<html><center><span style='color:#B42318;'>áº¢nh khÃ´ng tá»“n táº¡i</span><br>"
-                        + "<small style='color:#627368;'>(Báº¥m Chá»n áº£nh...)</small></center></html>");
     }
 
     private void luu() throws Exception {
         SanPham sp = new SanPham();
         sp.setMaSanPham(maCu);
-        kiemTraRong(tenSanPham.getText().trim(), "TÃªn sáº£n pháº©m");
+        kiemTraRong(tenSanPham.getText().trim(), "Tên sản phẩm");
         sp.setTenSanPham(tenSanPham.getText().trim());
-        kiemTraRong(loaiHang.getText().trim(), "Loáº¡i hÃ ng");
+        kiemTraRong(loaiHang.getText().trim(), "Loại hàng");
         sp.setLoaiHang(loaiHang.getText().trim());
-        kiemTraRong(thuongHieu.getText().trim(), "ThÆ°Æ¡ng hiá»‡u");
+        kiemTraRong(thuongHieu.getText().trim(), "Thương hiệu");
         sp.setThuongHieu(thuongHieu.getText().trim());
         sp.setDonGiaBan(InHoaDon.soTien(donGiaBan.getText().trim()));
         sp.setGiaNhap(InHoaDon.soTien(giaNhap.getText().trim()));
         sp.setThongSoKiThuat(thongSoKiThuat.getText().trim());
-        kiemTraRong(xuatXu.getText().trim(), "Xuáº¥t xá»©");
+        kiemTraRong(xuatXu.getText().trim(), "Xuất xứ");
         sp.setXuatXu(xuatXu.getText().trim());
         sp.setThoiHanBaoHanh(Integer.parseInt(thoiHanBaoHanh.getText().trim()));
         sp.setTrangThai((String) trangThai.getSelectedItem());
-
-        // Xá»­ lÃ½ lÆ°u Ä‘Æ°á»ng dáº«n áº£nh
-        String maLuu = (maCu != null) ? maCu : maSanPham.getText().trim();
-        String duongDanLuu = duongDanAnhHienTai;
-
-        if (fileAnhMoi != null && fileAnhMoi.isFile()) {
-            File thuMucAnh = new File("resource/hinhanh");
-            if (!thuMucAnh.exists()) thuMucAnh.mkdirs();
-
-            String tenGoc = fileAnhMoi.getName();
-            String ext = ".png";
-            int idx = tenGoc.lastIndexOf('.');
-            if (idx > 0) ext = tenGoc.substring(idx).toLowerCase(java.util.Locale.ROOT);
-
-            String tenDich = (maLuu.isBlank() ? "SP_" + System.currentTimeMillis() : maLuu) + ext;
-            File fileDich = new File(thuMucAnh, tenDich);
-            Files.copy(
-                    fileAnhMoi.toPath(),
-                    fileDich.toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
-            duongDanLuu = "resource/hinhanh/" + tenDich;
-        }
-
-        sp.setHinhAnh(duongDanLuu);
-
         if (maCu == null) {
             sanPhamDAO.insertSanPham(sp, tk);
-            JOptionPane.showMessageDialog(this, "ÄÃ£ thÃªm sáº£n pháº©m " + sp.getMaSanPham() + ".");
+            JOptionPane.showMessageDialog(this, "Đã thêm sản phẩm " + sp.getMaSanPham() + ".");
         } else {
             sanPhamDAO.updateSanPham(sp, tk);
-            JOptionPane.showMessageDialog(this, "ÄÃ£ cáº­p nháº­t sáº£n pháº©m " + sp.getMaSanPham() + ".");
         }
         taoMoi();
         loadDataToTable();
@@ -522,8 +344,6 @@ public class SanPham_GUI extends JPanel implements ActionListener {
         try {
             if (o.equals(btnMoi)) taoMoi();
             else if (o.equals(btnLuu)) luu();
-            else if (o.equals(btnChonAnh)) chonAnh();
-            else if (o.equals(btnXoaAnh)) boAnh();
             else if (o.equals(btnTim) || o.equals(txtTim)) loadDataToTable();
             else if (o.equals(btnTai)) {
                 txtTim.setText("");
@@ -532,8 +352,8 @@ public class SanPham_GUI extends JPanel implements ActionListener {
                 locTT.setSelectedIndex(0);
                 loadDataToTable();
             } else if (o.equals(btnXoa)) {
-                if (maCu == null) throw new IllegalArgumentException("Chá»n dÃ²ng cáº§n xÃ³a.");
-                if (xacNhan(this, "XÃ³a dá»¯ liá»‡u chÆ°a cÃ³ liÃªn káº¿t?")) {
+                if (maCu == null) throw new IllegalArgumentException("Chọn dòng cần xóa.");
+                if (xacNhan(this, "Xóa dữ liệu chưa có liên kết?")) {
                     sanPhamDAO.deleteSanPham(maCu, tk);
                     taoMoi();
                     loadDataToTable();
@@ -542,7 +362,7 @@ public class SanPham_GUI extends JPanel implements ActionListener {
         } catch (java.sql.SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(
-                    this, "Lá»—i SQL:\n" + ex.getMessage(), "Lá»—i SQL", JOptionPane.ERROR_MESSAGE);
+                    this, "Lỗi SQL:\n" + ex.getMessage(), "Lỗi SQL", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             thongBaoLoi(this, ex);
         }
@@ -577,7 +397,7 @@ public class SanPham_GUI extends JPanel implements ActionListener {
 
     private void thongBaoLoi(Component c, Exception e) {
         JOptionPane.showMessageDialog(
-                c, e.getMessage(), "KhÃ´ng thá»±c hiá»‡n Ä‘Æ°á»£c", JOptionPane.ERROR_MESSAGE);
+                c, e.getMessage(), "Không thực hiện được", JOptionPane.ERROR_MESSAGE);
     }
 
     private DefaultTableModel taoModel(String... cot) {
@@ -595,7 +415,7 @@ public class SanPham_GUI extends JPanel implements ActionListener {
 
     private void kiemTraRong(String s, String ten) {
         if (s == null || s.trim().isEmpty())
-            throw new IllegalArgumentException("Vui lÃ²ng nháº­p " + ten);
+            throw new IllegalArgumentException("Vui lòng nhập " + ten);
     }
 
     private JLabel taoTieuDe(String t) {
@@ -603,7 +423,7 @@ public class SanPham_GUI extends JPanel implements ActionListener {
     }
 
     private boolean xacNhan(Component c, String s) {
-        return JOptionPane.showConfirmDialog(c, s, "XÃ¡c nháº­n", JOptionPane.YES_NO_OPTION)
+        return JOptionPane.showConfirmDialog(c, s, "Xác nhận", JOptionPane.YES_NO_OPTION)
                 == JOptionPane.YES_OPTION;
     }
 

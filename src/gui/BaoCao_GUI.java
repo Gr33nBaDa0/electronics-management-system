@@ -1,6 +1,6 @@
 package gui;
 
-import util.InHoaDon;
+import until.InHoaDon;
 
 import connectDB.ConnectDB;
 
@@ -8,7 +8,7 @@ import dao.BaoCao_DAO;
 
 import entity.TaiKhoan;
 
-import util.GiaoDien;
+import until.GiaoDien;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -34,7 +34,7 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 public class BaoCao_GUI extends JPanel implements ActionListener {
-    // MÃ u dÃ¹ng chung Ä‘Æ°á»£c khai bÃ¡o á»Ÿ Ä‘áº§u lá»›p.
+    // Màu dùng chung được khai báo ở đầu lớp.
     private static final Color PRIMARY = GiaoDien.PRIMARY,
             DARK = GiaoDien.DARK,
             BACKGROUND = GiaoDien.BACKGROUND,
@@ -46,25 +46,25 @@ public class BaoCao_GUI extends JPanel implements ActionListener {
     private final TaiKhoan tk;
     private final JTextField tu = new JTextField(LocalDate.now().withDayOfMonth(1).toString(), 10),
             den = new JTextField(LocalDate.now().toString(), 10);
-    private final JButton btnTai = taoNut("Láº­p bÃ¡o cÃ¡o"), btnXuat = taoNut("Xuáº¥t báº£ng CSV");
+    private final JButton btnTai = taoNut("Lập báo cáo"), btnXuat = taoNut("Xuất bảng CSV");
     private final JLabel tong = new JLabel();
     private final DefaultTableModel
             model =
                     taoModel(
-                            "NgÃ y ca",
-                            "HÃ¬nh thá»©c",
-                            "Sá»‘ Ä‘Æ¡n thu",
-                            "Tiá»n thu",
-                            "Tiá»n hoÃ n",
-                            "Thu sau hoÃ n"),
+                            "Ngày ca",
+                            "Hình thức",
+                            "Số đơn thu",
+                            "Tiền thu",
+                            "Tiền hoàn",
+                            "Thu sau hoàn"),
             modelSP =
                     taoModel(
-                            "MÃ£ SP",
-                            "Sáº£n pháº©m",
-                            "Tá»“n hiá»‡n táº¡i",
-                            "SL bÃ¡n trong ká»³",
-                            "SL tráº£ trong ká»³",
-                            "Cáº£nh bÃ¡o tá»“n");
+                            "Mã SP",
+                            "Sản phẩm",
+                            "Tồn hiện tại",
+                            "SL bán trong kỳ",
+                            "SL trả trong kỳ",
+                            "Cảnh báo tồn");
     private final JTable table = taoBang(model), tableSP = taoBang(modelSP);
     private final JTabbedPane tabs = new JTabbedPane();
 
@@ -72,7 +72,7 @@ public class BaoCao_GUI extends JPanel implements ActionListener {
         this.tk = tk;
         GiaoDien.boCuc(this);
         JPanel loc =
-                GiaoDien.form(2, "Tá»« ngÃ y ca (yyyy-MM-dd)", tu, "Äáº¿n ngÃ y ca (yyyy-MM-dd)", den);
+                GiaoDien.form(2, "Từ ngày ca (yyyy-MM-dd)", tu, "Đến ngày ca (yyyy-MM-dd)", den);
         JPanel boLoc = new JPanel(new BorderLayout(16, 0));
         boLoc.setOpaque(false);
         boLoc.add(loc, BorderLayout.CENTER);
@@ -82,17 +82,17 @@ public class BaoCao_GUI extends JPanel implements ActionListener {
         tong.setBorder(BorderFactory.createEmptyBorder(12, 14, 12, 14));
         tong.setOpaque(true);
         tong.setBackground(GiaoDien.PRIMARY_SOFT);
-        add(GiaoDien.doc(GiaoDien.the("Ká»³ bÃ¡o cÃ¡o", boLoc, tong)), BorderLayout.NORTH);
+        add(GiaoDien.doc(GiaoDien.the("Kỳ báo cáo", boLoc, tong)), BorderLayout.NORTH);
 
-        tabs.addTab("Tiá»n thu vÃ  hoÃ n", GiaoDien.cuon(table));
-        tabs.addTab("Sáº£n pháº©m vÃ  tá»“n", GiaoDien.cuon(tableSP));
+        tabs.addTab("Tiền thu và hoàn", GiaoDien.cuon(table));
+        tabs.addTab("Sản phẩm và tồn", GiaoDien.cuon(tableSP));
         add(
                 GiaoDien.the(
-                        "Chi tiáº¿t bÃ¡o cÃ¡o",
+                        "Chi tiết báo cáo",
                         tabs,
                         GiaoDien.ghiChu(
-                                "Tiá»n thu gá»“m VAT. HoÃ n tiá»n theo ngÃ y ca hoÃ n; tá»“n kho lÃ  sá»‘ lÆ°á»£ng"
-                                        + " hiá»‡n táº¡i.")),
+                                "Tiền thu gồm VAT. Hoàn tiền theo ngày ca hoàn; tồn kho là số lượng"
+                                        + " hiện tại.")),
                 BorderLayout.CENTER);
         GiaoDien.trangTri(this);
         btnTai.addActionListener(this);
@@ -133,21 +133,21 @@ public class BaoCao_GUI extends JPanel implements ActionListener {
             tong.setText(
                     "Thu: "
                             + formatGia(thu)
-                            + " Â· HoÃ n: "
+                            + " · Hoàn: "
                             + formatGia(hoan)
-                            + " Â· Sau hoÃ n: "
+                            + " · Sau hoàn: "
                             + formatGia(InHoaDon.tron(thu - hoan))
                             + " VND");
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(
                     this,
-                    "Lá»—i táº£i dá»¯ liá»‡u SQL:\n" + e.getMessage(),
-                    "Lá»—i SQL",
+                    "Lỗi tải dữ liệu SQL:\n" + e.getMessage(),
+                    "Lỗi SQL",
                     JOptionPane.ERROR_MESSAGE);
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(
-                    this, e.getMessage(), "ThÃ´ng bÃ¡o", JOptionPane.WARNING_MESSAGE);
+                    this, e.getMessage(), "Thông báo", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -161,7 +161,7 @@ public class BaoCao_GUI extends JPanel implements ActionListener {
             JFileChooser f = new JFileChooser();
             f.setSelectedFile(new java.io.File("BaoCao.csv"));
             if (f.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
-            if (f.getSelectedFile().exists() && !xacNhan(this, "Ghi Ä‘Ã¨ file Ä‘Ã£ cÃ³?")) return;
+            if (f.getSelectedFile().exists() && !xacNhan(this, "Ghi đè file đã có?")) return;
             DefaultTableModel m = tabs.getSelectedIndex() == 0 ? model : modelSP;
             StringBuilder s = new StringBuilder("\ufeff");
             for (int r = -1; r < m.getRowCount(); r++) {
@@ -173,7 +173,7 @@ public class BaoCao_GUI extends JPanel implements ActionListener {
                 s.append('\n');
             }
             Files.writeString(f.getSelectedFile().toPath(), s.toString(), StandardCharsets.UTF_8);
-            JOptionPane.showMessageDialog(this, "ÄÃ£ xuáº¥t CSV.");
+            JOptionPane.showMessageDialog(this, "Đã xuất CSV.");
         } catch (Exception ex) {
             thongBaoLoi(this, ex);
         }
@@ -197,7 +197,7 @@ public class BaoCao_GUI extends JPanel implements ActionListener {
 
     private void thongBaoLoi(Component c, Exception e) {
         JOptionPane.showMessageDialog(
-                c, e.getMessage(), "KhÃ´ng thá»±c hiá»‡n Ä‘Æ°á»£c", JOptionPane.ERROR_MESSAGE);
+                c, e.getMessage(), "Không thực hiện được", JOptionPane.ERROR_MESSAGE);
     }
 
     private DefaultTableModel taoModel(String... cot) {
@@ -218,7 +218,7 @@ public class BaoCao_GUI extends JPanel implements ActionListener {
     }
 
     private boolean xacNhan(Component c, String s) {
-        return JOptionPane.showConfirmDialog(c, s, "XÃ¡c nháº­n", JOptionPane.YES_NO_OPTION)
+        return JOptionPane.showConfirmDialog(c, s, "Xác nhận", JOptionPane.YES_NO_OPTION)
                 == JOptionPane.YES_OPTION;
     }
 

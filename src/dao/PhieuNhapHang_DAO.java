@@ -15,22 +15,12 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Lớp xử lý dữ liệu Phiếu Nhập Hàng (Data Access Object)
- * Quản lý quy trình lập phiếu, duyệt hàng thực nhận, từ chối và kiểm soát nội bộ 4 mắt.
- * @author Võ Văn Tuấn - MSSV: 24694721 (Nhóm 12)
- */
 public class PhieuNhapHang_DAO {
 
     public List<PhieuNhapHang> getAllPhieuNhapHang() throws SQLException {
         List<PhieuNhapHang> ds = new ArrayList<>();
         Connection con = ConnectDB.getConnection();
-        String sql =
-                "SELECT p.*, nvLap.HoTen AS TenNguoiLap, nvDuyet.HoTen AS TenNguoiDuyet "
-                        + "FROM dbo.PhieuNhapHang p "
-                        + "LEFT JOIN dbo.NhanVien nvLap ON nvLap.MaNhanVien = p.MaNhanVienLap "
-                        + "LEFT JOIN dbo.NhanVien nvDuyet ON nvDuyet.MaNhanVien = p.MaQuanLyDuyet "
-                        + "ORDER BY p.NgayLap DESC";
+        String sql = "SELECT * FROM dbo.PhieuNhapHang ORDER BY NgayLap DESC";
         try (PreparedStatement s = con.prepareStatement(sql);
                 ResultSet r = s.executeQuery()) {
             while (r.next()) {
@@ -40,20 +30,9 @@ public class PhieuNhapHang_DAO {
                 p.setSoChungTu(r.getString("SoChungTu"));
                 p.setNhaCungCap(r.getString("NhaCungCap"));
                 p.setNguoiGiao(r.getString("NguoiGiao"));
-
-                NhanVien nvLap = new NhanVien(r.getString("MaNhanVienLap"));
-                nvLap.setHoTen(r.getString("TenNguoiLap"));
-                p.setNhanVienLap(nvLap);
-
+                p.setNhanVienLap(new NhanVien(r.getString("MaNhanVienLap")));
                 String q = r.getString("MaQuanLyDuyet");
-                if (q != null) {
-                    NhanVien nvDuyet = new NhanVien(q);
-                    nvDuyet.setHoTen(r.getString("TenNguoiDuyet"));
-                    p.setQuanLyDuyet(nvDuyet);
-                } else {
-                    p.setQuanLyDuyet(null);
-                }
-
+                p.setQuanLyDuyet(q == null ? null : new NhanVien(q));
                 p.setTrangThai(r.getString("TrangThai"));
                 Timestamp thoiGian3 = r.getTimestamp("NgayDuyet");
                 p.setNgayDuyet(thoiGian3 == null ? null : thoiGian3.toLocalDateTime());

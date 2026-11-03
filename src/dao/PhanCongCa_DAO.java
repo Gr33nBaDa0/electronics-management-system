@@ -49,7 +49,7 @@ public class PhanCongCa_DAO {
         return ds;
     }
 
-    /** PC + ngÃ y phÃ¢n cÃ´ng yyyyMMdd + thá»© tá»± 4 sá»‘ trong ngÃ y. Giá»¯ nguyÃªn mÃ£ cÅ©. */
+    /** PC + ngày phân công yyyyMMdd + thứ tự 4 số trong ngày. Giữ nguyên mã cũ. */
     private String taoMaPhanCong(Connection con, LocalDate ngay) throws SQLException {
         String dau = "PC" + ngay.format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE);
         String sql =
@@ -66,7 +66,7 @@ public class PhanCongCa_DAO {
                 }
             }
         }
-        if (lonNhat >= 9999) throw new SQLException("NgÃ y nÃ y Ä‘Ã£ háº¿t dáº£i mÃ£ phÃ¢n cÃ´ng 0001â€“9999.");
+        if (lonNhat >= 9999) throw new SQLException("Ngày này đã hết dải mã phân công 0001–9999.");
         return dau + String.format(java.util.Locale.ROOT, "%04d", lonNhat + 1);
     }
 
@@ -80,7 +80,7 @@ public class PhanCongCa_DAO {
         try {
             new TaiKhoan_DAO().kiemTraQuyen(tk, true);
             if (ngay.isBefore(LocalDate.now())) {
-                throw new SQLException("KhÃ´ng phÃ¢n cÃ´ng ngÃ y quÃ¡ khá»©.");
+                throw new SQLException("Không phân công ngày quá khứ.");
             }
             String maPhanCong = taoMaPhanCong(con, ngay);
             String sql2 =
@@ -96,7 +96,7 @@ public class PhanCongCa_DAO {
                 }
             }
             if (ketQua3 == null) {
-                throw new SQLException("NhÃ¢n viÃªn khÃ´ng tá»“n táº¡i.");
+                throw new SQLException("Nhân viên không tồn tại.");
             }
             String sql =
                     "SELECT COUNT(*) FROM dbo.PhanCongCa p JOIN dbo.CaLamViec a ON a.MaCa=p.MaCa"
@@ -114,7 +114,7 @@ public class PhanCongCa_DAO {
                 }
             }
             if (ketQua7 != 0) {
-                throw new SQLException("Ca Ä‘Ã£ trÃ¹ng hoáº·c chá»“ng giá» vá»›i phÃ¢n cÃ´ng hiá»‡n cÃ³.");
+                throw new SQLException("Ca đã trùng hoặc chồng giờ với phân công hiện có.");
             }
             String sql4 =
                     "INSERT INTO dbo.PhanCongCa(MaPhanCong,MaNhanVien,Ngay,MaCa,GhiChu)"
@@ -145,14 +145,14 @@ public class PhanCongCa_DAO {
         con.setAutoCommit(false);
         try {
             new TaiKhoan_DAO().kiemTraQuyen(tk, true);
-            String sql = "DELETE FROM dbo.PhanCongCa WHERE MaPhanCong=? AND TrangThai=N'ChÆ°a má»Ÿ'";
+            String sql = "DELETE FROM dbo.PhanCongCa WHERE MaPhanCong=? AND TrangThai=N'Chưa mở'";
             int ketQua3;
             try (PreparedStatement stmt = con.prepareStatement(sql)) {
                 stmt.setString(1, id);
                 ketQua3 = stmt.executeUpdate();
             }
             if (ketQua3 != 1) {
-                throw new SQLException("Chá»‰ xÃ³a phÃ¢n cÃ´ng chÆ°a má»Ÿ, chÆ°a cÃ³ chá»©ng tá»«.");
+                throw new SQLException("Chỉ xóa phân công chưa mở, chưa có chứng từ.");
             }
             con.commit();
         } catch (SQLException | RuntimeException e) {
@@ -173,7 +173,7 @@ public class PhanCongCa_DAO {
         try {
             new TaiKhoan_DAO().kiemTraQuyen(tk, false);
             if (!Double.isFinite(quy) || quy < 0) {
-                throw new SQLException("Quá»¹ Ä‘áº§u ca khÃ´ng Ä‘Æ°á»£c Ã¢m.");
+                throw new SQLException("Quỹ đầu ca không được âm.");
             }
             String nv = tk.getNhanVien().getMaNhanVien();
             String sql =
@@ -189,8 +189,8 @@ public class PhanCongCa_DAO {
                 }
             }
             String sql2 =
-                    "SELECT COUNT(*) FROM dbo.PhanCongCa WHERE MaNhanVien=? AND TrangThai=N'Äang"
-                            + " má»Ÿ'";
+                    "SELECT COUNT(*) FROM dbo.PhanCongCa WHERE MaNhanVien=? AND TrangThai=N'Đang"
+                            + " mở'";
             int ketQua7 = 0;
             try (PreparedStatement stmt3 = con.prepareStatement(sql2)) {
                 stmt3.setString(1, nv);
@@ -201,13 +201,13 @@ public class PhanCongCa_DAO {
                 }
             }
             if (ketQua7 != 0) {
-                throw new SQLException("Báº¡n cÃ²n ca Ä‘ang má»Ÿ. ÄÃ³ng ca cÅ© trÆ°á»›c.");
+                throw new SQLException("Bạn còn ca đang mở. Đóng ca cũ trước.");
             }
             String sql3 =
                     "UPDATE dbo.PhanCongCa SET"
-                            + " TienQuyDauCa=?,GioMoCa=SYSDATETIME(),TrangThai=N'Äang má»Ÿ' WHERE"
+                            + " TienQuyDauCa=?,GioMoCa=SYSDATETIME(),TrangThai=N'Đang mở' WHERE"
                             + " MaPhanCong=? AND MaNhanVien=? AND Ngay=CAST(GETDATE() AS DATE) AND"
-                            + " TrangThai=N'ChÆ°a má»Ÿ'";
+                            + " TrangThai=N'Chưa mở'";
             int ketQua11;
             try (PreparedStatement stmt4 = con.prepareStatement(sql3)) {
                 stmt4.setDouble(1, quy);
@@ -216,7 +216,7 @@ public class PhanCongCa_DAO {
                 ketQua11 = stmt4.executeUpdate();
             }
             if (ketQua11 != 1) {
-                throw new SQLException("Chá»‰ má»Ÿ ca cá»§a mÃ¬nh, Ä‘Ãºng ngÃ y vÃ  chÆ°a má»Ÿ.");
+                throw new SQLException("Chỉ mở ca của mình, đúng ngày và chưa mở.");
             }
             con.commit();
         } catch (SQLException | RuntimeException e) {
@@ -243,7 +243,7 @@ public class PhanCongCa_DAO {
         }
         String nv = ketQua3;
         if (!("ADMIN".equals(tk.getQuyen())) && !(tk.getNhanVien().getMaNhanVien().equals(nv))) {
-            throw new SQLException("KhÃ´ng Ä‘Æ°á»£c xem quá»¹ ca khÃ¡c.");
+            throw new SQLException("Không được xem quỹ ca khác.");
         }
         return tienLyThuyet(con, pc);
     }
@@ -264,8 +264,8 @@ public class PhanCongCa_DAO {
                 "SELECT COALESCE(SUM(v.Tien),0) FROM (SELECT"
                     + " h.MaHoaDon,ROUND((SUM(d.SoLuong*d.DonGia-d.GiamGia)-h.DiemSuDung*1000)*(1+h.ThueSuatVAT),2)"
                     + " AS Tien FROM dbo.HoaDon h JOIN dbo.ChiTietHoaDon d ON d.MaHoaDon=h.MaHoaDon"
-                    + " WHERE h.MaPhanCong=? AND h.TrangThaiThanhToan=N'ÄÃ£ thanh toÃ¡n' AND"
-                    + " h.HinhThucThanhToan=N'Tiá»n máº·t' GROUP BY"
+                    + " WHERE h.MaPhanCong=? AND h.TrangThaiThanhToan=N'Đã thanh toán' AND"
+                    + " h.HinhThucThanhToan=N'Tiền mặt' GROUP BY"
                     + " h.MaHoaDon,h.DiemSuDung,h.ThueSuatVAT) v";
         double ketQua7 = 0.0;
         try (PreparedStatement stmt3 = con.prepareStatement(sql)) {
@@ -281,7 +281,7 @@ public class PhanCongCa_DAO {
                 "SELECT COALESCE(SUM(d.TienHoan),0) FROM dbo.PhieuDoiTra p JOIN dbo.ChiTietDoiTra d"
                         + " ON d.MaPhieuDoiTra=p.MaPhieuDoiTra JOIN dbo.HoaDon h ON"
                         + " h.MaHoaDon=p.MaHoaDonGoc WHERE p.MaPhanCongHoanTien=? AND"
-                        + " p.TrangThai=N'HoÃ n táº¥t' AND h.HinhThucThanhToan=N'Tiá»n máº·t'";
+                        + " p.TrangThai=N'Hoàn tất' AND h.HinhThucThanhToan=N'Tiền mặt'";
         double ketQua11 = 0.0;
         try (PreparedStatement stmt4 = con.prepareStatement(sql4)) {
             stmt4.setString(1, pc);
@@ -292,7 +292,7 @@ public class PhanCongCa_DAO {
             }
         }
         double hoan = ketQua11;
-        return util.InHoaDon.tron(quy + thu - hoan);
+        return until.InHoaDon.tron(quy + thu - hoan);
     }
 
     public void dongCa(String id, double dem, String lyDo, TaiKhoan tk) throws SQLException {
@@ -305,7 +305,7 @@ public class PhanCongCa_DAO {
             new TaiKhoan_DAO().kiemTraQuyen(tk, false);
             String sql =
                     "SELECT MaNhanVien FROM dbo.PhanCongCa WITH (UPDLOCK,HOLDLOCK) WHERE"
-                            + " MaPhanCong=? AND TrangThai=N'Äang má»Ÿ'";
+                            + " MaPhanCong=? AND TrangThai=N'Đang mở'";
             String ketQua3 = null;
             try (PreparedStatement stmt = con.prepareStatement(sql)) {
                 stmt.setString(1, id);
@@ -317,18 +317,18 @@ public class PhanCongCa_DAO {
             }
             String nv = ketQua3;
             if (!(tk.getNhanVien().getMaNhanVien().equals(nv))) {
-                throw new SQLException("Chá»‰ Ä‘Ã³ng ca Ä‘ang má»Ÿ cá»§a mÃ¬nh.");
+                throw new SQLException("Chỉ đóng ca đang mở của mình.");
             }
             if (!Double.isFinite(dem) || dem < 0) {
-                throw new SQLException("Tiá»n thá»±c Ä‘áº¿m khÃ´ng Ä‘Æ°á»£c Ã¢m.");
+                throw new SQLException("Tiền thực đếm không được âm.");
             }
             double lt = tienLyThuyet(con, id);
-            if (util.InHoaDon.soSanhTien(dem, lt) != 0 && (lyDo == null || lyDo.trim().isEmpty())) {
-                throw new SQLException("CÃ³ chÃªnh lá»‡ch, cáº§n nháº­p giáº£i trÃ¬nh.");
+            if (until.InHoaDon.soSanhTien(dem, lt) != 0 && (lyDo == null || lyDo.trim().isEmpty())) {
+                throw new SQLException("Có chênh lệch, cần nhập giải trình.");
             }
             String sql2 =
                     "UPDATE dbo.PhanCongCa SET"
-                        + " TienMatThucDem=?,GhiChu=?,GioDongCa=SYSDATETIME(),TrangThai=N'ÄÃ£ Ä‘Ã³ng'"
+                        + " TienMatThucDem=?,GhiChu=?,GioDongCa=SYSDATETIME(),TrangThai=N'Đã đóng'"
                         + " WHERE MaPhanCong=?";
             try (PreparedStatement stmt3 = con.prepareStatement(sql2)) {
                 stmt3.setDouble(1, dem);
@@ -349,7 +349,7 @@ public class PhanCongCa_DAO {
     public String layMaCaDangMo(Connection con, TaiKhoan taiKhoan) throws SQLException {
         String sql =
                 "SELECT MaPhanCong FROM dbo.PhanCongCa WITH (UPDLOCK,HOLDLOCK) WHERE MaNhanVien = ?"
-                        + " AND Ngay = CAST(GETDATE() AS DATE) AND TrangThai = N'Äang má»Ÿ'";
+                        + " AND Ngay = CAST(GETDATE() AS DATE) AND TrangThai = N'Đang mở'";
         try (PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setString(1, taiKhoan.getNhanVien().getMaNhanVien());
             try (ResultSet rs = stmt.executeQuery()) {
@@ -358,6 +358,6 @@ public class PhanCongCa_DAO {
                 }
             }
         }
-        throw new SQLException("Báº¡n chÆ°a má»Ÿ ca hÃ´m nay. VÃ o má»¥c Ca lÃ m viá»‡c Ä‘á»ƒ má»Ÿ ca.");
+        throw new SQLException("Bạn chưa mở ca hôm nay. Vào mục Ca làm việc để mở ca.");
     }
 }
