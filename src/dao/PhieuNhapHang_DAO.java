@@ -15,6 +15,11 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Lớp xử lý dữ liệu Phiếu Nhập Hàng (Data Access Object)
+ * Quản lý quy trình lập phiếu, duyệt hàng thực nhận, từ chối và kiểm soát nội bộ 4 mắt.
+ * @author Võ Văn Tuấn - MSSV: 24694721 (Nhóm 12)
+ */
 public class PhieuNhapHang_DAO {
 
     public List<PhieuNhapHang> getAllPhieuNhapHang() throws SQLException {
