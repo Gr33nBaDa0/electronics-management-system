@@ -40,37 +40,9 @@ public class PhanCongCa {
 		this.gioDongCa = gioDongCa;
 	}
 
-    public PhanCongCa(String maPhanCong) {
-        this.maPhanCong = maPhanCong;
-    }
-
-    public PhanCongCa(
-            String maPhanCong,
-            NhanVien nhanVien,
-            LocalDate ngay,
-            String ghiChu,
-            CaLamViec caLamViec,
-            double tienQuyDauCa,
-            double tienMatThucDem,
-            String trangThai,
-            LocalDateTime gioMoCa,
-            LocalDateTime gioDongCa) {
-        this.maPhanCong = maPhanCong;
-        this.nhanVien = nhanVien;
-        this.ngay = ngay;
-        this.ghiChu = ghiChu;
-        this.caLamViec = caLamViec;
-        this.tienQuyDauCa = tienQuyDauCa;
-        this.tienMatThucDem = tienMatThucDem;
-        this.trangThai = trangThai;
-        this.gioMoCa = gioMoCa;
-        this.gioDongCa = gioDongCa;
-    }
-
     public String getMaPhanCong() {
         return maPhanCong;
     }
-
     public void setMaPhanCong(String maPhanCong) {
         this.maPhanCong = maPhanCong;
     }
@@ -78,15 +50,16 @@ public class PhanCongCa {
     public NhanVien getNhanVien() {
         return nhanVien;
     }
-
     public void setNhanVien(NhanVien nhanVien) {
+        if (nhanVien == null) {
+            throw new IllegalArgumentException("Nhân viên không được rỗng");
+        }
         this.nhanVien = nhanVien;
     }
 
     public LocalDate getNgay() {
         return ngay;
     }
-
     public void setNgay(LocalDate ngay) {
         this.ngay = ngay;
     }
@@ -94,7 +67,6 @@ public class PhanCongCa {
     public String getGhiChu() {
         return ghiChu;
     }
-
     public void setGhiChu(String ghiChu) {
         this.ghiChu = ghiChu;
     }
@@ -102,31 +74,43 @@ public class PhanCongCa {
     public CaLamViec getCaLamViec() {
         return caLamViec;
     }
-
     public void setCaLamViec(CaLamViec caLamViec) {
+        if (caLamViec == null) {
+            throw new IllegalArgumentException("Ca làm việc không được rỗng");
+        }
         this.caLamViec = caLamViec;
     }
 
-    public double getTienQuyDauCa() {
-        return tienQuyDauCa;
+    public BigDecimal getTienQuyDauCa() {
+        return tienQuyDauCa != null ? tienQuyDauCa : BigDecimal.ZERO;
+    }
+    public void setTienQuyDauCa(BigDecimal tienQuyDauCa) {
+        if (tienQuyDauCa != null && tienQuyDauCa.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Tiền quỹ đầu ca phải lớn hơn hoặc bằng 0");
+        }
+        this.tienQuyDauCa = tienQuyDauCa != null ? tienQuyDauCa : BigDecimal.ZERO;
     }
 
-    public void setTienQuyDauCa(double tienQuyDauCa) {
-        this.tienQuyDauCa = tienQuyDauCa;
+    public void setTienQuyDauCa(double tien) {
+        setTienQuyDauCa(BigDecimal.valueOf(tien));
+    }
+    public BigDecimal getTienMatThucDem() {
+        return tienMatThucDem != null ? tienMatThucDem : BigDecimal.ZERO;
     }
 
-    public double getTienMatThucDem() {
-        return tienMatThucDem;
+    public void setTienMatThucDem(BigDecimal tienMatThucDem) {
+        if (tienMatThucDem != null && tienMatThucDem.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Tiền mặt thực đếm phải lớn hơn hoặc bằng 0");
+        }
+        this.tienMatThucDem = tienMatThucDem != null ? tienMatThucDem : BigDecimal.ZERO;
     }
-
-    public void setTienMatThucDem(double tienMatThucDem) {
-        this.tienMatThucDem = tienMatThucDem;
+    public void setTienMatThucDem(double tien) {
+        setTienMatThucDem(BigDecimal.valueOf(tien));
     }
-
+    
     public String getTrangThai() {
         return trangThai;
     }
-
     public void setTrangThai(String trangThai) {
         this.trangThai = trangThai;
     }
@@ -145,20 +129,42 @@ public class PhanCongCa {
         this.gioDongCa = gioDongCa;
     }
 
-    public LocalDateTime getGioMoCa() {
-        return gioMoCa;
+    public boolean xacNhanVaoCa() {
+        if ("Chưa mở".equalsIgnoreCase(this.trangThai) || this.trangThai == null) {
+            this.trangThai = "Đang mở";
+            this.gioMoCa = LocalDateTime.now();
+            return true;
+        }
+        return false;
     }
 
-    public void setGioMoCa(LocalDateTime gioMoCa) {
-        this.gioMoCa = gioMoCa;
+    public boolean xacNhanDongCa() {
+        if ("Đang mở".equalsIgnoreCase(this.trangThai)) {
+            this.trangThai = "Đã đóng";
+            this.gioDongCa = LocalDateTime.now();
+            return true;
+        }
+        return false;
     }
 
-    public LocalDateTime getGioDongCa() {
-        return gioDongCa;
+    public double tinhTienMatLyThuyet(double tongThu, double tongChi) {
+        double dauCa = getTienQuyDauCa().doubleValue();
+        return dauCa + tongThu - tongChi;
     }
 
-    public void setGioDongCa(LocalDateTime gioDongCa) {
-        this.gioDongCa = gioDongCa;
+    public BigDecimal tinhTienMatLyThuyet(BigDecimal tongThu, BigDecimal tongChi) {
+        BigDecimal thu = tongThu != null ? tongThu : BigDecimal.ZERO;
+        BigDecimal chi = tongChi != null ? tongChi : BigDecimal.ZERO;
+        return getTienQuyDauCa().add(thu).subtract(chi);
+    }
+
+    public double tinhChenhLech(double tongThu, double tongChi) {
+        double thucDem = getTienMatThucDem().doubleValue();
+        return thucDem - tinhTienMatLyThuyet(tongThu, tongChi);
+    }
+
+    public BigDecimal tinhChenhLech(BigDecimal tongThu, BigDecimal tongChi) {
+        return getTienMatThucDem().subtract(tinhTienMatLyThuyet(tongThu, tongChi));
     }
 
     @Override
@@ -179,6 +185,8 @@ public class PhanCongCa {
     
 	@Override
     public String toString() {
-        return String.valueOf(maPhanCong);
+        return "PhanCongCa [maPhanCong=" + maPhanCong + ", nhanVien=" + (nhanVien != null ? nhanVien.getHoTen() : "")
+                + ", ngay=" + ngay + ", ca=" + (caLamViec != null ? caLamViec.getTenCa() : "")
+                + ", trangThai=" + trangThai + "]";
     }
 }

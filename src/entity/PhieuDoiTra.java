@@ -19,8 +19,10 @@ public class PhieuDoiTra {
     private int diemHoanLai;
     private int diemThuHoi;
 
-    public PhieuDoiTra() {}
-
+    public PhieuDoiTra() {
+        this.trangThai = "Chờ duyệt";
+        this.ngayLap = LocalDateTime.now();
+    }
     public PhieuDoiTra(String maPhieuDoiTra) {
         this.maPhieuDoiTra = maPhieuDoiTra;
     }
@@ -48,61 +50,29 @@ public class PhieuDoiTra {
         this.maPhieuDoiTra = maPhieuDoiTra != null ? maPhieuDoiTra.trim() : null;
     }
 
-    public PhieuDoiTra(
-            String maPhieuDoiTra,
-            HoaDon hoaDonGoc,
-            NhanVien nhanVienLap,
-            NhanVien quanLyDuyet,
-            PhanCongCa phanCongHoanTien,
-            LocalDateTime ngayLap,
-            String lyDo,
-            String trangThai,
-            LocalDateTime ngayDuyet,
-            String lyDoTuChoi,
-            int diemHoanLai,
-            int diemThuHoi) {
-        this.maPhieuDoiTra = maPhieuDoiTra;
-        this.hoaDonGoc = hoaDonGoc;
-        this.nhanVienLap = nhanVienLap;
-        this.quanLyDuyet = quanLyDuyet;
-        this.phanCongHoanTien = phanCongHoanTien;
-        this.ngayLap = ngayLap;
-        this.lyDo = lyDo;
-        this.trangThai = trangThai;
-        this.ngayDuyet = ngayDuyet;
-        this.lyDoTuChoi = lyDoTuChoi;
-        this.diemHoanLai = diemHoanLai;
-        this.diemThuHoi = diemThuHoi;
-    }
-
-    public String getMaPhieuDoiTra() {
-        return maPhieuDoiTra;
-    }
-
-    public void setMaPhieuDoiTra(String maPhieuDoiTra) {
-        this.maPhieuDoiTra = maPhieuDoiTra;
-    }
-
     public HoaDon getHoaDonGoc() {
         return hoaDonGoc;
     }
-
     public void setHoaDonGoc(HoaDon hoaDonGoc) {
+        if (hoaDonGoc == null) {
+            throw new IllegalArgumentException("Hóa đơn gốc không được rỗng");
+        }
         this.hoaDonGoc = hoaDonGoc;
     }
 
     public NhanVien getNhanVienLap() {
         return nhanVienLap;
     }
-
     public void setNhanVienLap(NhanVien nhanVienLap) {
+        if (nhanVienLap == null) {
+            throw new IllegalArgumentException("Nhân viên lập không được rỗng");
+        }
         this.nhanVienLap = nhanVienLap;
     }
 
     public NhanVien getQuanLyDuyet() {
         return quanLyDuyet;
     }
-
     public void setQuanLyDuyet(NhanVien quanLyDuyet) {
         this.quanLyDuyet = quanLyDuyet;
     }
@@ -110,39 +80,54 @@ public class PhieuDoiTra {
     public PhanCongCa getPhanCongHoanTien() {
         return phanCongHoanTien;
     }
-
     public void setPhanCongHoanTien(PhanCongCa phanCongHoanTien) {
         this.phanCongHoanTien = phanCongHoanTien;
+    }
+
+    public PhanCongCa getPhanCongCaLamViec() {
+        return getPhanCongHoanTien();
+    }
+    public void setPhanCongCaLamViec(PhanCongCa ca) {
+        setPhanCongHoanTien(ca);
     }
 
     public LocalDateTime getNgayLap() {
         return ngayLap;
     }
-
     public void setNgayLap(LocalDateTime ngayLap) {
+        if (ngayLap != null && ngayLap.isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Ngày lập không hợp lệ (Phải nhỏ hơn hoặc bằng hiện tại)");
+        }
         this.ngayLap = ngayLap;
     }
 
     public String getLyDo() {
         return lyDo;
     }
-
     public void setLyDo(String lyDo) {
-        this.lyDo = lyDo;
+        if (lyDo == null || lyDo.trim().isEmpty()) {
+            throw new IllegalArgumentException("Lý do đổi trả không được rỗng");
+        }
+        this.lyDo = lyDo.trim();
     }
 
     public String getTrangThai() {
         return trangThai;
     }
-
     public void setTrangThai(String trangThai) {
+        if (trangThai != null && !trangThai.trim().isEmpty()) {
+            if (!trangThai.equalsIgnoreCase("Chờ duyệt")
+                    && !trangThai.equalsIgnoreCase("Đã duyệt")
+                    && !trangThai.equalsIgnoreCase("Từ chối")) {
+                throw new IllegalArgumentException("Trạng thái không hợp lệ (Chờ duyệt, Đã duyệt hoặc Từ chối)");
+            }
+        }
         this.trangThai = trangThai;
     }
 
     public LocalDateTime getNgayDuyet() {
         return ngayDuyet;
     }
-
     public void setNgayDuyet(LocalDateTime ngayDuyet) {
         this.ngayDuyet = ngayDuyet;
     }
@@ -150,7 +135,6 @@ public class PhieuDoiTra {
     public String getLyDoTuChoi() {
         return lyDoTuChoi;
     }
-
     public void setLyDoTuChoi(String lyDoTuChoi) {
         this.lyDoTuChoi = lyDoTuChoi;
     }
@@ -158,17 +142,12 @@ public class PhieuDoiTra {
     public int getDiemHoanLai() {
         return diemHoanLai;
     }
-
     public void setDiemHoanLai(int diemHoanLai) {
-        this.diemHoanLai = diemHoanLai;
+        this.diemHoanLai = Math.max(0, diemHoanLai);
     }
 
     public int getDiemThuHoi() {
         return diemThuHoi;
-    }
-
-    public void setDiemThuHoi(int diemThuHoi) {
-        this.diemThuHoi = diemThuHoi;
     }
     public void setDiemThuHoi(int diemThuHoi) {
         this.diemThuHoi = Math.max(0, diemThuHoi);
@@ -211,6 +190,8 @@ public class PhieuDoiTra {
 
     @Override
     public String toString() {
-        return String.valueOf(maPhieuDoiTra);
+        return "PhieuDoiTra [ma=" + maPhieuDoiTra + ", hd=" + (hoaDonGoc != null ? hoaDonGoc.getMaHoaDon() : "")
+                + ", nv=" + (nhanVienLap != null ? nhanVienLap.getHoTen() : "")
+                + ", tt=" + trangThai + "]";
     }
 }
