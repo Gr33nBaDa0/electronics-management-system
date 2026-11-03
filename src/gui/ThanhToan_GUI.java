@@ -6,8 +6,8 @@ import dao.HoaDon_DAO;
 import entity.HoaDon;
 import entity.TaiKhoan;
 
-import util.*;
-import util.GiaoDien;
+import until.*;
+import until.GiaoDien;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -29,7 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class ThanhToan_GUI extends JDialog implements ActionListener {
-    // MÃ u dÃ¹ng chung Ä‘Æ°á»£c khai bÃ¡o á»Ÿ Ä‘áº§u lá»›p.
+    // Màu dùng chung được khai báo ở đầu lớp.
     private static final Color PRIMARY = GiaoDien.PRIMARY,
             DARK = GiaoDien.DARK,
             BACKGROUND = GiaoDien.BACKGROUND,
@@ -43,23 +43,23 @@ public class ThanhToan_GUI extends JDialog implements ActionListener {
     private final double total;
     private boolean daThanhToan;
     private final JComboBox<String> hinhThuc =
-            new JComboBox<>(new String[] {"Tiá»n máº·t", "Chuyá»ƒn khoáº£n QR"});
+            new JComboBox<>(new String[] {"Tiền mặt", "Chuyển khoản QR"});
     private final JTextField tienNhan = new JTextField(16);
-    private final JLabel lblTienThua = new JLabel("Nháº­p sá»‘ tiá»n khÃ¡ch Ä‘Æ°a.");
+    private final JLabel lblTienThua = new JLabel("Nhập số tiền khách đưa.");
     private final JCheckBox daNhan =
-            new JCheckBox("ÄÃ£ kiá»ƒm tra tiá»n chuyá»ƒn khoáº£n vÃ o tÃ i khoáº£n cá»­a hÃ ng");
-    private final JButton btnQR = taoNut("Hiá»‡n QR"),
-            btnTra = taoNut("Thanh toÃ¡n & xuáº¥t hÃ³a Ä‘Æ¡n"),
-            btnDong = taoNut("Äá»ƒ sau");
+            new JCheckBox("Đã kiểm tra tiền chuyển khoản vào tài khoản cửa hàng");
+    private final JButton btnQR = taoNut("Hiện QR"),
+            btnTra = taoNut("Thanh toán & xuất hóa đơn"),
+            btnDong = taoNut("Để sau");
 
     public ThanhToan_GUI(Frame chu, String ma, TaiKhoan tk) throws Exception {
-        super(chu, "Thanh toÃ¡n " + ma, true);
+        super(chu, "Thanh toán " + ma, true);
         this.ma = ma;
         this.tk = tk;
         HoaDon h = new HoaDon_DAO().tim(ma);
-        if (h == null || !"ChÆ°a thanh toÃ¡n".equals(h.getTrangThaiThanhToan()))
+        if (h == null || !"Chưa thanh toán".equals(h.getTrangThaiThanhToan()))
             throw new IllegalArgumentException(
-                    "HÃ³a Ä‘Æ¡n khÃ´ng tá»“n táº¡i hoáº·c khÃ´ng cÃ²n chá» thanh toÃ¡n.");
+                    "Hóa đơn không tồn tại hoặc không còn chờ thanh toán.");
         total =
                 InHoaDon.phaiTra(
                         new ChiTietHoaDon_DAO().getTheoHoaDon(ma),
@@ -70,19 +70,19 @@ public class ThanhToan_GUI extends JDialog implements ActionListener {
         JLabel soTien = new JLabel(formatGia(total) + " VND");
         soTien.setFont(GiaoDien.phong(Font.BOLD, 30));
         soTien.setForeground(PRIMARY);
-        JPanel tongTien = GiaoDien.the("Tá»”NG Cáº¦N THANH TOÃN", soTien, null);
+        JPanel tongTien = GiaoDien.the("TỔNG CẦN THANH TOÁN", soTien, null);
         tongTien.setBackground(GiaoDien.PRIMARY_SOFT);
         JPanel form =
                 GiaoDien.form(
-                        1, "HÃ¬nh thá»©c thanh toÃ¡n", hinhThuc, "Tiá»n khÃ¡ch Ä‘Æ°a (VND)", tienNhan);
+                        1, "Hình thức thanh toán", hinhThuc, "Tiền khách đưa (VND)", tienNhan);
         lblTienThua.setForeground(GiaoDien.MUTED);
         JPanel noiDung = GiaoDien.doc(form, lblTienThua, taoDong(btnQR), daNhan);
         p.add(tongTien, BorderLayout.NORTH);
-        p.add(GiaoDien.the("ThÃ´ng tin thanh toÃ¡n", noiDung, null), BorderLayout.CENTER);
+        p.add(GiaoDien.the("Thông tin thanh toán", noiDung, null), BorderLayout.CENTER);
         p.add(taoDong(btnTra, btnDong), BorderLayout.SOUTH);
         setContentPane(p);
         GiaoDien.trangTri(p);
-        tienNhan.setToolTipText("VÃ­ dá»¥: 1000000 hoáº·c 1,000,000");
+        tienNhan.setToolTipText("Ví dụ: 1000000 hoặc 1,000,000");
         btnQR.addActionListener(this);
         btnTra.addActionListener(this);
         btnDong.addActionListener(this);
@@ -134,27 +134,27 @@ public class ThanhToan_GUI extends JDialog implements ActionListener {
             } else if (o.equals(btnTra)) {
                 String ht = (String) hinhThuc.getSelectedItem();
                 double nhan =
-                        "Tiá»n máº·t".equals(ht)
+                        "Tiền mặt".equals(ht)
                                 ? InHoaDon.soTien(tienNhan.getText())
                                 : 0.0;
                 btnTra.setEnabled(false);
                 double thua = new HoaDon_DAO().thanhToan(ma, ht, nhan, daNhan.isSelected(), tk);
                 daThanhToan = true;
-                String thongBao = "Thanh toÃ¡n thÃ nh cÃ´ng. Tiá»n thá»«a: " + formatGia(thua) + " VND";
+                String thongBao = "Thanh toán thành công. Tiền thừa: " + formatGia(thua) + " VND";
                 java.io.File pdf = null;
                 try {
                     pdf = InHoaDon.xuatFilePDF(ma);
                     if (!InHoaDon.moFilePDF(pdf))
-                        thongBao += "\nPDF Ä‘Ã£ lÆ°u: " + pdf.getAbsolutePath();
+                        thongBao += "\nPDF đã lưu: " + pdf.getAbsolutePath();
                 } catch (Exception | LinkageError loiIn) {
                     thongBao +=
                             pdf == null
-                                    ? "\nChÆ°a xuáº¥t Ä‘Æ°á»£c PDF: "
+                                    ? "\nChưa xuất được PDF: "
                                             + loiIn.getMessage()
-                                            + "\nBáº¡n cÃ³ thá»ƒ in láº¡i táº¡i mÃ n HÃ³a Ä‘Æ¡n."
-                                    : "\nPDF Ä‘Ã£ lÆ°u: "
+                                            + "\nBạn có thể in lại tại màn Hóa đơn."
+                                    : "\nPDF đã lưu: "
                                             + pdf.getAbsolutePath()
-                                            + "\nChÆ°a má»Ÿ tá»± Ä‘á»™ng Ä‘Æ°á»£c file PDF.";
+                                            + "\nChưa mở tự động được file PDF.";
                 }
                 JOptionPane.showMessageDialog(this, thongBao);
                 dispose();
@@ -165,11 +165,11 @@ public class ThanhToan_GUI extends JDialog implements ActionListener {
         }
     }
 
-    /** CÃ¡ch bá»‘ trÃ­ QR vÃ  nÃºt xÃ¡c nháº­n nháº­n tiá»n theo file máº«u. */
+    /** Cách bố trí QR và nút xác nhận nhận tiền theo file mẫu. */
     private boolean hienThiDialogQR() throws Exception {
         java.awt.image.BufferedImage img = InHoaDon.taoQR(ma, total);
         final boolean[] daNhanTien = {false};
-        JDialog qrDialog = new JDialog(this, "QuÃ©t mÃ£ chuyá»ƒn khoáº£n", true);
+        JDialog qrDialog = new JDialog(this, "Quét mã chuyển khoản", true);
         JPanel p = new JPanel();
         GiaoDien.boCuc(p);
         double tyLe = Math.min(360.0 / img.getWidth(), 420.0 / img.getHeight());
@@ -181,21 +181,21 @@ public class ThanhToan_GUI extends JDialog implements ActionListener {
                                         Math.max(1, (int) (img.getHeight() * tyLe)),
                                         Image.SCALE_SMOOTH)));
         JLabel tieuDe =
-                new JLabel("Má»i khÃ¡ch quÃ©t mÃ£ - " + formatGia(total) + " VND", JLabel.CENTER);
-        JButton xacNhan = taoNut("XÃC NHáº¬N: TÃ”I ÄÃƒ NHáº¬N TIá»€N");
-        JButton dong = taoNut("ÄÃ³ng / Ä‘á»ƒ sau");
+                new JLabel("Mời khách quét mã - " + formatGia(total) + " VND", JLabel.CENTER);
+        JButton xacNhan = taoNut("XÁC NHẬN: TÔI ĐÃ NHẬN TIỀN");
+        JButton dong = taoNut("Đóng / để sau");
         xacNhan.addActionListener(
                 a -> {
                     daNhanTien[0] = true;
                     qrDialog.dispose();
                 });
         dong.addActionListener(a -> qrDialog.dispose());
-        p.add(GiaoDien.doc(tieuDe, new JLabel("HÃ³a Ä‘Æ¡n: " + ma)), BorderLayout.NORTH);
+        p.add(GiaoDien.doc(tieuDe, new JLabel("Hóa đơn: " + ma)), BorderLayout.NORTH);
         p.add(anh, BorderLayout.CENTER);
         p.add(
                 GiaoDien.doc(
                         GiaoDien.ghiChu(
-                                "Kiá»ƒm tra giao dá»‹ch vÃ o tÃ i khoáº£n cá»­a hÃ ng trÆ°á»›c khi xÃ¡c nháº­n."),
+                                "Kiểm tra giao dịch vào tài khoản cửa hàng trước khi xác nhận."),
                         taoDong(xacNhan, dong)),
                 BorderLayout.SOUTH);
         GiaoDien.trangTri(p);
@@ -219,7 +219,7 @@ public class ThanhToan_GUI extends JDialog implements ActionListener {
             tienNhan.requestFocusInWindow();
         } else {
             lblTienThua.setForeground(GiaoDien.MUTED);
-            lblTienThua.setText("XÃ¡c nháº­n sau khi Ä‘Ã£ nháº­n tiá»n vÃ o tÃ i khoáº£n cá»­a hÃ ng.");
+            lblTienThua.setText("Xác nhận sau khi đã nhận tiền vào tài khoản cửa hàng.");
         }
     }
 
@@ -229,12 +229,12 @@ public class ThanhToan_GUI extends JDialog implements ActionListener {
             double thua = InHoaDon.tron(InHoaDon.soTien(tienNhan.getText()) - total);
             lblTienThua.setForeground(thua < 0 ? ERROR : PRIMARY);
             lblTienThua.setText(
-                    (thua < 0 ? "CÃ²n thiáº¿u: " : "Tiá»n tráº£ láº¡i: ")
+                    (thua < 0 ? "Còn thiếu: " : "Tiền trả lại: ")
                             + formatGia(Math.abs(thua))
                             + " VND");
         } catch (NumberFormatException e) {
             lblTienThua.setForeground(GiaoDien.MUTED);
-            lblTienThua.setText("Nháº­p sá»‘ tiá»n khÃ¡ch Ä‘Æ°a.");
+            lblTienThua.setText("Nhập số tiền khách đưa.");
         }
     }
 
@@ -252,7 +252,7 @@ public class ThanhToan_GUI extends JDialog implements ActionListener {
 
     private void thongBaoLoi(Component c, Exception e) {
         JOptionPane.showMessageDialog(
-                c, e.getMessage(), "KhÃ´ng thá»±c hiá»‡n Ä‘Æ°á»£c", JOptionPane.ERROR_MESSAGE);
+                c, e.getMessage(), "Không thực hiện được", JOptionPane.ERROR_MESSAGE);
     }
 
     private JButton taoNut(String t) {

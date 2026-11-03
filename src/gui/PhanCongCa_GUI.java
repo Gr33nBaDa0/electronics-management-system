@@ -11,8 +11,8 @@ import entity.NhanVien;
 import entity.PhanCongCa;
 import entity.TaiKhoan;
 
-import util.GiaoDien;
-import util.InHoaDon;
+import until.GiaoDien;
+import until.InHoaDon;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -44,7 +44,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 public class PhanCongCa_GUI extends JPanel implements ActionListener {
-    // MÃ u dÃ¹ng chung Ä‘Æ°á»£c khai bÃ¡o á»Ÿ Ä‘áº§u lá»›p.
+    // Màu dùng chung được khai báo ở đầu lớp.
     private static final Color PRIMARY = GiaoDien.PRIMARY,
             DARK = GiaoDien.DARK,
             BACKGROUND = GiaoDien.BACKGROUND,
@@ -61,25 +61,25 @@ public class PhanCongCa_GUI extends JPanel implements ActionListener {
             txtTim = new JTextField(16);
     private final JComboBox<CaLamViec> ca = new JComboBox<>();
     private final JComboBox<String> loc =
-            new JComboBox<>(new String[] {"Táº¥t cáº£", "ChÆ°a má»Ÿ", "Äang má»Ÿ", "ÄÃ£ Ä‘Ã³ng"});
-    private final JButton btnPhan = taoNut("PhÃ¢n cÃ´ng"),
-            btnXoa = taoNut("XÃ³a phÃ¢n cÃ´ng"),
-            btnMo = taoNut("Má»Ÿ ca"),
-            btnDong = taoNut("Äá»‘i soÃ¡t / Ä‘Ã³ng ca"),
-            btnTai = taoNut("Táº£i láº¡i / lá»c"),
-            btnNgay = taoNut("Chá»n ngÃ y");
+            new JComboBox<>(new String[] {"Tất cả", "Chưa mở", "Đang mở", "Đã đóng"});
+    private final JButton btnPhan = taoNut("Phân công"),
+            btnXoa = taoNut("Xóa phân công"),
+            btnMo = taoNut("Mở ca"),
+            btnDong = taoNut("Đối soát / đóng ca"),
+            btnTai = taoNut("Tải lại / lọc"),
+            btnNgay = taoNut("Chọn ngày");
     private final DefaultTableModel model =
             taoModel(
-                    "MÃ£ phÃ¢n cÃ´ng",
-                    "NhÃ¢n viÃªn",
-                    "NgÃ y",
+                    "Mã phân công",
+                    "Nhân viên",
+                    "Ngày",
                     "Ca",
-                    "Quá»¹ Ä‘áº§u",
-                    "Thá»±c Ä‘áº¿m",
-                    "Tráº¡ng thÃ¡i",
-                    "Má»Ÿ lÃºc",
-                    "ÄÃ³ng lÃºc",
-                    "Ghi chÃº");
+                    "Quỹ đầu",
+                    "Thực đếm",
+                    "Trạng thái",
+                    "Mở lúc",
+                    "Đóng lúc",
+                    "Ghi chú");
     private final JTable table = taoBang(model);
     private List<PhanCongCa> hienThi = new ArrayList<>();
 
@@ -88,7 +88,7 @@ public class PhanCongCa_GUI extends JPanel implements ActionListener {
         GiaoDien.boCuc(this);
         nv.setEditable(false);
         nv.setMaximumRowCount(10);
-        nv.setToolTipText("Chá»n mÃ£ vÃ  há» tÃªn nhÃ¢n viÃªn cÃ³ trong SQL");
+        nv.setToolTipText("Chọn mã và họ tên nhân viên có trong SQL");
         nv.setRenderer(
                 new DefaultListCellRenderer() {
                     @Override
@@ -107,7 +107,7 @@ public class PhanCongCa_GUI extends JPanel implements ActionListener {
                     }
                 });
         ngay.setEditable(false);
-        ngay.setToolTipText("Báº¥m Chá»n ngÃ y Ä‘á»ƒ má»Ÿ lá»‹ch");
+        ngay.setToolTipText("Bấm Chọn ngày để mở lịch");
         JPanel oNgay = new JPanel(new BorderLayout(6, 0));
         oNgay.setOpaque(false);
         oNgay.add(ngay, BorderLayout.CENTER);
@@ -115,28 +115,28 @@ public class PhanCongCa_GUI extends JPanel implements ActionListener {
         JPanel dau =
                 GiaoDien.doc(
                         GiaoDien.the(
-                                "PhÃ¢n cÃ´ng nhÃ¢n viÃªn",
+                                "Phân công nhân viên",
                                 GiaoDien.form(
                                         4,
-                                        "MÃ£ nhÃ¢n viÃªn",
+                                        "Mã nhân viên",
                                         nv,
-                                        "NgÃ y (yyyy-MM-dd)",
+                                        "Ngày (yyyy-MM-dd)",
                                         oNgay,
-                                        "Ca lÃ m viá»‡c",
+                                        "Ca làm việc",
                                         ca,
-                                        "Ghi chÃº",
+                                        "Ghi chú",
                                         ghiChu),
                                 taoDong(btnPhan, btnXoa)));
         add(dau, BorderLayout.NORTH);
         JPanel danhSach = new JPanel(new BorderLayout(0, 12));
         danhSach.setOpaque(false);
-        danhSach.add(taoDong(new JLabel("MÃ£ NV / ngÃ y:"), txtTim, loc, btnTai), BorderLayout.NORTH);
+        danhSach.add(taoDong(new JLabel("Mã NV / ngày:"), txtTim, loc, btnTai), BorderLayout.NORTH);
         danhSach.add(GiaoDien.cuon(table), BorderLayout.CENTER);
         JPanel thaoTac =
                 GiaoDien.doc(
                         taoDong(btnMo, btnDong),
-                        GiaoDien.ghiChu("NhÃ¢n viÃªn chá»‰ má»Ÿ vÃ  Ä‘Ã³ng ca Ä‘Æ°á»£c phÃ¢n cÃ´ng cho mÃ¬nh."));
-        add(GiaoDien.the("Lá»‹ch phÃ¢n cÃ´ng", danhSach, thaoTac), BorderLayout.CENTER);
+                        GiaoDien.ghiChu("Nhân viên chỉ mở và đóng ca được phân công cho mình."));
+        add(GiaoDien.the("Lịch phân công", danhSach, thaoTac), BorderLayout.CENTER);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         GiaoDien.trangTri(this);
         for (JButton b : new JButton[] {btnPhan, btnXoa, btnMo, btnDong, btnTai, btnNgay})
@@ -207,12 +207,12 @@ public class PhanCongCa_GUI extends JPanel implements ActionListener {
             e.printStackTrace();
             JOptionPane.showMessageDialog(
                     this,
-                    "Lá»—i táº£i dá»¯ liá»‡u SQL:\n" + e.getMessage(),
-                    "Lá»—i SQL",
+                    "Lỗi tải dữ liệu SQL:\n" + e.getMessage(),
+                    "Lỗi SQL",
                     JOptionPane.ERROR_MESSAGE);
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(
-                    this, e.getMessage(), "ThÃ´ng bÃ¡o", JOptionPane.WARNING_MESSAGE);
+                    this, e.getMessage(), "Thông báo", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -231,9 +231,9 @@ public class PhanCongCa_GUI extends JPanel implements ActionListener {
             }
             if (o.equals(btnPhan)) {
                 if (nv.getSelectedItem() == null)
-                    throw new IllegalArgumentException("ChÆ°a cÃ³ nhÃ¢n viÃªn trong SQL.");
+                    throw new IllegalArgumentException("Chưa có nhân viên trong SQL.");
                 if (ca.getSelectedItem() == null)
-                    throw new IllegalArgumentException("ChÆ°a cÃ³ ca trong SQL.");
+                    throw new IllegalArgumentException("Chưa có ca trong SQL.");
                 dao.phanCong(
                         ((NhanVien) nv.getSelectedItem()).getMaNhanVien(),
                         ((CaLamViec) ca.getSelectedItem()).getMaCa(),
@@ -244,21 +244,21 @@ public class PhanCongCa_GUI extends JPanel implements ActionListener {
                 return;
             }
             int i = table.getSelectedRow();
-            if (i < 0) throw new IllegalArgumentException("Chá»n phÃ¢n cÃ´ng ca.");
+            if (i < 0) throw new IllegalArgumentException("Chọn phân công ca.");
             PhanCongCa a = hienThi.get(i);
             if (o.equals(btnXoa)) {
-                if (xacNhan(this, "XÃ³a phÃ¢n cÃ´ng chÆ°a má»Ÿ?")) dao.xoa(a.getMaPhanCong(), tk);
+                if (xacNhan(this, "Xóa phân công chưa mở?")) dao.xoa(a.getMaPhanCong(), tk);
             } else if (o.equals(btnMo)) {
                 String tien =
                         JOptionPane.showInputDialog(
-                                this, "Tiá»n quá»¹ Ä‘áº§u ca (sá»‘ khÃ´ng phÃ¢n cÃ¡ch):", "1000000");
+                                this, "Tiền quỹ đầu ca (số không phân cách):", "1000000");
                 if (tien != null) dao.moCa(a.getMaPhanCong(), InHoaDon.soTien(tien), tk);
             } else if (o.equals(btnDong)) {
                 double lt = dao.tienLyThuyet(a.getMaPhanCong(), tk);
                 String dem =
                         JOptionPane.showInputDialog(
                                 this,
-                                "Quá»¹ lÃ½ thuyáº¿t: " + formatGia(lt) + " VND. Nháº­p tiá»n thá»±c Ä‘áº¿m:");
+                                "Quỹ lý thuyết: " + formatGia(lt) + " VND. Nhập tiền thực đếm:");
                 if (dem == null) return;
                 double thuc = InHoaDon.soTien(dem);
                 String lyDo = ghiChu.getText();
@@ -266,25 +266,25 @@ public class PhanCongCa_GUI extends JPanel implements ActionListener {
                     lyDo =
                             JOptionPane.showInputDialog(
                                     this,
-                                    "ChÃªnh lá»‡ch "
+                                    "Chênh lệch "
                                             + formatGia(InHoaDon.tron(thuc - lt))
-                                            + ". Nháº­p giáº£i trÃ¬nh:");
+                                            + ". Nhập giải trình:");
                     if (lyDo == null) return;
                 }
-                if (xacNhan(this, "ÄÃ³ng ca? Sau khi Ä‘Ã³ng khÃ´ng Ä‘Æ°á»£c sá»­a."))
+                if (xacNhan(this, "Đóng ca? Sau khi đóng không được sửa."))
                     dao.dongCa(a.getMaPhanCong(), thuc, lyDo, tk);
             }
             loadDataToTable();
         } catch (java.sql.SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(
-                    this, "Lá»—i SQL:\n" + ex.getMessage(), "Lá»—i SQL", JOptionPane.ERROR_MESSAGE);
+                    this, "Lỗi SQL:\n" + ex.getMessage(), "Lỗi SQL", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             thongBaoLoi(this, ex);
         }
     }
 
-    /** Lá»‹ch chá»n ngÃ y báº±ng Swing sáºµn cÃ³, khÃ´ng cáº§n thÃªm thÆ° viá»‡n. */
+    /** Lịch chọn ngày bằng Swing sẵn có, không cần thêm thư viện. */
     private void chonNgay() {
         LocalDate dangChon = LocalDate.parse(ngay.getText());
         YearMonth[] thang = {
@@ -293,7 +293,7 @@ public class PhanCongCa_GUI extends JPanel implements ActionListener {
         JDialog lich =
                 new JDialog(
                         SwingUtilities.getWindowAncestor(this),
-                        "Chá»n ngÃ y phÃ¢n cÃ´ng",
+                        "Chọn ngày phân công",
                         Dialog.ModalityType.APPLICATION_MODAL);
         lich.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         JPanel noiDung = new JPanel(new BorderLayout(0, 12));
@@ -301,10 +301,10 @@ public class PhanCongCa_GUI extends JPanel implements ActionListener {
         noiDung.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
         JButton truoc = taoNut("<"),
                 sau = taoNut(">"),
-                homNay = taoNut("HÃ´m nay"),
-                huy = taoNut("Há»§y");
-        truoc.setToolTipText("ThÃ¡ng trÆ°á»›c");
-        sau.setToolTipText("ThÃ¡ng sau");
+                homNay = taoNut("Hôm nay"),
+                huy = taoNut("Hủy");
+        truoc.setToolTipText("Tháng trước");
+        sau.setToolTipText("Tháng sau");
         JLabel tieuDe = new JLabel("", SwingConstants.CENTER);
         JPanel dau = new JPanel(new BorderLayout(8, 0));
         dau.setOpaque(false);
@@ -319,7 +319,7 @@ public class PhanCongCa_GUI extends JPanel implements ActionListener {
         Runnable veLai =
                 () -> {
                     tieuDe.setText(
-                            "ThÃ¡ng " + thang[0].getMonthValue() + " / " + thang[0].getYear());
+                            "Tháng " + thang[0].getMonthValue() + " / " + thang[0].getYear());
                     truoc.setEnabled(thang[0].isAfter(YearMonth.now()));
                     sau.setEnabled(thang[0].isBefore(YearMonth.of(9999, 12)));
                     veLich(luoi, thang[0], dangChon, lich);
@@ -420,7 +420,7 @@ public class PhanCongCa_GUI extends JPanel implements ActionListener {
 
     private void thongBaoLoi(Component c, Exception e) {
         JOptionPane.showMessageDialog(
-                c, e.getMessage(), "KhÃ´ng thá»±c hiá»‡n Ä‘Æ°á»£c", JOptionPane.ERROR_MESSAGE);
+                c, e.getMessage(), "Không thực hiện được", JOptionPane.ERROR_MESSAGE);
     }
 
     private DefaultTableModel taoModel(String... cot) {
@@ -441,7 +441,7 @@ public class PhanCongCa_GUI extends JPanel implements ActionListener {
     }
 
     private boolean xacNhan(Component c, String s) {
-        return JOptionPane.showConfirmDialog(c, s, "XÃ¡c nháº­n", JOptionPane.YES_NO_OPTION)
+        return JOptionPane.showConfirmDialog(c, s, "Xác nhận", JOptionPane.YES_NO_OPTION)
                 == JOptionPane.YES_OPTION;
     }
 

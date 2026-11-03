@@ -8,7 +8,7 @@ import dao.TaiKhoan_DAO;
 import entity.NhanVien;
 import entity.TaiKhoan;
 
-import util.GiaoDien;
+import until.GiaoDien;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -34,7 +34,7 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 public class NhanVien_GUI extends JPanel implements ActionListener {
-    // MÃ u dÃ¹ng chung Ä‘Æ°á»£c khai bÃ¡o á»Ÿ Ä‘áº§u lá»›p.
+    // Màu dùng chung được khai báo ở đầu lớp.
     private static final Color PRIMARY = GiaoDien.PRIMARY,
             DARK = GiaoDien.DARK,
             BACKGROUND = GiaoDien.BACKGROUND,
@@ -58,70 +58,70 @@ public class NhanVien_GUI extends JPanel implements ActionListener {
             user = new JTextField(12),
             txtTim = new JTextField(18);
     private final JPasswordField pass = new JPasswordField(12);
-    private final JComboBox<String> vaiTro = new JComboBox<>(new String[] {"BÃ¡n hÃ ng", "Quáº£n lÃ½"}),
-            gioiTinh = new JComboBox<>(new String[] {"Nam", "Ná»¯", "KhÃ¡c"}),
-            locVaiTro = new JComboBox<>(new String[] {"Táº¥t cáº£", "BÃ¡n hÃ ng", "Quáº£n lÃ½"});
-    private final JButton btnMoi = taoNut("Táº¡o má»›i"),
-            btnLuu = taoNut("LÆ°u há»“ sÆ¡ + tÃ i khoáº£n"),
-            btnXoa = taoNut("XÃ³a"),
-            btnTim = taoNut("TÃ¬m"),
-            btnAnh = taoNut("Chá»n áº£nh tháº»"),
-            btnReset = taoNut("Äáº·t láº¡i máº­t kháº©u"),
-            btnTai = taoNut("Táº£i láº¡i / bá» lá»c");
-    private final JLabel lblAnh = new JLabel("ChÆ°a chá»n áº£nh"), lblTong = new JLabel();
+    private final JComboBox<String> vaiTro = new JComboBox<>(new String[] {"Bán hàng", "Quản lý"}),
+            gioiTinh = new JComboBox<>(new String[] {"Nam", "Nữ", "Khác"}),
+            locVaiTro = new JComboBox<>(new String[] {"Tất cả", "Bán hàng", "Quản lý"});
+    private final JButton btnMoi = taoNut("Tạo mới"),
+            btnLuu = taoNut("Lưu hồ sơ + tài khoản"),
+            btnXoa = taoNut("Xóa"),
+            btnTim = taoNut("Tìm"),
+            btnAnh = taoNut("Chọn ảnh thẻ"),
+            btnReset = taoNut("Đặt lại mật khẩu"),
+            btnTai = taoNut("Tải lại / bỏ lọc");
+    private final JLabel lblAnh = new JLabel("Chưa chọn ảnh"), lblTong = new JLabel();
     private final DefaultTableModel model =
             taoModel(
-                    "MÃ£ NV",
-                    "Há» tÃªn",
-                    "Vai trÃ²",
-                    "SÄT",
+                    "Mã NV",
+                    "Họ tên",
+                    "Vai trò",
+                    "SĐT",
                     "Email",
                     "CCCD",
-                    "Giá»›i tÃ­nh",
-                    "NgÃ y sinh",
-                    "NgÃ y vÃ o lÃ m");
+                    "Giới tính",
+                    "Ngày sinh",
+                    "Ngày vào làm");
     private final JTable table = taoBang(model);
 
     public NhanVien_GUI(TaiKhoan tk) {
         this.tk = tk;
         GiaoDien.boCuc(this);
 
-        btnLuu.setText("LÆ°u");
-        btnAnh.setText("Chá»n áº£nh");
+        btnLuu.setText("Lưu");
+        btnAnh.setText("Chọn ảnh");
         btnLuu.setPreferredSize(new Dimension(94, 38));
         btnAnh.setPreferredSize(new Dimension(112, 38));
-        sinh.setToolTipText("NgÃ y sinh: yyyy-MM-dd");
-        vaoLam.setToolTipText("NgÃ y vÃ o lÃ m: yyyy-MM-dd");
+        sinh.setToolTipText("Ngày sinh: yyyy-MM-dd");
+        vaoLam.setToolTipText("Ngày vào làm: yyyy-MM-dd");
         JPanel form =
                 GiaoDien.form(
                         2,
-                        "MÃ£ nhÃ¢n viÃªn",
+                        "Mã nhân viên",
                         ma,
-                        "Há» tÃªn",
+                        "Họ tên",
                         ten,
-                        "Vai trÃ²",
+                        "Vai trò",
                         vaiTro,
-                        "Sá»‘ Ä‘iá»‡n thoáº¡i",
+                        "Số điện thoại",
                         sdt,
                         "Email",
                         email,
-                        "Äá»‹a chá»‰",
+                        "Địa chỉ",
                         diaChi,
-                        "Sá»‘ CCCD",
+                        "Số CCCD",
                         cccd,
-                        "Giá»›i tÃ­nh",
+                        "Giới tính",
                         gioiTinh,
-                        "NgÃ y sinh",
+                        "Ngày sinh",
                         sinh,
-                        "NgÃ y vÃ o lÃ m",
+                        "Ngày vào làm",
                         vaoLam,
-                        "TÃªn Ä‘Äƒng nháº­p má»›i",
+                        "Tên đăng nhập mới",
                         user,
-                        "Máº­t kháº©u má»›i",
+                        "Mật khẩu mới",
                         pass);
         JPanel trai =
                 GiaoDien.the(
-                        "Há»“ sÆ¡ nhÃ¢n viÃªn",
+                        "Hồ sơ nhân viên",
                         GiaoDien.cuonForm(form),
                         GiaoDien.doc(
                                 taoDong(btnAnh, lblAnh),
@@ -131,11 +131,11 @@ public class NhanVien_GUI extends JPanel implements ActionListener {
         danhSach.setOpaque(false);
         danhSach.add(
                 GiaoDien.doc(
-                        GiaoDien.form(2, "MÃ£ / há» tÃªn", txtTim, "Vai trÃ²", locVaiTro),
+                        GiaoDien.form(2, "Mã / họ tên", txtTim, "Vai trò", locVaiTro),
                         taoDong(btnTim, btnTai)),
                 BorderLayout.NORTH);
         danhSach.add(GiaoDien.cuon(table), BorderLayout.CENTER);
-        JPanel phai = GiaoDien.the("Danh sÃ¡ch nhÃ¢n viÃªn", danhSach, taoDong(lblTong));
+        JPanel phai = GiaoDien.the("Danh sách nhân viên", danhSach, taoDong(lblTong));
         trai.setMinimumSize(new Dimension(360, 180));
         phai.setMinimumSize(new Dimension(400, 180));
         add(
@@ -186,18 +186,18 @@ public class NhanVien_GUI extends JPanel implements ActionListener {
                             n.getNgayBatDauLV()
                         });
             }
-            lblTong.setText("Tá»•ng: " + hienThi.size() + " nhÃ¢n viÃªn");
+            lblTong.setText("Tổng: " + hienThi.size() + " nhân viên");
 
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(
                     this,
-                    "Lá»—i táº£i dá»¯ liá»‡u SQL:\n" + e.getMessage(),
-                    "Lá»—i SQL",
+                    "Lỗi tải dữ liệu SQL:\n" + e.getMessage(),
+                    "Lỗi SQL",
                     JOptionPane.ERROR_MESSAGE);
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(
-                    this, e.getMessage(), "ThÃ´ng bÃ¡o", JOptionPane.WARNING_MESSAGE);
+                    this, e.getMessage(), "Thông báo", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -218,7 +218,7 @@ public class NhanVien_GUI extends JPanel implements ActionListener {
         sinh.setText(String.valueOf(n.getNgaySinh()));
         vaoLam.setText(String.valueOf(n.getNgayBatDauLV()));
         anh = n.getHinhTheNV();
-        lblAnh.setText(anh == null ? "ChÆ°a cÃ³ áº£nh" : "CÃ³ áº£nh tháº»");
+        lblAnh.setText(anh == null ? "Chưa có ảnh" : "Có ảnh thẻ");
         user.setText("");
         user.setEditable(false);
         pass.setText("");
@@ -234,16 +234,16 @@ public class NhanVien_GUI extends JPanel implements ActionListener {
         ma.setEditable(true);
         user.setEditable(true);
         pass.setEnabled(true);
-        lblAnh.setText("ChÆ°a chá»n áº£nh");
+        lblAnh.setText("Chưa chọn ảnh");
     }
 
     private void luu() throws Exception {
         if (!ma.getText().matches("(NV|QL)\\d{3}"))
-            throw new IllegalArgumentException("MÃ£ vÃ­ dá»¥ NV001 hoáº·c QL001.");
-        kiemTraRong(ten.getText(), "há» tÃªn");
+            throw new IllegalArgumentException("Mã ví dụ NV001 hoặc QL001.");
+        kiemTraRong(ten.getText(), "họ tên");
         kiemTraSDT(sdt.getText());
         if (!cccd.getText().matches("\\d{12}"))
-            throw new IllegalArgumentException("CCCD gá»“m 12 chá»¯ sá»‘.");
+            throw new IllegalArgumentException("CCCD gồm 12 chữ số.");
         NhanVien n = new NhanVien(ma.getText());
         n.setHoTen(ten.getText().trim());
         n.setVaiTro((String) vaiTro.getSelectedItem());
@@ -258,12 +258,12 @@ public class NhanVien_GUI extends JPanel implements ActionListener {
         TaiKhoan a = null;
         if (maCu == null) {
             String mk = new String(pass.getPassword());
-            kiemTraDoDai(user.getText(), 5, "tÃªn Ä‘Äƒng nháº­p");
-            kiemTraDoDai(mk, 128, "máº­t kháº©u");
+            kiemTraDoDai(user.getText(), 5, "tên đăng nhập");
+            kiemTraDoDai(mk, 128, "mật khẩu");
             a =
                     new TaiKhoan(
                             user.getText().trim(),
-                            "Quáº£n lÃ½".equals(n.getVaiTro()) ? "ADMIN" : "BAN_HANG",
+                            "Quản lý".equals(n.getVaiTro()) ? "ADMIN" : "BAN_HANG",
                             mk,
                             n);
         }
@@ -291,30 +291,30 @@ public class NhanVien_GUI extends JPanel implements ActionListener {
                 JFileChooser f = new JFileChooser();
                 if (f.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                     if (f.getSelectedFile().length() > 2 * 1024 * 1024)
-                        throw new IllegalArgumentException("áº¢nh tá»‘i Ä‘a 2 MB.");
+                        throw new IllegalArgumentException("Ảnh tối đa 2 MB.");
                     anh = Files.readAllBytes(f.getSelectedFile().toPath());
                     if (javax.imageio.ImageIO.read(new java.io.ByteArrayInputStream(anh)) == null)
-                        throw new IllegalArgumentException("File khÃ´ng pháº£i áº£nh.");
+                        throw new IllegalArgumentException("File không phải ảnh.");
                     lblAnh.setText(f.getSelectedFile().getName());
                 }
             } else if (o.equals(btnXoa)) {
-                if (maCu == null) throw new IllegalArgumentException("Chá»n nhÃ¢n viÃªn.");
-                if (xacNhan(this, "XÃ³a há»“ sÆ¡ vÃ  tÃ i khoáº£n chÆ°a cÃ³ lá»‹ch sá»­?")) {
+                if (maCu == null) throw new IllegalArgumentException("Chọn nhân viên.");
+                if (xacNhan(this, "Xóa hồ sơ và tài khoản chưa có lịch sử?")) {
                     new NhanVien_DAO().deleteNhanVien(maCu, tk);
                     moi();
                     loadDataToTable();
                 }
             } else if (o.equals(btnReset)) {
-                if (maCu == null) throw new IllegalArgumentException("Chá»n nhÃ¢n viÃªn.");
+                if (maCu == null) throw new IllegalArgumentException("Chọn nhân viên.");
                 String username = null;
                 for (TaiKhoan a : new TaiKhoan_DAO().getAllTaiKhoan(tk))
                     if (maCu.equals(a.getNhanVien().getMaNhanVien())) username = a.getTenDangNhap();
-                if (username == null) throw new IllegalArgumentException("ChÆ°a cÃ³ tÃ i khoáº£n.");
+                if (username == null) throw new IllegalArgumentException("Chưa có tài khoản.");
                 JPasswordField f = new JPasswordField();
                 if (JOptionPane.showConfirmDialog(
                                 this,
                                 f,
-                                "Máº­t kháº©u má»›i cá»§a " + username,
+                                "Mật khẩu mới của " + username,
                                 JOptionPane.OK_CANCEL_OPTION)
                         == JOptionPane.OK_OPTION)
                     new TaiKhoan_DAO().updateMatKhau(username, new String(f.getPassword()), tk);
@@ -322,7 +322,7 @@ public class NhanVien_GUI extends JPanel implements ActionListener {
         } catch (java.sql.SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(
-                    this, "Lá»—i SQL:\n" + ex.getMessage(), "Lá»—i SQL", JOptionPane.ERROR_MESSAGE);
+                    this, "Lỗi SQL:\n" + ex.getMessage(), "Lỗi SQL", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             thongBaoLoi(this, ex);
         }
@@ -338,12 +338,12 @@ public class NhanVien_GUI extends JPanel implements ActionListener {
 
     private void thongBaoLoi(Component c, Exception e) {
         JOptionPane.showMessageDialog(
-                c, e.getMessage(), "KhÃ´ng thá»±c hiá»‡n Ä‘Æ°á»£c", JOptionPane.ERROR_MESSAGE);
+                c, e.getMessage(), "Không thực hiện được", JOptionPane.ERROR_MESSAGE);
     }
 
     private void kiemTraDoDai(String s, int n, String ten) {
         kiemTraRong(s, ten);
-        if (s.length() > n) throw new IllegalArgumentException(ten + " tá»‘i Ä‘a " + n + " kÃ½ tá»±.");
+        if (s.length() > n) throw new IllegalArgumentException(ten + " tối đa " + n + " ký tự.");
     }
 
     private DefaultTableModel taoModel(String... cot) {
@@ -361,12 +361,12 @@ public class NhanVien_GUI extends JPanel implements ActionListener {
 
     private void kiemTraRong(String s, String ten) {
         if (s == null || s.trim().isEmpty())
-            throw new IllegalArgumentException("Vui lÃ²ng nháº­p " + ten);
+            throw new IllegalArgumentException("Vui lòng nhập " + ten);
     }
 
     private void kiemTraSDT(String s) {
         if (s == null || !s.matches("0\\d{9}"))
-            throw new IllegalArgumentException("SÄT pháº£i gá»“m 10 chá»¯ sá»‘, báº¯t Ä‘áº§u báº±ng 0.");
+            throw new IllegalArgumentException("SĐT phải gồm 10 chữ số, bắt đầu bằng 0.");
     }
 
     private JLabel taoTieuDe(String t) {
@@ -374,7 +374,7 @@ public class NhanVien_GUI extends JPanel implements ActionListener {
     }
 
     private boolean xacNhan(Component c, String s) {
-        return JOptionPane.showConfirmDialog(c, s, "XÃ¡c nháº­n", JOptionPane.YES_NO_OPTION)
+        return JOptionPane.showConfirmDialog(c, s, "Xác nhận", JOptionPane.YES_NO_OPTION)
                 == JOptionPane.YES_OPTION;
     }
 
