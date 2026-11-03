@@ -1,5 +1,14 @@
 package dao;
 
+import connectDB.ConnectDB;
+
+import entity.ChiTietHoaDon;
+import entity.ChuongTrinhKhuyenMai;
+import entity.HoaDon;
+import entity.SanPham;
+
+import until.InHoaDon;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,22 +16,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import connectDB.ConnectDB;
-import entity.ChiTietHoaDon;
-import entity.ChuongTrinhKhuyenMai;
-import entity.HoaDon;
-import entity.SanPham;
-import until.InHoaDon;
-
 public class ChiTietHoaDon_DAO {
 
-	public List<ChiTietHoaDon> getTheoHoaDon(String ma) throws SQLException {
+    public List<ChiTietHoaDon> getTheoHoaDon(String ma) throws SQLException {
         Connection con = ConnectDB.getConnection();
         return getTheoHoaDon(con, ma);
     }
 
     public List<ChiTietHoaDon> getTheoHoaDon(Connection con, String ma) throws SQLException {
         List<ChiTietHoaDon> ds = new ArrayList<>();
+        HoaDon hoaDon = HoaDon_DAO.tim(con, ma, false);
+        if (hoaDon == null) return ds;
         String sql =
                 "SELECT d.*,s.*,km.TenChuongTrinh AS TenKhuyenMai,km.GiaTriGiam,"
                         + " km.NgayBatDau AS KMBatDau,km.NgayKetThuc AS KMKetThuc,"
@@ -35,7 +39,7 @@ public class ChiTietHoaDon_DAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     ChiTietHoaDon d = new ChiTietHoaDon();
-                    d.setHoaDon(new HoaDon(ma));
+                    d.setHoaDon(hoaDon);
                     SanPham sanPham = new SanPham();
                     sanPham.setMaSanPham(rs.getString("MaSanPham"));
                     sanPham.setTenSanPham(rs.getString("TenSanPham"));
@@ -61,15 +65,31 @@ public class ChiTietHoaDon_DAO {
                         d.setChuongTrinhKhuyenMai(khuyenMai);
                     }
                     d.setDonGia(rs.getDouble("DonGia"));
-                   /* if (InHoaDon.soSanhTien(d.getGiamGia(), rs.getDouble("GiamGia")) != 0) {
-                        throw new SQLException("Mức giảm của hóa đơn " + ma
-                                + " không khớp khuyến mãi gốc. Kiểm tra dữ liệu lịch sử trước khi xử lý.");
-                    }*/
                     ds.add(d);
                 }
             }
         }
         return ds;
     }
-    
+
+    public void ghi(Connection con, HoaDon hd, List<ChiTietHoaDon> ds) throws SQLException {
+        for (ChiTietHoaDon d : ds) {
+            String sql =
+                    "INSERT INTO"
+                        + " dbo.ChiTietHoaDon(MaHoaDon,MaSanPham,SoLuong,MaKhuyenMai,DonGia)"
+                        + " VALUES(?,?,?,?,?)";
+            try (PreparedStatement stmt = con.prepareStatement(sql)) {
+                stmt.setString(1, hd.getMaHoaDon());
+                stmt.setString(2, d.getSanPham().getMaSanPham());
+                stmt.setInt(3, d.getSoLuong());
+                stmt.setString(
+                        4,
+                        d.getChuongTrinhKhuyenMai() == null
+                                ? null
+                                : d.getChuongTrinhKhuyenMai().getMaKhuyenMai());
+                stmt.setDouble(5, d.getDonGia());
+                stmt.executeUpdate();
+            }
+        }
+    }
 }
